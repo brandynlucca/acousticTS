@@ -1,6 +1,6 @@
 ################################################################################
 ################################################################################
-# INITIALIZATION AND MATERIAL-PROPERTY UTILITIES
+# INITIALIZATION AND MATERIAL-PROPERTY UTILITIES ===============================
 ################################################################################
 ################################################################################
 #' Derive density and sound speed contrasts from absolute properties
@@ -53,6 +53,30 @@
   )
 }
 
+#' Construct numerical model tables with ordinary data-frame fallback
+#' @param ... Named numerical columns with syntactically valid unique names.
+#' @return A data frame with the usual scalar recycling and row names.
+#' @keywords internal
+#' @noRd
+.model_data_frame <- function(...) {
+  columns <- list(...)
+  # Preserve data.frame handling of classes, names, and unusual column types ===
+  plain_numeric <- vapply(columns, function(column) {
+    is.null(attributes(column)) &&
+      typeof(column) %in% c("double", "integer", "complex", "logical")
+  }, logical(1))
+  sizes <- lengths(columns)
+  n_rows <- if (length(sizes)) max(sizes) else 0L
+  if (!all(plain_numeric) || any(sizes != n_rows & sizes != 1L)) {
+    return(do.call(data.frame, columns))
+  }
+  # Recycle scalar columns before assigning compact automatic row names ========
+  if (n_rows != 1L) {
+    for (i in which(sizes == 1L)) columns[[i]] <- rep(columns[[i]], n_rows)
+  }
+  structure(columns, class = "data.frame", row.names = .set_row_names(n_rows))
+}
+
 #' Build surrounding-medium parameter frame
 #' @param sound_speed_sw Surrounding-medium sound speed.
 #' @param density_sw Surrounding-medium density.
@@ -60,7 +84,7 @@
 #' @keywords internal
 #' @noRd
 .init_medium_params <- function(sound_speed_sw = 1500, density_sw = 1026) {
-  data.frame(
+  .model_data_frame(
     sound_speed = sound_speed_sw,
     density = density_sw
   )
@@ -76,7 +100,7 @@
 #' @noRd
 .init_acoustics_df <- function(frequency, ...) {
   sound_speeds <- list(...)
-  acoustics <- data.frame(frequency = frequency)
+  acoustics <- .model_data_frame(frequency = frequency)
 
   if (length(sound_speeds) == 0) {
     return(acoustics)
@@ -151,7 +175,7 @@
                               result_cols = c("sigma_bs")) {
   methods::slot(object, "model_parameters")[[model_name]] <- model_parameters
 
-  model_frame <- data.frame(frequency = frequency)
+  model_frame <- .model_data_frame(frequency = frequency)
   for (col in result_cols) {
     model_frame[[col]] <- rep(NA_real_, length(frequency))
   }

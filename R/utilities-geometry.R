@@ -1,6 +1,6 @@
 ################################################################################
 ################################################################################
-# GEOMETRY, PROFILE, AND RESAMPLING UTILITIES
+# GEOMETRY, PROFILE, AND RESAMPLING UTILITIES ==================================
 ################################################################################
 ################################################################################
 #' Extract x-axis values from a position matrix
@@ -82,6 +82,60 @@
   abs(diff(range(x_vals, na.rm = TRUE)))
 }
 
+#' Resolve exact semiaxes for the prolate modal-series backends
+#' @param shape_parameters Stored prolate shape metadata.
+#' @return Scalar semiaxes, spheroidal surface coordinate, and focal distance.
+#' @keywords internal
+#' @noRd
+.prolate_spheroidal_geometry <- function(shape_parameters) {
+  # Fall back to sampled geometry only when semiaxis metadata is absent ========
+  if ("semimajor_length" %in% names(shape_parameters)) {
+    semimajor_length <- shape_parameters$semimajor_length
+  } else {
+    semimajor_length <- shape_parameters$length
+    if (is.numeric(semimajor_length)) {
+      semimajor_length <- semimajor_length / 2
+    }
+  }
+  semiminor_length <- if ("semiminor_length" %in% names(shape_parameters)) {
+    shape_parameters$semiminor_length
+  } else {
+    shape_parameters$radius
+  }
+
+  # Reject invalid supplied semiaxes before considering spheroidal coordinates =
+  valid_axis <- function(value) {
+    is.numeric(value) && !is.complex(value) && length(value) == 1L &&
+      is.finite(value) && value > 0
+  }
+  if (!valid_axis(semimajor_length) || !valid_axis(semiminor_length) ||
+    semiminor_length >= semimajor_length) {
+    stop(
+      "Prolate spheroidal coordinates require finite scalar semiaxes with ",
+      "0 < b < a. Use a Sphere object for an exact sphere.",
+      call. = FALSE
+    )
+  }
+
+  # Preserve the existing arithmetic after resolving the exact semiaxes ========
+  xi <- 1 / sqrt(1 - (semiminor_length / semimajor_length)^2)
+  q <- semimajor_length / xi
+  if (!is.finite(xi) || xi <= 1 || !is.finite(q) || q <= 0) {
+    stop(
+      "Prolate geometry is not representable by finite spheroidal ",
+      "coordinates with xi > 1.",
+      call. = FALSE
+    )
+  }
+
+  list(
+    semimajor_length = semimajor_length,
+    semiminor_length = semiminor_length,
+    xi = xi,
+    q = q
+  )
+}
+
 #' Resolve centerline z coordinates from a position matrix or body list
 #' @param position_matrix Numeric position matrix.
 #' @param body Body list containing an \code{rpos} matrix.
@@ -97,10 +151,10 @@
     row_major <- TRUE
   }
 
-  # Resolve the node count used by the fallback centerline ====================
+  # Resolve the node count used by the fallback centerline =====================
   n_nodes <- if (row_major) ncol(position_matrix) else nrow(position_matrix)
 
-  # Return the stored centerline z axis when it exists ========================
+  # Return the stored centerline z axis when it exists =========================
   if (row_major && !is.null(rownames(position_matrix))) {
     z_idx <- match(
       c("z", "z_body", "z_bladder", "z_shell", "z_fluid", "z_backbone"),
@@ -115,7 +169,7 @@
     return(as.numeric(position_matrix[, 3]))
   }
 
-  # Fall back to the midpoint of the vertical envelopes when available ========
+  # Fall back to the midpoint of the vertical envelopes when available =========
   zU <- .geometry_axis_values(
     position_matrix,
     axis = "zU",
@@ -134,7 +188,7 @@
     return((zU + zL) / 2)
   }
 
-  # Fall back to a flat centerline when no vertical offset is stored ==========
+  # Fall back to a flat centerline when no vertical offset is stored ===========
   rep(0, n_nodes)
 }
 
@@ -153,11 +207,11 @@
     row_major <- TRUE
   }
 
-  # Resolve the centerline coordinates used by the path-length calculation ====
+  # Resolve the centerline coordinates used by the path-length calculation =====
   x_vals <- .shape_x(position_matrix, row_major = row_major)
   z_vals <- .shape_centerline_z(position_matrix, row_major = row_major)
 
-  # Return the accumulated centerline distance ================================
+  # Return the accumulated centerline distance =================================
   if (length(x_vals) < 2L) {
     return(0)
   }
@@ -583,7 +637,7 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   body <- acousticTS::extract(object, "body")
   body_curved <- brake_df(body, radius_curvature, mode)
   methods::slot(object, "body") <- body_curved
-  # Mirror the curvature metadata onto the stored shape parameters ============
+  # Mirror the curvature metadata onto the stored shape parameters =============
   if ("shape_parameters" %in% methods::slotNames(object)) {
     shape_parameters <- methods::slot(object, "shape_parameters")
     curved_length <- .shape_arc_length(body = body_curved)
@@ -959,11 +1013,12 @@ sdwba_resample <- function(object, n_segments) {
   }
 
   if (length(n_segments) != 1L || !is.finite(n_segments) ||
-      n_segments < 1 || n_segments != floor(n_segments)) {
+    n_segments < 1 || n_segments != floor(n_segments)) {
     stop("'n_segments' must be a positive integer")
   }
 
-  # Analytic shapes must not inherit breakpoints or radii from their input mesh
+  # Analytic shapes must not inherit breakpoints or radii from their input =====
+  # mesh =======================================================================
   object <- .as_dwba_profile(object, n_segments = n_segments)
 
   # Recover the original profile and build the new x grid ======================
@@ -976,11 +1031,11 @@ sdwba_resample <- function(object, n_segments) {
     return(object)
   }
   if (!all(is.finite(orig_x)) ||
-      !(all(diff(orig_x) > 0) || all(diff(orig_x) < 0))) {
+    !(all(diff(orig_x) > 0) || all(diff(orig_x) < 0))) {
     stop("SDWBA resampling requires strictly monotonic axial coordinates")
   }
 
-  # Apply the original descending-coordinate algorithm in either input order.
+  # Apply the original descending-coordinate algorithm in either input order. ==
   increasing <- orig_x[1] < orig_x[n_orig]
   if (increasing) {
     body$rpos <- body$rpos[, n_orig:1, drop = FALSE]
@@ -997,7 +1052,7 @@ sdwba_resample <- function(object, n_segments) {
   x_nearest <- vapply(orig_x, function(x) which.min(abs(x - x_new)), integer(1))
   if (n_orig > 2L) {
     interior <- 2:(n_orig - 1L)
-    # Interior breakpoints must not replace the target's endpoints.
+    # Interior breakpoints must not replace the target's endpoints. ============
     interior <- interior[x_nearest[interior] > 1L &
       x_nearest[interior] < length(x_new)]
     x_new[x_nearest[interior]] <- orig_x[interior]
@@ -1013,7 +1068,7 @@ sdwba_resample <- function(object, n_segments) {
     t(rpos_interp)
   )
 
-  # Retain the original descending stepwise radius assignment.
+  # Retain the original descending stepwise radius assignment. =================
   new_radius <- numeric(n_segments + 1L)
   for (i in seq_len(n_orig - 1L)) {
     indices <- which(x_new_seg <= orig_x[i]) + 1L

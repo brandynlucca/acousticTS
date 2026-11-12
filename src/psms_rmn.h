@@ -1,5 +1,141 @@
 #pragma once
 
+namespace psms_packed {
+template<typename T> struct Decimal {
+    T mantissa = 0;
+    long long exponent = 0;
+};
+
+struct ScalingDiagnostics {
+    size_t scaled_underflows = 0, incident_underflows = 0;
+    long long largest_column_exponent = 0;
+};
+
+template<typename T> T scale_decimal(T value, long long exponent) {
+    if (value == T(0) || !is_finite_real(value)) return value;
+    // Split decimal multipliers so representable subnormal results survive.
+    int step = std::numeric_limits<T>::max_exponent10 / 2;
+#if ACOUSTICTS_HAVE_QUADMATH
+    if constexpr (std::is_same_v<T, acousticts_quad_t>) step = FLT128_MAX_10_EXP / 2;
+#endif
+    if (step < 1) throw std::runtime_error("Native decimal exponent range is unavailable.");
+    while (exponent > step) {
+        value *= pow10_typed<T>(step);
+        exponent -= step;
+        if (!is_finite_real(value)) return value;
+    }
+    while (exponent < -step) {
+        value *= pow10_typed<T>(-step);
+        exponent += step;
+        if (value == T(0)) return value;
+    }
+    return value * pow10_typed<T>(static_cast<int>(exponent));
+}
+
+template<typename T> std::complex<T> scale_decimal(const std::complex<T>& value,
+        long long exponent) {
+    return {scale_decimal(value.real(), exponent), scale_decimal(value.imag(), exponent)};
+}
+
+template<typename T> Decimal<T> normalize(T mantissa, long long exponent = 0) {
+    if (!is_finite_real(mantissa)) throw std::runtime_error("Packed radial mantissa is nonfinite.");
+    if (mantissa == T(0)) return {T(0), 0};
+    int shift;
+#if ACOUSTICTS_HAVE_QUADMATH
+    if constexpr (std::is_same_v<T, acousticts_quad_t>) {
+        shift = static_cast<int>(floorq(log10q(precabs(mantissa))));
+    } else
+#endif
+    {
+        shift = static_cast<int>(std::floor(std::log10(precabs(mantissa))));
+    }
+    // Correct the selected decade by native comparisons at exact powers of ten.
+    mantissa = scale_decimal(mantissa, -static_cast<long long>(shift));
+    exponent += shift;
+    while (precabs(mantissa) >= T(10)) { mantissa /= T(10); ++exponent; }
+    while (precabs(mantissa) < T(1)) { mantissa *= T(10); --exponent; }
+    return {mantissa, exponent};
+}
+
+template<typename T> Decimal<T> component(const std::vector<T>& values,
+        const std::vector<int>& exponents, size_t index) {
+    if (index >= values.size() || index >= exponents.size() || is_na_int(exponents[index]))
+        throw std::runtime_error("Packed radial value or exponent is missing.");
+    return normalize(values[index], exponents[index]);
+}
+
+template<typename T> T shifted(const Decimal<T>& value, long long exponent,
+        ScalingDiagnostics& diagnostics) {
+    const T result = scale_decimal(value.mantissa, value.exponent - exponent);
+    if (value.mantissa != T(0) && result == T(0)) ++diagnostics.scaled_underflows;
+    return result;
+}
+
+template<typename T> bool below_radial_floor(const Decimal<T>& value) {
+    if (value.mantissa == T(0)) return true;
+    const auto floor = normalize(T(1e-300));
+    return value.exponent < floor.exponent || (value.exponent == floor.exponent &&
+        precabs(value.mantissa) < floor.mantissa);
+}
+
+template<typename T> struct ExteriorPair {
+    std::complex<T> value, derivative;
+    T incident_value = 0, incident_derivative = 0;
+    long long exponent = 0;
+};
+
+template<typename T> ExteriorPair<T> exterior_pair(const ProfcnBatchResult<T>& data,
+        int local, int degree, ScalingDiagnostics& diagnostics) {
+    const size_t index = degree + size_t(data.lnum) * local;
+    const auto first = component(data.r1c, data.ir1e, index);
+    const auto first_derivative = component(data.r1dc, data.ir1de, index);
+    const auto second = component(data.r2c, data.ir2e, index);
+    const auto second_derivative = component(data.r2dc, data.ir2de, index);
+    if (first.mantissa == T(0) && first_derivative.mantissa == T(0))
+        throw std::runtime_error("Packed first-kind radial value and derivative both vanished.");
+    // Preserve the existing second-kind tiny-pair guard before changing scales.
+    if (below_radial_floor(second) && below_radial_floor(second_derivative))
+        throw std::runtime_error("Packed second-kind radial pair failed the native radial guard.");
+    long long exponent = std::numeric_limits<long long>::lowest();
+    for (const auto& value : {first, first_derivative, second, second_derivative})
+        if (value.mantissa != T(0)) exponent = std::max(exponent, value.exponent);
+    ExteriorPair<T> result;
+    result.exponent = exponent;
+    result.value = {shifted(first, exponent, diagnostics), shifted(second, exponent, diagnostics)};
+    result.derivative = {shifted(first_derivative, exponent, diagnostics),
+        shifted(second_derivative, exponent, diagnostics)};
+    // Incident forcing retains its physical first-kind scale independently of R3.
+    result.incident_value = scale_decimal(first.mantissa, first.exponent);
+    result.incident_derivative = scale_decimal(first_derivative.mantissa, first_derivative.exponent);
+    if (!is_finite_real(result.incident_value) || !is_finite_real(result.incident_derivative))
+        throw std::runtime_error("Incident radial values exceed the requested native range.");
+    if ((first.mantissa != T(0) && result.incident_value == T(0)) ||
+            (first_derivative.mantissa != T(0) && result.incident_derivative == T(0)))
+        ++diagnostics.incident_underflows;
+    diagnostics.largest_column_exponent = std::max(diagnostics.largest_column_exponent, exponent);
+    return result;
+}
+
+template<typename T> std::pair<T, T> interior_pair(const ProfcnBatchResult<T>& data,
+        int local, int degree, const Decimal<T>& density, ScalingDiagnostics& diagnostics) {
+    const size_t index = degree + size_t(data.lnum) * local;
+    const auto value = component(data.r1c, data.ir1e, index);
+    const auto derivative = component(data.r1dc, data.ir1de, index);
+    // Include density before selecting the common interior boundary scale.
+    const auto pressure = normalize(value.mantissa * density.mantissa,
+        value.exponent + density.exponent);
+    if (pressure.mantissa == T(0) && derivative.mantissa == T(0))
+        throw std::runtime_error("Packed interior radial pair vanished.");
+    const long long exponent = pressure.mantissa == T(0) ? derivative.exponent :
+        derivative.mantissa == T(0) ? pressure.exponent : std::max(pressure.exponent, derivative.exponent);
+    const T scaled_value = shifted(pressure, exponent, diagnostics);
+    const T scaled_derivative = shifted(derivative, exponent, diagnostics);
+    const T scale = std::max(precabs(scaled_value), precabs(scaled_derivative));
+    if (!(scale > T(0))) throw std::runtime_error("Packed interior normalization vanished.");
+    return {scaled_value / scale, scaled_derivative / scale};
+}
+}
+
 // ============================================================================
 // PSMS SPHEROIDAL RADIAL HELPERS
 // ============================================================================
@@ -102,10 +238,29 @@ RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
 }
 
 template<typename T>
+std::pair<std::complex<T>, std::complex<T>> combine_higher_radial_kind(
+    const RmnResult<T>& result, int kind
+) {
+    T second = result.val2, second_derivative = result.der2;
+    const T tiny = T(1e-300);
+    // Apply the same second-kind pair guard used by vector and matrix extraction.
+    if (!is_finite_real(second) || !is_finite_real(second_derivative) ||
+            (precabs(second) < tiny && precabs(second_derivative) < tiny)) {
+        second = second_derivative = precnan<T>();
+    }
+    if (kind == 4) {
+        second = -second;
+        second_derivative = -second_derivative;
+    }
+    return {{result.val1, second}, {result.der1, second_derivative}};
+}
+
+template<typename T>
 std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
     int m, int n, T c, T x1, int kind = 1
 ) {
-    int lnum = n - m + 1;
+    int lnum = checked_profcn_integer(static_cast<long long>(n) - m + 1,
+        "inclusive radial degree count");
     int lnum_safe = std::max(lnum, 2);
     T x1_r = x1 - T(1);
     int idx = n - m;
@@ -155,8 +310,8 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
         // cases. Mark those as invalid instead of letting them propagate.
         if (kind == 2) {
             const T tiny = T(1e-300);
-            bool R_bad = !std::isfinite(static_cast<double>(R)) ||
-                        !std::isfinite(static_cast<double>(Rd)) ||
+            bool R_bad = !is_finite_real(R) ||
+                        !is_finite_real(Rd) ||
                         (precabs(R) < tiny && precabs(Rd) < tiny);
             if (R_bad) {
                 R = precnan<T>();
@@ -169,15 +324,7 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
     // Higher-order conventions use outgoing/incoming combinations built from
     // first- and second-kind radial functions.
     RmnResult<T> result = Rmn_higher_order<T>(m, n, lnum_safe, c, x1_r);
-    std::complex<T> val, der;
-    if (kind == 3) {
-        val = std::complex<T>(result.val1, result.val2);
-        der = std::complex<T>(result.der1, result.der2);
-    } else {
-        val = std::complex<T>(result.val1, -result.val2);
-        der = std::complex<T>(result.der1, -result.der2);
-    }
-    return {val, der};
+    return combine_higher_radial_kind(result, kind);
 }
 
 // ============================================================================
@@ -247,8 +394,8 @@ RadialValue<T> extract_radial_from_batch(
         out.der_imag = 0;
         if (kind == 2) {
             const T tiny = T(1e-300);
-            bool bad = !std::isfinite(static_cast<double>(out.val_real)) ||
-                    !std::isfinite(static_cast<double>(out.der_real)) ||
+            bool bad = !is_finite_real(out.val_real) ||
+                    !is_finite_real(out.der_real) ||
                     (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
                 out.val_real = precnan<T>();
@@ -303,8 +450,8 @@ RadialValue<T> extract_radial_from_batch(
     }
 
     const T tiny = T(1e-300);
-    bool bad = !std::isfinite(static_cast<double>(out.val_imag)) ||
-            !std::isfinite(static_cast<double>(out.der_imag)) ||
+    bool bad = !is_finite_real(out.val_imag) ||
+            !is_finite_real(out.der_imag) ||
             (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
         out.val_imag = precnan<T>();
@@ -340,8 +487,8 @@ RadialValue<T> extract_radial_from_mblock(
         out.der_imag = T(0);
         if (kind == 2) {
             const T tiny = T(1e-300);
-            bool bad = !std::isfinite(static_cast<double>(out.val_real)) ||
-                !std::isfinite(static_cast<double>(out.der_real)) ||
+            bool bad = !is_finite_real(out.val_real) ||
+                !is_finite_real(out.der_real) ||
                 (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
                 out.val_real = precnan<T>();
@@ -373,8 +520,8 @@ RadialValue<T> extract_radial_from_mblock(
         : precnan<T>();
 
     const T tiny = T(1e-300);
-    bool bad = !std::isfinite(static_cast<double>(out.val_imag)) ||
-        !std::isfinite(static_cast<double>(out.der_imag)) ||
+    bool bad = !is_finite_real(out.val_imag) ||
+        !is_finite_real(out.der_imag) ||
         (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
         out.val_imag = precnan<T>();
@@ -424,7 +571,8 @@ RmnMatrixResult<T> Rmn_matrix(
         int n_max = *std::max_element(n.begin(), n.end());
         if (n_min < m_val)
             throw std::invalid_argument("All 'n' values must be >= 'm'.");
-        int lnum = n_max - m_val + 1;
+        int lnum = checked_profcn_integer(static_cast<long long>(n_max) - m_val + 1,
+            "inclusive radial degree count");
         bool batch_complex = is_complex && x1_r > T(0);
         int radial_kind = batch_complex ? 2 : (is_complex ? 1 : kind);
         auto result1 = cprofcn<T>(c, m_val, lnum, {T(1)}, radial_kind, 0, 0, x1_r);
@@ -469,7 +617,8 @@ RmnMatrixResult<T> Rmn_matrix(
             int n_max_local = n[indices[0]];
             for (size_t idx_i = 0; idx_i < indices.size(); ++idx_i)
                 if (n[indices[idx_i]] > n_max_local) n_max_local = n[indices[idx_i]];
-            int lnum = n_max_local - m_val + 1;
+            int lnum = checked_profcn_integer(static_cast<long long>(n_max_local) - m_val + 1,
+                "inclusive radial degree count");
             bool batch_complex = is_complex && x1_r > T(0);
             int radial_kind = batch_complex ? 2 : (is_complex ? 1 : kind);
             auto result1 = cprofcn<T>(c, m_val, lnum, {T(1)}, radial_kind, 0, 0, x1_r);
@@ -499,7 +648,8 @@ RmnMatrixResult<T> Rmn_matrix(
     for (int i = 0; i < m_len; ++i) {
         int m_val = m[i];
         int n_max = *std::max_element(n.begin(), n.end());
-        int lnum = n_max - m_val + 1;
+        int lnum = checked_profcn_integer(static_cast<long long>(n_max) - m_val + 1,
+            "inclusive radial degree count");
         bool batch_complex = is_complex && x1_r > T(0);
         int radial_kind = batch_complex ? 2 : (is_complex ? 1 : kind);
         auto result1 = cprofcn<T>(c, m_val, lnum, {T(1)}, radial_kind, 0, 0, x1_r);

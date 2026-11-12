@@ -1,5 +1,5 @@
 ################################################################################
-# Sphere modal series solution
+# Sphere modal series solution =================================================
 ################################################################################
 #' Spherical modal series (SPHMS) solution
 #'
@@ -159,7 +159,7 @@ NULL
 #' Resolve the exterior shell/body layer used to define the SPHMS interfaces.
 #' @noRd
 .sphms_exterior_layer <- function(object) {
-  # ESS objects use the shell as the exterior interface; other classes use body
+  # Use the shell exterior for ESS objects and the body for other classes ======
   if ("shell" %in% methods::slotNames(object)) {
     return(acousticTS::extract(object, "shell"))
   }
@@ -265,7 +265,7 @@ NULL
     return(m_limit)
   }
 
-  # Otherwise use the relevant outer radius for the default truncation rule ===
+  # Otherwise use the relevant outer radius for the default truncation rule ====
   if (!is.na(body_params$radius_shell)) {
     return(round(acoustics$k_sw * body_params$radius_shell + 20))
   }
@@ -370,9 +370,9 @@ SPHMS <- function(object) {
   # Compute the linear scattering coefficient, f_bs ============================
   f_bs <- -1i / acoustics$k_sw * sph_bm
   # Calculate backscatter and return ===========================================
-  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Compute sigma_bs ===========================================================
   o_bs <- abs(f_bs)
-  methods::slot(object, "model")$SPHMS <- data.frame(
+  methods::slot(object, "model")$SPHMS <- .model_data_frame(
     frequency = acoustics$frequency,
     f_bs = f_bs,
     sigma_bs = o_bs,
@@ -464,28 +464,25 @@ SPHMS <- function(object) {
 #' Calculate fluid-filled SPHMS modal coefficients
 #' @noRd
 .sphms_am_fluid <- function(k1a, k3a, g31, h31, m_limit) {
-  # Get material properties product ===========================================
+  # Get material properties product ============================================
   gh <- g31 * h31
-  cm_num <- .modal_series_apply(
+  cm <- .modal_series_apply(
     m_limit = m_limit,
     FUN = function(k1a, k3a, ml) {
       m <- 0:ml
-      (jsd(m, k3a) * ys(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) -
-        (gh * ysd(m, k1a) / jsd(m, k1a))
+      # Reuse exterior derivatives and interior values in both ratios ==========
+      interior_j <- js(m, k3a)
+      interior_derivative <- jsd(m, k3a)
+      exterior_derivative <- jsd(m, k1a)
+      denominator <- interior_j * exterior_derivative
+      cm_num <- (interior_derivative * ys(m, k1a)) / denominator -
+        (gh * ysd(m, k1a) / exterior_derivative)
+      cm_denom <- (interior_derivative * js(m, k1a)) / denominator - gh
+      cm_num / cm_denom
     },
     k1a = k1a,
     k3a = k3a
   )
-  cm_denom <- .modal_series_apply(
-    m_limit = m_limit,
-    FUN = function(k1a, k3a, ml) {
-      m <- 0:ml
-      (jsd(m, k3a) * js(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) - gh
-    },
-    k1a = k1a,
-    k3a = k3a
-  )
-  cm <- cm_num / cm_denom
   -1 / (1 + 1i * cm)
 }
 

@@ -1,10 +1,11 @@
 ################################################################################
-# MODEL REGISTRY
+# MODEL REGISTRY ===============================================================
 ################################################################################
 
 .model_registry_state <- local({
   env <- new.env(parent = emptyenv())
   env$user <- list()
+  env$builtin <- NULL
   env$loaded <- FALSE
   env
 })
@@ -54,7 +55,8 @@
                                       source = c("builtin", "user"),
                                       persistent = FALSE,
                                       initialize_ref = NULL,
-                                      solver_ref = NULL) {
+                                      solver_ref = NULL,
+                                      simulation_batch = NULL) {
   source <- match.arg(source)
   canonical <- .normalize_model_identifier(name, "name")[[1]]
 
@@ -77,7 +79,8 @@
     source = source,
     persistent = isTRUE(persistent),
     initialize_ref = initialize_ref,
-    solver_ref = solver_ref
+    solver_ref = solver_ref,
+    simulation_batch = simulation_batch
   )
 }
 
@@ -85,7 +88,11 @@
 #' @keywords internal
 #' @noRd
 .builtin_model_registry <- function() {
-  list(
+  # Cache immutable metadata while retaining names for live function lookup. ===
+  if (!is.null(.model_registry_state$builtin)) {
+    return(.model_registry_state$builtin)
+  }
+  entries <- list(
     dwba = .new_model_registry_entry(
       name = "dwba",
       initialize = "dwba_initialize",
@@ -170,7 +177,11 @@
       name = "psms",
       initialize = "psms_initialize",
       solver = "PSMS",
-      slot = "PSMS"
+      slot = "PSMS",
+      simulation_batch = list(
+        plan = ".psms_simulation_batch_plan",
+        run = ".psms_simulation_batch_run"
+      )
     ),
     fcms = .new_model_registry_entry(
       name = "fcms",
@@ -197,6 +208,8 @@
       slot = "TRCM"
     )
   )
+  .model_registry_state$builtin <- entries
+  entries
 }
 
 #' User-level registry path for persisted model registrations

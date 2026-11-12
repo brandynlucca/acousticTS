@@ -9,6 +9,10 @@ module prolate_swf_quad
 module prolate_swf
  use param
 #endif
+ use iso_c_binding, only: c_int
+ use iso_fortran_env, only: int64
+ use, intrinsic :: ieee_arithmetic, only: ieee_round_type, ieee_nearest, &
+     ieee_get_rounding_mode, operator(==), operator(/=)
 
  ! ---------------------------------------------------------------------------
  ! Lightweight caches for repeated Legendre- and quadrature-related work.
@@ -19,9 +23,14 @@ module prolate_swf
  ! ---------------------------------------------------------------------------
  integer, parameter :: pleg_cache_slots = 48
  integer, parameter :: qleg_cache_slots = 48
+ ! Auxiliary entries share a 64 MiB retained-storage budget in each precision.
+ integer(int64), parameter :: auxiliary_cache_bytes = 64_int64 * 1024 * 1024
+ integer(int64), save :: auxiliary_cache_budget = auxiliary_cache_bytes
+ integer, save :: auxiliary_cache_next = 1
 
  type :: pleg_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: m = -1
    integer :: iopd = -1
    integer :: narg = 0
@@ -40,6 +49,7 @@ module prolate_swf
 
  type :: qleg_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: m = -1
    integer :: lnum = 0
    integer :: limq = 0
@@ -58,28 +68,1413 @@ module prolate_swf
 
  type :: gauss_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: ndec = 0
    integer :: n = 0
    real(knd), allocatable :: x(:), w(:)
  end type
 
+ type :: pint_cache_entry
+   logical :: valid = .false.
+#ifdef USE_QUAD
+   logical :: parity_integrals = .false., moment_errors_valid = .false.
+   integer :: quadrature_rule = 0
+   integer :: moment_error_highest(2) = 0
+   real(knd), allocatable :: moment_errors(:,:)
+#endif
+   integer(int64) :: bytes = 0
+   integer :: m = -1, lnum = 0, limint = 0, ndec = 0, ngau = 0, ngqs = 0
+   real(knd) :: c = 0.0_knd, x1 = 0.0_knd, coefme = 0.0_knd, coefmo = 0.0_knd
+   real(knd), allocatable :: wg(:), xg(:), rpint1(:), rpint2(:)
+   real(knd), allocatable :: pint1(:), pint2(:), pint3(:), pint4(:), pnorm(:)
+   integer, allocatable :: norme(:), ipnorm(:)
+ end type
+
+ ! Share a bounded geometry budget without limiting computed support.
+#ifndef ACOUSTICTS_PINT_CACHE_BYTES
+ integer, parameter :: pint_geometry_cache_bytes = 384 * 1024 * 1024
+#else
+ integer, parameter :: pint_geometry_cache_bytes = ACOUSTICTS_PINT_CACHE_BYTES
+#endif
+ type :: pint_geometry_entry
+#ifdef USE_QUAD
+   integer :: quadrature_rule = 0
+#endif
+   logical :: valid = .false., kernels_valid = .false.
+   integer :: m = -1, ndec = 0, ngau = 0, ngqs = 0, nodes = 0, degrees = 0
+   real(knd) :: x1 = 0.0_knd, kernel_c = 0.0_knd
+   real(knd), allocatable :: wg(:), xg(:), geometry(:,:), basis(:,:)
+   real(knd), allocatable :: kernels(:,:)
+ end type
+
+ ! Retain exact Legendre norm factors without limiting coefficient support.
+ integer, parameter :: legendre_normalization_slot_bytes = 64 * 1024
+ type :: legendre_normalization_entry
+   integer :: m = -1
+   real(knd), allocatable :: steps(:)
+ end type
+
+ ! Bound storage for frequency-independent angular normalization by exact mode.
+ type :: angular_normalization_entry
+   integer :: m = -1, l = -1, exponent = 0
+   real(knd) :: factor = 0.0_knd
+ end type
+
  type(pleg_cache_entry), save :: pleg_cache(pleg_cache_slots)
  type(qleg_cache_entry), save :: qleg_cache(qleg_cache_slots)
  type(gauss_cache_entry), save :: gauss_cache
+ type(pint_cache_entry), save :: pint_cache(48)
+ type(pint_geometry_entry), target, save :: pint_geometry_cache(48)
+ type(legendre_normalization_entry), save :: legendre_normalization_cache(48)
+ type(angular_normalization_entry), save :: angular_normalization_cache(16384)
+ integer, save :: legendre_normalization_next = 1
+ integer, save :: pint_geometry_next = 1
+ integer, save :: pint_cache_next = 1
  integer, save :: pleg_cache_next = 1
  integer, save :: qleg_cache_next = 1
 
+ ! Retain one bounded Bouwkamp table without limiting the requested support.
+ integer, parameter :: bouwkamp_cache_bytes = 128 * 1024
+ integer, parameter :: bouwkamp_cache_entries = &
+     bouwkamp_cache_bytes / (4 * (storage_size(0.0_knd) / 8))
+ real(knd), save :: bouwkamp_tables(bouwkamp_cache_entries, 4)
+ real(knd), save :: bouwkamp_parameter = -1.0_knd
+ integer, save :: bouwkamp_order = -1, bouwkamp_counts(4) = 0
+ type(ieee_round_type), save :: bouwkamp_rounding = ieee_nearest
+
+#ifdef USE_QUAD
+ abstract interface
+   function pint_exact_available_callback() bind(C) result(available)
+     use iso_c_binding, only: c_int
+     implicit none
+     integer(c_int) :: available
+   end function
+   subroutine pint_exact_sum_callback(basis, kernels, degree_capacity, nodes, &
+       first, last, extra, pint1, pint2, pint4) bind(C)
+     use iso_c_binding, only: c_int
+     import knd
+     implicit none
+     integer(c_int), value :: degree_capacity, nodes, first, last, extra
+     real(knd), intent(in) :: basis(*), kernels(*)
+     real(knd), intent(inout) :: pint1(*), pint2(*), pint4(*)
+   end subroutine
+ end interface
+ procedure(pint_exact_available_callback), pointer, save :: pint_exact_available_proc => null()
+ procedure(pint_exact_sum_callback), pointer, save :: pint_exact_sum_proc => null()
+ interface
+   subroutine quad_sincos(argument, sine, cosine) bind(C, name="sincosq")
+     import knd
+     implicit none
+     real(knd), value :: argument
+     real(knd), intent(out) :: sine, cosine
+   end subroutine
+   function quad_fraction_exponent(argument, power) bind(C, name="frexpq") result(mantissa)
+     use iso_c_binding, only: c_int
+     import knd
+     implicit none
+     real(knd), value :: argument
+     integer(c_int), intent(out) :: power
+     real(knd) :: mantissa
+   end function
+ end interface
+#endif
+
+
+#ifdef USE_QUAD
+ integer, save :: radial_quadrature_mode = 0, radial_quadrature_cache_index = 0
+ integer, save :: radial_quadrature_count = 0
+ real(knd), allocatable, save :: radial_quadrature_errors(:,:)
+ integer, allocatable, save :: radial_quadrature_valid(:)
+ integer, save :: radial_quadrature_even_only=0
+ ! G32/K65 tables rounded once to binary128 after independent 256/512-bit construction.
+ ! Laurie (1997), Math. Comp. 66:1133-1145, doi:10.1090/S0025-5718-97-00861-2.
+ real(knd), parameter :: radial_kronrod_nodes(65) = [ &
+     -0.9995459021243644786356102801611156773503686_knd, &
+     -0.9972638618494815635449811286650407007025362_knd, &
+     -0.9926280352629719126857911564384674665955853_knd, &
+     -0.9856115115452683354001750446309020202789914_knd, &
+     -0.9763102836146638071976696431931250008536076_knd, &
+     -0.9647622555875064307738119281182749256381614_knd, &
+     -0.9509546848486611853898827506153308138838534_knd, &
+     -0.9349060759377396891709191348354093484659924_knd, &
+     -0.9166772666513643242753456588579187060499126_knd, &
+     -0.8963211557660521239653072437192122956357944_knd, &
+     -0.8738697689453106061296618026136287985488697_knd, &
+     -0.8493676137325699701336930049677425157861154_knd, &
+     -0.8228829501360513216482688494721261945318814_knd, &
+     -0.7944837959679424069630972989704289426673091_knd, &
+     -0.7642282519978037041506601268743724296595995_knd, &
+     -0.7321821187402896803874266650912671758177258_knd, &
+     -0.6984265577952104928847701424474830393966363_knd, &
+     -0.6630442669302152009751151686632383824009494_knd, &
+     -0.6261129377018239978202383797579510343888991_knd, &
+     -0.587715757240762329040745476401826832814152_knd, &
+     -0.5479463141991524786809395016097409353325334_knd, &
+     -0.5068999089322293900237474743778212210719605_knd, &
+     -0.4646693084819922177561782003797081319536022_knd, &
+     -0.4213512761306353453641194361724264880270147_knd, &
+     -0.3770494211541211054453354855498081152933683_knd, &
+     -0.3318686022821276497799168057301879773123819_knd, &
+     -0.2859124585894597594166071011903518559017199_knd, &
+     -0.2392873622521370745446032091655015218137725_knd, &
+     -0.1921036089831424972716415922525946227283582_knd, &
+     -0.144471961582796493485186373598810646713169_knd, &
+     -0.09650269687689436580083125301636477223757547_knd, &
+     -0.0483076656877383162348125704405021659326524_knd, &
+     0.0_knd, &
+     0.0483076656877383162348125704405021659326524_knd, &
+     0.09650269687689436580083125301636477223757547_knd, &
+     0.144471961582796493485186373598810646713169_knd, &
+     0.1921036089831424972716415922525946227283582_knd, &
+     0.2392873622521370745446032091655015218137725_knd, &
+     0.2859124585894597594166071011903518559017199_knd, &
+     0.3318686022821276497799168057301879773123819_knd, &
+     0.3770494211541211054453354855498081152933683_knd, &
+     0.4213512761306353453641194361724264880270147_knd, &
+     0.4646693084819922177561782003797081319536022_knd, &
+     0.5068999089322293900237474743778212210719605_knd, &
+     0.5479463141991524786809395016097409353325334_knd, &
+     0.587715757240762329040745476401826832814152_knd, &
+     0.6261129377018239978202383797579510343888991_knd, &
+     0.6630442669302152009751151686632383824009494_knd, &
+     0.6984265577952104928847701424474830393966363_knd, &
+     0.7321821187402896803874266650912671758177258_knd, &
+     0.7642282519978037041506601268743724296595995_knd, &
+     0.7944837959679424069630972989704289426673091_knd, &
+     0.8228829501360513216482688494721261945318814_knd, &
+     0.8493676137325699701336930049677425157861154_knd, &
+     0.8738697689453106061296618026136287985488697_knd, &
+     0.8963211557660521239653072437192122956357944_knd, &
+     0.9166772666513643242753456588579187060499126_knd, &
+     0.9349060759377396891709191348354093484659924_knd, &
+     0.9509546848486611853898827506153308138838534_knd, &
+     0.9647622555875064307738119281182749256381614_knd, &
+     0.9763102836146638071976696431931250008536076_knd, &
+     0.9856115115452683354001750446309020202789914_knd, &
+     0.9926280352629719126857911564384674665955853_knd, &
+     0.9972638618494815635449811286650407007025362_knd, &
+     0.9995459021243644786356102801611156773503686_knd ]
+ real(knd), parameter :: radial_kronrod_weights(65) = [ &
+     0.001223360817951471800293037150648862627265593_knd, &
+     0.003426818775772370935574575578524918012668217_knd, &
+     0.005841737079166693303947976639999538411357158_knd, &
+     0.00817250403853166841434380511928449699180114_knd, &
+     0.01042398739880681882803425076201579041885857_knd, &
+     0.01267605480665440285936888339950223514688111_knd, &
+     0.0149361036060860273850967513325093980381689_knd, &
+     0.01714980520978425325608582622023252404175238_knd, &
+     0.01929877143032681129440373976352388503097007_knd, &
+     0.02140891318482191595577751802023112132255121_knd, &
+     0.02348665967216332459208791286477200902335634_knd, &
+     0.0255056954808946528145288998993078328531122_knd, &
+     0.02745209842221040378314770679595457074187528_knd, &
+     0.02933695668962066136861561458558389021413469_knd, &
+     0.03116332556197373717115584868496635394761078_knd, &
+     0.03291507764390360026329647678555552914446816_knd, &
+     0.03458212274473303413072638341688458206622867_knd, &
+     0.0361697694756422998609583913032902788041436_knd, &
+     0.0376791306456133985148959737488490213918369_knd, &
+     0.03909942013330661120748212704423617154824023_knd, &
+     0.04042349237037309667234926942157626500174432_knd, &
+     0.04165401998564305139829641329777878502822819_knd, &
+     0.04279111559644674693365492544373854847761422_knd, &
+     0.04382754403013974904681615267379811578296547_knd, &
+     0.04475863874976693729519919207537853267515619_knd, &
+     0.04558582656454707028057546196326516247466871_knd, &
+     0.04630875673802571324038129847244323547068304_knd, &
+     0.04692296828170361110348071335251484336463502_knd, &
+     0.0474260618738823823628799498539220833462199_knd, &
+     0.04781890873698847221226358465730239704751049_knd, &
+     0.0481009691854577469278465438391580807352269_knd, &
+     0.04827019307577738559871207883299113908757599_knd, &
+     0.04832638398656775837544543400051961361725191_knd, &
+     0.04827019307577738559871207883299113908757599_knd, &
+     0.0481009691854577469278465438391580807352269_knd, &
+     0.04781890873698847221226358465730239704751049_knd, &
+     0.0474260618738823823628799498539220833462199_knd, &
+     0.04692296828170361110348071335251484336463502_knd, &
+     0.04630875673802571324038129847244323547068304_knd, &
+     0.04558582656454707028057546196326516247466871_knd, &
+     0.04475863874976693729519919207537853267515619_knd, &
+     0.04382754403013974904681615267379811578296547_knd, &
+     0.04279111559644674693365492544373854847761422_knd, &
+     0.04165401998564305139829641329777878502822819_knd, &
+     0.04042349237037309667234926942157626500174432_knd, &
+     0.03909942013330661120748212704423617154824023_knd, &
+     0.0376791306456133985148959737488490213918369_knd, &
+     0.0361697694756422998609583913032902788041436_knd, &
+     0.03458212274473303413072638341688458206622867_knd, &
+     0.03291507764390360026329647678555552914446816_knd, &
+     0.03116332556197373717115584868496635394761078_knd, &
+     0.02933695668962066136861561458558389021413469_knd, &
+     0.02745209842221040378314770679595457074187528_knd, &
+     0.0255056954808946528145288998993078328531122_knd, &
+     0.02348665967216332459208791286477200902335634_knd, &
+     0.02140891318482191595577751802023112132255121_knd, &
+     0.01929877143032681129440373976352388503097007_knd, &
+     0.01714980520978425325608582622023252404175238_knd, &
+     0.0149361036060860273850967513325093980381689_knd, &
+     0.01267605480665440285936888339950223514688111_knd, &
+     0.01042398739880681882803425076201579041885857_knd, &
+     0.00817250403853166841434380511928449699180114_knd, &
+     0.005841737079166693303947976639999538411357158_knd, &
+     0.003426818775772370935574575578524918012668217_knd, &
+     0.001223360817951471800293037150648862627265593_knd ]
+ real(knd), parameter :: radial_gauss_weights(65) = [ &
+     0.0_knd, &
+     0.007018610009470096600407063738853182667819391_knd, &
+     0.0_knd, &
+     0.01627439473090567060517056220638661833146524_knd, &
+     0.0_knd, &
+     0.02539206530926205945575258978922403004323919_knd, &
+     0.0_knd, &
+     0.03427386291302143310268773225237270477414701_knd, &
+     0.0_knd, &
+     0.04283589802222668065687864660612553058235913_knd, &
+     0.0_knd, &
+     0.05099805926237617619616324468952169640208691_knd, &
+     0.0_knd, &
+     0.05868409347853554714528363730017088442840841_knd, &
+     0.0_knd, &
+     0.06582222277636184683765006370693877267645803_knd, &
+     0.0_knd, &
+     0.07234579410884850622539935647848778582913504_knd, &
+     0.0_knd, &
+     0.07819389578707030647174091882830667516452729_knd, &
+     0.0_knd, &
+     0.08331192422694675522219907460434860756319818_knd, &
+     0.0_knd, &
+     0.08765209300440381114277146275180229285411485_knd, &
+     0.0_knd, &
+     0.0911738786957638847128685771116370669828272_knd, &
+     0.0_knd, &
+     0.093844399080804565639180237668117257198119_knd, &
+     0.0_knd, &
+     0.0956387200792748594190820022041311029919722_knd, &
+     0.0_knd, &
+     0.09654008851472780056676483006357579677633761_knd, &
+     0.0_knd, &
+     0.09654008851472780056676483006357579677633761_knd, &
+     0.0_knd, &
+     0.0956387200792748594190820022041311029919722_knd, &
+     0.0_knd, &
+     0.093844399080804565639180237668117257198119_knd, &
+     0.0_knd, &
+     0.0911738786957638847128685771116370669828272_knd, &
+     0.0_knd, &
+     0.08765209300440381114277146275180229285411485_knd, &
+     0.0_knd, &
+     0.08331192422694675522219907460434860756319818_knd, &
+     0.0_knd, &
+     0.07819389578707030647174091882830667516452729_knd, &
+     0.0_knd, &
+     0.07234579410884850622539935647848778582913504_knd, &
+     0.0_knd, &
+     0.06582222277636184683765006370693877267645803_knd, &
+     0.0_knd, &
+     0.05868409347853554714528363730017088442840841_knd, &
+     0.0_knd, &
+     0.05099805926237617619616324468952169640208691_knd, &
+     0.0_knd, &
+     0.04283589802222668065687864660612553058235913_knd, &
+     0.0_knd, &
+     0.03427386291302143310268773225237270477414701_knd, &
+     0.0_knd, &
+     0.02539206530926205945575258978922403004323919_knd, &
+     0.0_knd, &
+     0.01627439473090567060517056220638661833146524_knd, &
+     0.0_knd, &
+     0.007018610009470096600407063738853182667819391_knd, &
+     0.0_knd ]
+#endif
+
+
+#ifdef USE_QUAD
+ abstract interface
+   function radial_quadrature_stream_callback(m,parity,seed,lim,maxint,enr,p1,p2,p3,p4, &
+       errors,dcon,outputs,jint) bind(C) result(status)
+     use iso_c_binding,only:c_int
+     import knd
+     implicit none
+     integer(c_int),value::m,parity,seed,lim,maxint
+     real(knd),intent(in)::enr(*),p1(*),p2(*),p3(*),p4(*),errors(*)
+     real(knd),value::dcon
+     real(knd),intent(out)::outputs(8)
+     integer(c_int),intent(out)::jint
+     integer(c_int)::status
+   end function
+ end interface
+ procedure(radial_quadrature_stream_callback),pointer,save::radial_quadrature_stream_proc=>null()
+#endif
+
+#ifdef USE_QUAD
+ abstract interface
+   function radial_quadrature_panel_callback(basis,kernels,coarse_kernels,capacity,nodes, &
+       panel_nodes,first,last,extra,error1,error2,error4) bind(C) result(status)
+     use iso_c_binding,only:c_int
+     import knd
+     implicit none
+     real(knd),intent(in)::basis(*),kernels(*),coarse_kernels(*)
+     integer(c_int),value::capacity,nodes,panel_nodes,first,last,extra
+     real(knd),intent(inout)::error1(*),error2(*),error4(*)
+     integer(c_int)::status
+   end function
+ end interface
+ procedure(radial_quadrature_panel_callback),pointer,save::radial_quadrature_panel_proc=>null()
+#endif
+#ifdef USE_QUAD
+ logical, save :: checked_moments_rejected=.false.
+ integer, save :: checked_moments_key_m=-1,checked_moments_key_mode=-1
+ real(knd), save :: checked_moments_key_c=-1.0_knd,checked_moments_key_x=-1.0_knd
+ abstract interface
+   integer(c_int) function checked_available_callback() bind(C)
+     import c_int
+     implicit none
+   end function
+   integer(c_int) function checked_moments_callback(m,c,q,s,capacity,required,first, &
+       p1,p2,p4,errors) bind(C)
+     import c_int,knd
+     implicit none
+     integer(c_int),value::m,capacity,required,first
+     real(knd),intent(in)::c,q,s
+     real(knd),intent(inout)::p1(*),p2(*),p4(*),errors(*)
+   end function
+   integer(c_int) function checked_parity_callback(alpha,beta,minus,plus,eminus,eplus, &
+       returned,error) bind(C)
+     import c_int,knd
+     implicit none
+     real(knd),intent(in)::alpha,beta,minus,plus,eminus,eplus,returned
+     real(knd),intent(out)::error
+   end function
+   integer(c_int) function checked_radial_callback(f,d,c,s1,s2,u1,u2,v,v1,v2,vd, &
+       error,error_d) bind(C)
+     import c_int,knd
+     implicit none
+     real(knd),intent(in)::f,d,c,s1,s2,u1,u2,v,v1,v2,vd
+     real(knd),intent(out)::error,error_d
+   end function
+   integer(c_int) function checked_pack_callback(value,uncertainty,shift,packed,error) bind(C)
+     import c_int,knd
+     implicit none
+     real(knd),intent(in)::value,uncertainty,packed
+     integer(c_int),value::shift
+     real(knd),intent(out)::error
+   end function
+ end interface
+ type :: radial_retry_workspace
+   logical :: prepared=.false.
+   real(knd), allocatable :: nf(:),ndf(:),nv(:),ndr(:),prat(:)
+   real(knd), allocatable :: ratios(:),beta(:),gamma(:)
+   integer, allocatable :: ne(:)
+   real(knd) :: factor=0
+   integer :: exponent=0,ratio_count=0
+ end type
+ logical, save :: checked_radial_enabled=.false.
+ logical, save :: radial_retry_tracking=.false.,radial_retry_converged=.false.
+ integer, save :: radial_retry_m=-1,radial_retry_count=0,radial_retry_captured=0, &
+     radial_retry_dimensions(6)=0
+ integer(int64), save :: radial_retry_generation=0_int64
+ real(knd), save :: radial_retry_c=-1.0_knd,radial_retry_x1=-1.0_knd
+ real(knd), allocatable, save :: radial_retry_values(:,:)
+ integer, allocatable, save :: radial_retry_metadata(:,:),radial_retry_done(:)
+ type(radial_retry_workspace), save :: radial_retry_work
+
+ procedure(checked_available_callback),pointer,save :: checked_available_proc=>null()
+
+ procedure(checked_moments_callback),pointer,save :: checked_moments_proc=>null()
+
+ procedure(checked_parity_callback),pointer,save :: checked_parity_proc=>null()
+
+ procedure(checked_radial_callback),pointer,save :: checked_radial_proc=>null()
+
+ procedure(checked_pack_callback),pointer,save :: checked_pack_proc=>null()
+
+#endif
+
+#ifdef USE_QUAD
+ abstract interface
+  subroutine degree_replay_begin_callback(m,count,c,x1) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::m,count
+   real(knd),intent(in)::c,x1
+  end subroutine
+  integer(c_int) function degree_replay_probe_callback(m,count,l,terms,limr,limn,nb,nv,nn,np, &
+       state,scalars,enr,bf,bdf,bn,bdr,be,nf,ndf,nnorm,ndr,ne,prat,capacity,coefficients, &
+       length,outputs,integers) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::m,count,l,terms,limr,limn,nb,nv,nn,np,capacity
+   integer(c_int),intent(in)::state(*),be(*),ne(*)
+   real(knd),intent(in)::scalars(*),bf(*),bdf(*),bn(*),bdr(*),nf(*),ndf(*),nnorm(*),ndr(*),prat(*)
+   real(knd),intent(inout)::enr(*),coefficients(*)
+   real(knd),intent(out)::outputs(*)
+   integer(c_int),intent(out)::length,integers(*)
+  end function
+  subroutine degree_replay_finish_callback(l,eligible,jnorm,terms,enr,capacity,coefficients, &
+       length,status,outputs,integers) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::l,eligible,jnorm,terms,capacity,length,status
+   integer(c_int),intent(in)::integers(*)
+   real(knd),intent(in)::enr(*),coefficients(*),outputs(*)
+  end subroutine
+  integer(c_int) function degree_replay_available_callback() bind(C)
+   import c_int
+   implicit none
+  end function
+  subroutine degree_replay_clear_callback() bind(C)
+   implicit none
+  end subroutine
+ end interface
+ procedure(degree_replay_available_callback),pointer,save :: degree_replay_available_proc=>null()
+ procedure(degree_replay_begin_callback),pointer,save :: degree_replay_begin_proc=>null()
+ procedure(degree_replay_probe_callback),pointer,save :: degree_replay_probe_proc=>null()
+ procedure(degree_replay_finish_callback),pointer,save :: degree_replay_finish_proc=>null()
+ procedure(degree_replay_clear_callback),pointer,save :: degree_replay_clear_proc=>null()
+#endif
+
  contains
+
+#ifdef USE_QUAD
+ subroutine invalidate_degree_replay()
+   implicit none
+   if(associated(degree_replay_clear_proc)) call degree_replay_clear_proc()
+ end subroutine
+
+ logical function degree_replay_available() result(available)
+   implicit none
+   available=.false.
+#if defined(__FAST_MATH__) || defined(__ASSOCIATIVE_MATH__) || defined(__RECIPROCAL_MATH__) || \
+    (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ != 0)
+   call invalidate_degree_replay()
+   return
+#endif
+   if(.not.associated(degree_replay_available_proc).or. &
+       .not.associated(degree_replay_begin_proc).or. &
+       .not.associated(degree_replay_probe_proc).or..not.associated(degree_replay_finish_proc).or. &
+       .not.associated(degree_replay_clear_proc)) return
+   available=degree_replay_available_proc()==1_c_int
+ end function
+
+ subroutine profcn_set_degree_replay_callbacks_quad(available,begin,probe,finish,clear) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   implicit none
+   type(c_funptr),value::available,begin,probe,finish,clear
+   ! Registration changes retire both the previous callback state and the new context.
+   call invalidate_degree_replay()
+   nullify(degree_replay_available_proc,degree_replay_begin_proc,degree_replay_probe_proc, &
+       degree_replay_finish_proc,degree_replay_clear_proc)
+   if(c_associated(available)) call c_f_procpointer(available,degree_replay_available_proc)
+   if(c_associated(begin)) call c_f_procpointer(begin,degree_replay_begin_proc)
+   if(c_associated(probe)) call c_f_procpointer(probe,degree_replay_probe_proc)
+   if(c_associated(finish)) call c_f_procpointer(finish,degree_replay_finish_proc)
+   if(c_associated(clear)) call c_f_procpointer(clear,degree_replay_clear_proc)
+   call invalidate_degree_replay()
+ end subroutine
+#endif
+
+#ifdef USE_QUAD
+ subroutine clear_radial_retry_ledger()
+   implicit none
+   type(radial_retry_workspace) :: empty
+   radial_retry_m=-1
+   radial_retry_count=0
+   radial_retry_captured=0
+   if(allocated(radial_retry_values)) deallocate(radial_retry_values)
+   if(allocated(radial_retry_metadata)) deallocate(radial_retry_metadata)
+   if(allocated(radial_retry_done)) deallocate(radial_retry_done)
+   radial_retry_work=empty
+   if(radial_retry_generation==huge(radial_retry_generation)) then
+     radial_retry_generation=1
+   else
+     radial_retry_generation=radial_retry_generation+1
+   end if
+ end subroutine
+
+ subroutine begin_radial_retry_ledger(m,count,c,x1,ndec,nex,maxd,maxlp,maxn,maxp)
+   implicit none
+   integer, intent(in) :: m,count,ndec,nex,maxd,maxlp,maxn,maxp
+   real(knd), intent(in) :: c,x1
+   integer :: allocation_status
+   character(len=256) :: allocation_message
+   call clear_radial_retry_ledger()
+   if(.not.checked_radial_enabled) return
+   allocate(radial_retry_values(2,count),stat=allocation_status,errmsg=allocation_message)
+   if(allocation_status==0) then
+     allocate(radial_retry_metadata(6,count),stat=allocation_status,errmsg=allocation_message)
+   end if
+   if(allocation_status==0) then
+     allocate(radial_retry_done(count),stat=allocation_status,errmsg=allocation_message)
+   end if
+   if(allocation_status/=0) then
+     call clear_radial_retry_ledger()
+     return
+   end if
+   radial_retry_values=0
+   radial_retry_metadata=0
+   radial_retry_done=0
+   radial_retry_m=m
+   radial_retry_count=count
+   radial_retry_c=c
+   radial_retry_x1=x1
+   radial_retry_dimensions=[ndec,nex,maxd,maxlp,maxn,maxp]
+ end subroutine
+
+ function profcn_retry_current_radials_quad(c,x1,m,count,token,requests,r1,r1e,r1d, &
+     r1de,r2,r2e,r2d,r2de,accuracy) bind(C) result(status)
+   use iso_c_binding, only: c_int,c_int64_t
+   implicit none
+   integer(c_int), value :: m,count
+   real(knd), intent(in) :: c,x1,r1(count),r1d(count)
+   integer(c_int64_t), value :: token
+   integer(c_int), intent(in) :: requests(count),r1e(count),r1de(count)
+   real(knd), intent(inout) :: r2(count),r2d(count)
+   integer(c_int), intent(inout) :: r2e(count),r2de(count),accuracy(count)
+   integer(c_int) :: status
+   integer :: i,l,ndec,nex,maxd,maxlp,maxn,maxp,limd,planned,idmf,current,jsub,terms, &
+       support,reason,a,ie,ide,allocation_status
+   real(knd) :: eigval,dmf,value,derivative
+   real(knd), allocatable :: original_ratios(:)
+   logical :: reconstructed
+   character(len=256) :: allocation_message
+   status=0
+   if(.not.checked_radial_enabled.or.token/=radial_retry_generation.or.radial_retry_m/=m.or. &
+      radial_retry_count/=count.or.radial_retry_captured/=count.or. &
+      radial_retry_c/=c.or.radial_retry_x1/=x1) return
+   if(radial_quadrature_count/=count) return
+   if(checked_moment_callbacks_available()/=1) return
+   if(.not.allocated(radial_quadrature_errors).or..not.allocated(radial_quadrature_valid)) return
+   ndec=radial_retry_dimensions(1)
+   nex=radial_retry_dimensions(2)
+   maxd=radial_retry_dimensions(3)
+   maxlp=radial_retry_dimensions(4)
+   maxn=radial_retry_dimensions(5)
+   maxp=radial_retry_dimensions(6)
+   allocate(original_ratios(maxd),stat=allocation_status,errmsg=allocation_message)
+   if(allocation_status/=0) return
+   do i=1,count
+     if(requests(i)==0.or.radial_retry_done(i)/=0) cycle
+     radial_retry_done(i)=1
+     if(radial_retry_metadata(6,i)==0) cycle
+     l=m+i-1
+     eigval=radial_retry_values(1,i)
+     dmf=radial_retry_values(2,i)
+     limd=radial_retry_metadata(1,i)
+     planned=radial_retry_metadata(2,i)
+     idmf=radial_retry_metadata(3,i)
+     current=radial_retry_metadata(4,i)
+     jsub=radial_retry_metadata(5,i)
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd, &
+         radial_retry_work,dmf,idmf,reconstructed)
+     if(.not.reconstructed) cycle
+     original_ratios=radial_retry_work%ratios
+     call retry_radial_neumann(l,m,c,x1,eigval,limd,planned,ndec,nex,maxd,maxlp,maxn,maxp, &
+       original_ratios,dmf,idmf,r1(i),r1e(i),r1d(i),r1de(i),current,jsub,radial_retry_work, &
+       value,ie,derivative,ide,a,terms,support,reason)
+     if(reason/=0) cycle
+     r2(i)=value
+     r2e(i)=ie
+     r2d(i)=derivative
+     r2de(i)=ide
+     accuracy(i)=a
+     ! This alternative adds no integration uncertainty. Native accuracy and support checks remain.
+     radial_quadrature_errors(i,:)=0
+     radial_quadrature_valid(i)=1
+   end do
+   status=1
+ end function
+
+ subroutine reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd, &
+     workspace,dmfnorm,idmfe,valid)
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+   implicit none
+   integer, intent(in) :: l,m,limd,ndec,nex,maxd,idmfe
+   real(knd), intent(in) :: c,eigval,dmfnorm
+   type(radial_retry_workspace), intent(inout) :: workspace
+   logical, intent(out) :: valid
+   integer :: ix,lm2,lim2,i,i2,j,m2,allocation_status,id01,idmf,idmlmf,idms,idmlms,jnorm,jsub
+   real(knd) :: c2,c4,sgn,d01,dmf,dmlmf,dms,dmlms
+   character(len=256) :: allocation_message
+   valid=.false.
+   if(.not.allocated(workspace%ratios).or..not.allocated(workspace%beta).or. &
+       .not.allocated(workspace%gamma)) then
+     if(allocated(workspace%ratios)) deallocate(workspace%ratios)
+     if(allocated(workspace%beta)) deallocate(workspace%beta)
+     if(allocated(workspace%gamma)) deallocate(workspace%gamma)
+     allocate(workspace%ratios(maxd),stat=allocation_status,errmsg=allocation_message)
+     if(allocation_status==0) then
+       allocate(workspace%beta(maxd),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%gamma(maxd),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status/=0) then
+       if(allocated(workspace%ratios)) deallocate(workspace%ratios)
+       if(allocated(workspace%beta)) deallocate(workspace%beta)
+       if(allocated(workspace%gamma)) deallocate(workspace%gamma)
+       return
+     end if
+   end if
+   lm2=(l-m)/2
+   ix=mod(l-m,2)
+   lim2=limd/2-ix
+   if(lim2<=lm2.or.lim2+1>maxd) return
+   c2=c*c
+   c4=c2*c2
+   m2=m+m
+   workspace%ratios=0
+   ! Recreate the native Bouwkamp factors without modifying its history or caches.
+   j=1
+   do i=2+ix,limd,2
+     i2=i+i
+     workspace%beta(j)=c4*real(i,knd)*real(i-1,knd)*real(m2+i,knd)*real(m2+i-1,knd)/ &
+       (real(m2+i2-1,knd)*real(m2+i2-1,knd)*real(m2+i2-3,knd)*real(m2+i2+1,knd))
+     j=j+1
+   end do
+   j=1
+   do i=1+ix,limd+1,2
+     i2=i+i
+     workspace%gamma(j)=real(m+i-1,knd)*real(m+i,knd)+0.5_knd*c2* &
+       (1.0_knd-real(m2*m2-1,knd)/(real(m2+i2-3,knd)*real(m2+i2+1,knd)))
+     j=j+1
+   end do
+   ! Match the native forward/backward ratio reconstruction at the stored eigenvalue.
+   workspace%ratios(1)=eigval-workspace%gamma(1)
+   do i=1,lm2-1
+     workspace%ratios(i+1)=-workspace%beta(i)/workspace%ratios(i)-workspace%gamma(i+1)+eigval
+   end do
+   workspace%ratios(lim2)=-workspace%beta(lim2)/(workspace%gamma(lim2+1)-eigval)
+   do i=lim2-1,lm2+1,-1
+     workspace%ratios(i)=-workspace%beta(i)/(workspace%gamma(i+1)-eigval+workspace%ratios(i+1))
+   end do
+   call dnorm(l,m,c,ndec,nex,limd,maxd,workspace%ratios,sgn,d01,id01,dmf,idmf,dmlmf,idmlmf, &
+     dms,idms,dmlms,idmlms,jnorm,jsub)
+   if(any(.not.ieee_is_finite(workspace%ratios(1:lim2)))) return
+   ! Retain the original fixed normalization before permitting a longer radial sum.
+   if(dmf/=dmfnorm.or.idmf/=idmfe) return
+   valid=.true.
+ end subroutine
+
+ subroutine retry_radial_neumann(l,m,c,x1,eigval,limd,planned_support,ndec,nex,maxd, &
+     maxlp,maxn,maxp,enr,dmfnorm,idmfe,r1c,ir1e,r1dc,ir1de,current_accuracy,jsub, &
+     workspace,r2,ir2,r2d,ir2d,accuracy,terms,used_support,reason)
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+   implicit none
+   integer, intent(in) :: l,m,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp, &
+       idmfe,ir1e,ir1de,current_accuracy,jsub
+   real(knd), intent(in) :: c,x1,eigval,enr(maxd),dmfnorm,r1c,r1dc
+   type(radial_retry_workspace), intent(inout) :: workspace
+   real(knd), intent(out) :: r2,r2d
+   integer, intent(out) :: ir2,ir2d,accuracy,terms,used_support,reason
+   integer :: n,j,limneu,nsub,allocation_status,support_cap
+   logical :: extended_valid
+   real(knd) :: x,rm,rm2,aj1,aj2,apcoef,w1,w2,wr,wt,dec,ratio
+   character(len=256) :: allocation_message
+   r2=0
+   r2d=0
+   ir2=0
+   ir2d=0
+   accuracy=-1
+   terms=-1
+   used_support=limd
+   reason=2
+   ! These are the existing eligibility and initialized-support conditions.
+   if(x1<0.00065_knd.or.ndec-jsub<=current_accuracy.or.r1dc==0) return
+   limneu=min(limd,maxp-2,maxn-m-2)
+   if(limneu/2-mod(l-m,2)<=(l-m)/2.or.l+1>maxlp) return
+   if(.not.workspace%prepared) then
+     n=min(maxn-2,maxp+m)
+     if(l+1>n.or.limneu+m>n) return
+     allocate(workspace%nf(maxn),stat=allocation_status,errmsg=allocation_message)
+     if(allocation_status==0) then
+       allocate(workspace%ndf(maxn),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%nv(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%ndr(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%ne(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%prat(maxp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status/=0) then
+       if(allocated(workspace%nf)) deallocate(workspace%nf)
+       if(allocated(workspace%ndf)) deallocate(workspace%ndf)
+       if(allocated(workspace%nv)) deallocate(workspace%nv)
+       if(allocated(workspace%ndr)) deallocate(workspace%ndr)
+       if(allocated(workspace%ne)) deallocate(workspace%ne)
+       if(allocated(workspace%prat)) deallocate(workspace%prat)
+       reason=7
+       return
+     end if
+     x=x1+1
+     call sphneu(c,x,n,maxn,maxlp,workspace%nf,workspace%nv,workspace%ne, &
+         workspace%ndf,workspace%ndr)
+     rm=real(m,knd)
+     rm2=rm+rm
+     workspace%prat(1)=1
+     workspace%prat(2)=rm2+1
+     do j=3,maxp
+       aj1=j-1
+       aj2=j-2
+       workspace%prat(j)=(rm2+aj1)*(rm2+aj2)/(aj1*aj2)
+     end do
+     ratio=x1*(x1+2)/(x*x)
+     apcoef=rm/2*log10(ratio)
+     workspace%exponent=int(apcoef)
+     workspace%factor=10.0_knd**(apcoef-workspace%exponent)
+     workspace%ratio_count=n
+     workspace%prepared=.true.
+   end if
+   if(limneu+m>workspace%ratio_count) return
+   support_cap=2*(min(max(limd,planned_support),maxp-2,maxn-m-2)/2)
+   do
+     radial_retry_tracking=.true.
+     radial_retry_converged=.false.
+     if(used_support==limd) then
+       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,enr,workspace%nf,workspace%nv, &
+         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor, &
+         workspace%exponent,dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+     else
+       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,workspace%ratios, &
+         workspace%nf,workspace%nv,workspace%ne,workspace%ndf,workspace%ndr,workspace%prat, &
+         workspace%factor,workspace%exponent,dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+     end if
+     radial_retry_tracking=.false.
+     if(radial_retry_converged) exit
+     reason=3
+     if(used_support>=support_cap) return
+     ! Grow work only after actual series nonconvergence, within the existing native cap.
+     used_support=2*(min(support_cap,used_support+max(2,used_support/4))/2)
+     limneu=used_support
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,used_support,ndec,nex,maxd, &
+         workspace,dmfnorm,idmfe,extended_valid)
+     reason=8
+     if(.not.extended_valid) return
+   end do
+   reason=4
+   if(.not.ieee_is_finite(r2).or..not.ieee_is_finite(r2d)) return
+   dec=10.0_knd**(-ndec-1)
+   w1=r1c*r2d*10.0_knd**(ir1e+ir2d)
+   w2=r2*r1dc*10.0_knd**(ir2+ir1de)
+   wr=w1-w2
+   wt=1/(c*x1*(x1+2))
+   if(.not.ieee_is_finite(wr).or.w1==0.or.wt==0) return
+   accuracy=max(0,-decimal_exponent(abs((wr-wt)/wt)+dec))
+   nsub=max(0,-decimal_exponent(abs(wr/w1)+dec))
+   if(accuracy>1) accuracy=accuracy+nsub
+   accuracy=min(accuracy,ndec-1)
+   reason=5
+   ! No inherited previous-degree estimate is used to select this candidate.
+   if(accuracy<=current_accuracy) return
+   reason=0
+ end subroutine
+
+ function profcn_current_radial_token_quad() bind(C) result(token)
+   use iso_c_binding, only: c_int64_t
+   implicit none
+   integer(c_int64_t) :: token
+   token=radial_retry_generation
+ end function
+ subroutine capture_radial_retry_degree(index,m,eigenvalue,support,planned,normalization, &
+     exponent,accuracy,jsub,integral)
+   implicit none
+   integer, intent(in) :: index,m,support,planned,exponent,accuracy,jsub
+   real(knd), intent(in) :: eigenvalue,normalization
+   logical, intent(in) :: integral
+   if(.not.checked_radial_enabled.or.radial_retry_m/=m.or.index<1.or. &
+       index>radial_retry_count) return
+   radial_retry_values(:,index)=[eigenvalue,normalization]
+   radial_retry_metadata(:,index)=[support,planned,exponent,accuracy,jsub,merge(1,0,integral)]
+   radial_retry_captured=index
+ end subroutine
+
+ function profcn_set_checked_radial_mode_quad(enabled) bind(C) result(previous)
+   use iso_c_binding, only: c_int
+   implicit none
+   integer(c_int), value :: enabled
+   integer(c_int) :: previous
+   previous=merge(1_c_int,0_c_int,checked_radial_enabled)
+   call clear_radial_retry_ledger()
+   checked_radial_enabled=enabled/=0.and.checked_moment_callbacks_available()==1
+   if(.not.checked_radial_enabled) call clear_checked_moment_caches()
+ end function
+
+ subroutine profcn_set_checked_radial_callbacks_quad(available,moments,parity, &
+     radial,packing) bind(C)
+   use iso_c_binding, only: c_funptr,c_f_procpointer,c_associated
+   implicit none
+   type(c_funptr), value :: available,moments,parity,radial,packing
+   call invalidate_degree_replay()
+   call clear_radial_retry_ledger()
+   call clear_checked_moment_caches()
+   checked_radial_enabled=.false.
+   nullify(checked_available_proc,checked_moments_proc,checked_parity_proc, &
+       checked_radial_proc,checked_pack_proc)
+   if(c_associated(available)) call c_f_procpointer(available,checked_available_proc)
+   if(c_associated(moments)) call c_f_procpointer(moments,checked_moments_proc)
+   if(c_associated(parity)) call c_f_procpointer(parity,checked_parity_proc)
+   if(c_associated(radial)) call c_f_procpointer(radial,checked_radial_proc)
+   if(c_associated(packing)) call c_f_procpointer(packing,checked_pack_proc)
+ end subroutine
+
+ integer(c_int) function checked_moment_callbacks_available() result(available)
+   implicit none
+   available=0_c_int
+   if(.not.associated(checked_available_proc).or..not.associated(checked_moments_proc).or. &
+       .not.associated(checked_parity_proc).or..not.associated(checked_radial_proc).or. &
+       .not.associated(checked_pack_proc)) return
+   available=checked_available_proc()
+ end function
+
+ logical function cache_has_checked_moments(index) result(tagged)
+   implicit none
+   integer, intent(in) :: index
+   tagged=.false.
+   if(.not.allocated(pint_cache(index)%moment_errors)) return
+   if(size(pint_cache(index)%moment_errors,1)<1.or.size(pint_cache(index)%moment_errors,2)<5) return
+   tagged=pint_cache(index)%moment_errors(1,5)==1.0_knd
+ end function
+
+ subroutine clear_checked_moment_caches()
+   implicit none
+   integer :: index
+   do index=1,size(pint_cache)
+     if(cache_has_checked_moments(index)) call clear_pint_cache_slot(index)
+   end do
+ end subroutine
+
+ logical function checked_moment_cache_eligible(index) result(eligible)
+   implicit none
+   integer, intent(in) :: index
+   eligible=.true.
+   if(.not.cache_has_checked_moments(index)) return
+   if(checked_radial_enabled.and.checked_moment_callbacks_available()==1) return
+   call clear_pint_cache_slot(index)
+   eligible=.false.
+ end function
+
+#endif
+
+#ifdef USE_QUAD
+  function profcn_radial_quadrature_available_quad() bind(C) result(available)
+    use iso_c_binding,only:c_int
+    integer(c_int)::available
+    available=0_c_int
+    if(.not.associated(radial_quadrature_stream_proc)) return
+    if(.not.associated(radial_quadrature_panel_proc)) return
+    if(.not.pint_exact_sums_enabled()) return
+    available=1_c_int
+  end function
+#endif
+
+#ifdef USE_QUAD
+ subroutine profcn_set_panel_error_quad(callback) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   type(c_funptr),value::callback
+   integer::slot
+   ! Changing the interpretation of paired columns invalidates every affected mapped moment entry.
+   call invalidate_degree_replay()
+   do slot=1,size(pint_cache)
+     if(pint_cache(slot)%valid .and. pint_cache(slot)%quadrature_rule==1) &
+         call clear_pint_cache_slot(slot)
+   end do
+   radial_quadrature_cache_index=0
+   radial_quadrature_count=0
+   nullify(radial_quadrature_panel_proc)
+   if(c_associated(callback)) call c_f_procpointer(callback,radial_quadrature_panel_proc)
+   if(profcn_radial_quadrature_available_quad()==0) call profcn_set_radial_quadrature_quad(0)
+ end subroutine
+#endif
+
+#ifdef USE_QUAD
+ subroutine profcn_set_radial_stream_quad(callback) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   type(c_funptr),value::callback
+   call invalidate_degree_replay()
+   nullify(radial_quadrature_stream_proc)
+   if(c_associated(callback)) call c_f_procpointer(callback,radial_quadrature_stream_proc)
+   radial_quadrature_count=0
+   if(profcn_radial_quadrature_available_quad()==0) call profcn_set_radial_quadrature_quad(0)
+ end subroutine
+#endif
+
+#ifdef USE_QUAD
+  subroutine profcn_set_radial_quadrature_even_quad(even_only) bind(C)
+    use iso_c_binding,only:c_int
+    integer(c_int),value::even_only
+    integer::selected
+    selected=0
+    if(even_only/=0_c_int) selected=1
+    if(selected/=radial_quadrature_even_only) radial_quadrature_count=0
+    radial_quadrature_even_only=selected
+  end subroutine
+  function profcn_get_radial_quadrature_even_quad() bind(C) result(even_only)
+    use iso_c_binding,only:c_int
+    integer(c_int)::even_only
+    even_only=int(radial_quadrature_even_only,c_int)
+  end function
+
+#endif
+
+#ifdef USE_QUAD
+
+
+  subroutine profcn_get_radial_quadrature_errors_quad(capacity,error_r2,error_r2d,valid) bind(C)
+    use iso_c_binding,only:c_int
+    integer(c_int),value::capacity
+    real(knd),intent(out)::error_r2(*),error_r2d(*)
+    integer(c_int),intent(out)::valid(*)
+    integer::j
+    do j=1,max(0,int(capacity))
+      error_r2(j)=0.0_knd
+      error_r2d(j)=0.0_knd
+      valid(j)=0_c_int
+    end do
+    if(radial_quadrature_count<=0 .or. capacity<radial_quadrature_count) return
+    do j=1,radial_quadrature_count
+      error_r2(j)=radial_quadrature_errors(j,1)
+      error_r2d(j)=radial_quadrature_errors(j,2)
+      valid(j)=int(radial_quadrature_valid(j),c_int)
+    end do
+  end subroutine
+
+  subroutine radial_error_product(a,b,value,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::a,b
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    value=a*b
+    if(.not.ieee_is_finite(a).or..not.ieee_is_finite(b).or..not.ieee_is_finite(value)) then
+      valid=.false.
+    end if
+    if(a/=0.0_knd.and.b/=0.0_knd.and.value==0.0_knd) then
+      valid=.false.
+    end if
+  end subroutine
+
+  subroutine radial_error_quotient(a,b,value,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::a,b
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    value=0.0_knd
+    if(.not.ieee_is_finite(a).or..not.ieee_is_finite(b).or.b==0.0_knd) then
+      valid=.false.
+      return
+    end if
+    value=a/b
+    if(.not.ieee_is_finite(value)) then
+      valid=.false.
+    end if
+    if(a/=0.0_knd.and.value==0.0_knd) then
+      valid=.false.
+    end if
+  end subroutine
+
+  subroutine radial_error_decimal_scale(a,power,value,valid)
+    real(knd),intent(in)::a
+    integer(int64),intent(in)::power
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    integer(int64)::remaining,step
+    real(knd)::next
+    value=a
+    remaining=power
+    do while(remaining/=0 .and. valid)
+      step=max(-1000_int64,min(1000_int64,remaining))
+      call radial_error_product(value,10.0_knd**int(step),next,valid)
+      value=next
+      remaining=remaining-step
+    end do
+  end subroutine
+
+
+  subroutine prepare_radial_moment_errors(idx,m,parity,highest,maxint,maxlp,pnorm,ipnorm,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    integer,intent(in)::idx,m,parity,highest,maxint,maxlp,ipnorm(maxlp)
+    real(knd),intent(in)::pnorm(maxlp)
+    logical,intent(inout)::valid
+    real(knd)::alpha(maxint),twom,beta,temp,temp2,error1,error2
+    integer::i,first
+    if(checked_radial_enabled.and.pint_cache(idx)%moment_errors(1,5)==1.0_knd) then
+      if(highest>size(pint_cache(idx)%moment_errors,1)) then
+        valid=.false.
+      else
+        valid=all(ieee_is_finite(pint_cache(idx)%moment_errors(parity+1:highest:2,1:2)))
+      end if
+      return
+    end if
+    if(pint_cache(idx)%moment_error_highest(parity+1)>=highest) return
+    twom=real(m,knd)+real(m,knd)
+    if(parity==1) then
+      alpha(2)=(twom+3.0_knd)*pnorm(2)/(pnorm(3)*2.0_knd)
+      alpha(2)=alpha(2)*10.0_knd**(ipnorm(2)-ipnorm(3))
+      do i=4,highest,2
+        alpha(i)=alpha(i-2)*(twom+i-1)*(twom+i+i-1)*(i-2)/ &
+            ((i-1)*(twom+i)*(twom+i+i-5))
+      end do
+    end if
+    first=parity+1
+    if(pint_cache(idx)%moment_error_highest(parity+1)>0) &
+        first=pint_cache(idx)%moment_error_highest(parity+1)+2
+    do i=first,highest,2
+      if(parity==0) then
+        error1=pint_cache(idx)%moment_errors(i,3)
+        error2=pint_cache(idx)%moment_errors(i,4)
+      else
+        beta=-(twom+i-1)/(twom+i)
+        call radial_error_product(abs(beta),pint_cache(idx)%moment_errors(i-1,4),temp,valid)
+        temp2=pint_cache(idx)%moment_errors(i+1,4)+temp
+        call radial_error_quotient(temp2,abs(alpha(i)),error1,valid)
+        call radial_error_product(abs(beta),pint_cache(idx)%moment_errors(i-1,6),temp,valid)
+        temp2=pint_cache(idx)%moment_errors(i+1,6)+temp
+        call radial_error_quotient(temp2,abs(alpha(i)),error2,valid)
+      end if
+      if(.not.ieee_is_finite(error1).or..not.ieee_is_finite(error2)) then
+        valid=.false.
+      end if
+      if(.not.valid) return
+      ! Raw panel errors occupy columns 3, 4, 6 and propagated family errors occupy 1, 2.
+      pint_cache(idx)%moment_errors(i,1)=error1
+      pint_cache(idx)%moment_errors(i,2)=error2
+      pint_cache(idx)%moment_error_highest(parity+1)=i
+    end do
+  end subroutine
+
+
+  subroutine pack_radial_quadrature_result(value,uncertainty,power,packed,exponent,error,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::value,uncertainty
+    integer(int64),intent(in)::power
+    real(knd),intent(out)::packed,error
+    integer,intent(out)::exponent
+    logical,intent(inout)::valid
+    integer::shift
+    integer(c_int)::checked_status
+    integer(int64)::packed_power
+    real(knd)::temp
+    packed=0.0_knd
+    error=0.0_knd
+    exponent=0
+    if(.not.valid) return
+    if(.not.ieee_is_finite(value).or..not.ieee_is_finite(uncertainty).or.uncertainty<0.0_knd) then
+      valid=.false.
+      return
+    end if
+    shift=0
+    if(value/=0.0_knd) shift=decimal_exponent(abs(value))
+    call radial_error_decimal_scale(value,-int(shift,int64),packed,valid)
+    packed_power=power+int(shift,int64)
+    if(packed/=0.0_knd.and.abs(packed)<1.0_knd) then
+      call radial_error_product(packed,10.0_knd,temp,valid)
+      packed=temp
+      packed_power=packed_power-1_int64
+    end if
+    if(packed_power>int(huge(exponent),int64).or.packed_power<-int(huge(exponent),int64)) then
+      valid=.false.
+      return
+    end if
+    exponent=int(packed_power)
+    if(valid.and.checked_radial_enabled) then
+      checked_status=checked_pack_proc(value,uncertainty,int(power-packed_power,c_int),packed,error)
+      if(checked_status/=1) valid=.false.
+    else if(valid) then
+      call radial_error_decimal_scale(uncertainty,power-packed_power,error,valid)
+    end if
+  end subroutine
+
+  subroutine r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
+      maxint,maxmp,maxlp,idx,norme,pnorm,ipnorm,coefme,coefmo,p1,p2,p3,p4, &
+      high,e_high,highd,e_highd,jint,coefn,icoefn,error,error_d,valid)
+    use iso_c_binding,only:c_int
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    integer,intent(in)::l,m,limint,limd,ndec,maxd,id01,maxint,maxmp,maxlp,idx, &
+        norme(maxmp),ipnorm(maxlp)
+    real(knd),intent(in)::c,x,enr(maxd),d01,pnorm(maxlp),coefme,coefmo, &
+        p1(maxint),p2(maxint),p3(maxint),p4(maxint)
+    real(knd),intent(out)::high,highd,error,error_d
+    integer,intent(out)::e_high,e_highd,jint
+    real(knd),intent(inout)::coefn
+    integer,intent(inout)::icoefn
+    logical,intent(out)::valid
+    real(knd)::sum1,sum2,unc1,unc2,last1,last2,lerr1,lerr2
+    real(knd)::temp,temp2,coefa,leading,radial_factor,derivative_factor,correction_factor
+    real(knd)::full,full_d,raw_error,raw_error_d,full_correction,error_correction,twom
+    real(knd)::lower1,lower2,endpoint,endpoint2,odd_factor,coef_derivative,dcon,ri
+    integer::parity,seed,lim,base,highest,prepared_last_odd,i,iterm
+    integer(c_int)::checked_status
+    integer(int64)::leading_exponent
+    integer(c_int)::stream_status,stream_stop
+    real(knd)::stream_outputs(8)
+    high=0.0_knd
+    highd=0.0_knd
+    e_high=0
+    e_highd=0
+    error=0.0_knd
+    error_d=0.0_knd
+    jint=0
+    valid=.false.
+    estimate: block
+    parity=mod(l-m,2)
+    seed=(l-m)/2
+    lim=limint/2-parity
+    base=l-m+1
+    highest=2*lim+parity+1
+    jint=max(0,lim)
+    if(l<m.or.lim<=seed.or.lim>maxd.or.lim>limd/2-parity) exit estimate
+    if(base>maxlp.or.highest+parity>maxint.or.m+1>maxmp) exit estimate
+    if(idx<1.or.idx>size(pint_cache)) exit estimate
+    if(.not.allocated(pint_cache(idx)%moment_errors)) exit estimate
+    if(size(pint_cache(idx)%moment_errors,1)/=maxint) exit estimate
+    ! Check prepared moments, including the odd neighbor needed by reconstructed families.
+    prepared_last_odd=2*((pint_cache(idx)%limint+1)/2)+1
+    if(highest+parity>prepared_last_odd) exit estimate
+    valid=.true.
+    twom=real(m,knd)+real(m,knd)
+    dcon=10.0_knd**(-ndec-1)
+    ! Preserve initialization of the leading coefficient used by subsequent degrees.
+    if(l==m) then
+      icoefn=norme(m+1)
+      coefn=0.5_knd
+      do i=1,m
+        ri=real(i,knd)
+        coefn=coefn/(ri+ri)
+        iterm=decimal_exponent(abs(coefn))
+        coefn=coefn*10.0_knd**(-iterm)
+        icoefn=icoefn+iterm
+      end do
+    end if
+    call prepare_radial_moment_errors(idx,m,parity,highest,maxint,maxlp,pnorm,ipnorm,valid)
+    if(.not.valid) exit estimate
+    ! Accumulate complete signed sums and positive panel uncertainties in one exact stream.
+    if(.not.associated(radial_quadrature_stream_proc)) then
+      valid=.false.
+      exit estimate
+    end if
+    stream_status=radial_quadrature_stream_proc(int(m,c_int),int(parity,c_int),int(seed,c_int), &
+        int(lim,c_int),int(maxint,c_int),enr,p1,p2,p3,p4,pint_cache(idx)%moment_errors, &
+        dcon,stream_outputs,stream_stop)
+    if(stream_status/=1_c_int) then
+      valid=.false.
+      exit estimate
+    end if
+    if(.not.all(ieee_is_finite(stream_outputs)).or.any(stream_outputs(3:8)<0.0_knd).or. &
+        stream_stop<=seed.or.stream_stop>lim) then
+      valid=.false.
+      exit estimate
+    end if
+    sum1=stream_outputs(1)
+    sum2=stream_outputs(2)
+    unc1=stream_outputs(3)
+    unc2=stream_outputs(4)
+    last1=stream_outputs(5)
+    last2=stream_outputs(6)
+    lerr1=stream_outputs(7)
+    lerr2=stream_outputs(8)
+    jint=int(stream_stop)
+    ! Panel differences are conditional estimates, not certified integration-error bounds.
+    ! Preserve the native finite endpoint test under the propagated moment uncertainty.
+    lower1=abs(sum1)-unc1
+    lower2=abs(sum2)-unc2
+    if(lower1<=0.0_knd.or.lower2<=0.0_knd) then
+      valid=.false.
+      exit estimate
+    end if
+    call radial_error_quotient(last1+lerr1,lower1,endpoint,valid)
+    call radial_error_quotient(last2+lerr2,lower2,endpoint2,valid)
+    if(.not.valid) exit estimate
+    if(endpoint+endpoint2>=dcon) then
+      valid=.false.
+      exit estimate
+    end if
+    ! Pack full finite values and errors in the same decimal exponent units.
+    coefa=(twom+real(2*parity+1,knd))*coefn
+    if(mod(seed,2)/=0) coefa=-coefa
+    call radial_error_quotient(coefa,d01,temp,valid)
+    call radial_error_product(temp,pnorm(base),leading,valid)
+    leading_exponent=int(icoefn,int64)-int(id01,int64)+int(ipnorm(base),int64)
+    odd_factor=1.0_knd
+    coef_derivative=coefme
+    if(parity==1) then
+      odd_factor=x
+      coef_derivative=coefmo
+    end if
+    call radial_error_product(leading,odd_factor,radial_factor,valid)
+    call radial_error_product(radial_factor,sum1,full,valid)
+    call radial_error_product(abs(radial_factor),unc1,raw_error,valid)
+    call radial_error_product(-c,x,temp,valid)
+    call radial_error_product(temp,radial_factor,derivative_factor,valid)
+    call radial_error_product(derivative_factor,sum2,full_d,valid)
+    call radial_error_product(abs(derivative_factor),unc2,raw_error_d,valid)
+    call radial_error_product(coef_derivative,radial_factor,correction_factor,valid)
+    call radial_error_product(correction_factor,sum1,full_correction,valid)
+    call radial_error_product(abs(correction_factor),unc1,error_correction,valid)
+    temp=full_d+full_correction
+    temp2=raw_error_d+error_correction
+    if(checked_radial_enabled.and.pint_cache(idx)%moment_errors(1,5)==1.0_knd) then
+      checked_status=checked_radial_proc(radial_factor,derivative_factor,correction_factor, &
+          sum1,sum2,unc1,unc2,full,full_d,full_correction,temp,raw_error,temp2)
+      if(checked_status/=1) valid=.false.
+    end if
+    call pack_radial_quadrature_result(full,raw_error,leading_exponent,high,e_high,error,valid)
+    call pack_radial_quadrature_result(temp,temp2,leading_exponent,highd,e_highd,error_d,valid)
+    end block estimate
+
+  end subroutine
+
+
+#endif
+
+
+#ifdef USE_QUAD
+  subroutine profcn_set_radial_quadrature_quad(mode) bind(C)
+    use iso_c_binding, only: c_int
+    integer(c_int), value :: mode
+    integer :: selected
+    selected=0
+    if(mode==1_c_int) then
+      if(profcn_radial_quadrature_available_quad()==1_c_int) selected=1
+    end if
+    if(selected /= radial_quadrature_mode) then
+      radial_quadrature_even_only=0
+      radial_quadrature_cache_index=0
+      radial_quadrature_count=0
+    end if
+    ! Keep original and mapped rules in the existing bounded caches.
+    radial_quadrature_mode=selected
+  end subroutine
+
+  function profcn_get_radial_quadrature_quad() bind(C) result(mode)
+    use iso_c_binding, only: c_int
+    integer(c_int) :: mode
+    mode=int(radial_quadrature_mode,c_int)
+  end function
+
+
+  subroutine prepare_radial_quadrature_results(lnum,mnum)
+    integer, intent(in) :: lnum,mnum
+    integer :: status
+    character(len=256) :: allocation_message
+    radial_quadrature_count=0
+    if(radial_quadrature_mode/=1 .or. mnum/=1) return
+    ! This allocation bound only disables the estimate, never the original radial calculation.
+    if(lnum<1 .or. lnum>1048576/(4*storage_size(0.0_knd)/8+4*storage_size(0)/8)) return
+    if(allocated(radial_quadrature_errors)) then
+      if(size(radial_quadrature_errors,1)/=lnum) &
+          deallocate(radial_quadrature_errors,radial_quadrature_valid)
+    end if
+    if(.not.allocated(radial_quadrature_errors)) then
+      allocate(radial_quadrature_errors(lnum,2),stat=status,errmsg=allocation_message)
+      if(status==0) then
+        allocate(radial_quadrature_valid(lnum),stat=status,errmsg=allocation_message)
+      end if
+      if(status/=0) then
+        if(allocated(radial_quadrature_errors)) deallocate(radial_quadrature_errors)
+        if(allocated(radial_quadrature_valid)) deallocate(radial_quadrature_valid)
+        return
+      end if
+    end if
+    radial_quadrature_errors=0.0_knd
+    radial_quadrature_valid=0
+    radial_quadrature_count=lnum
+  end subroutine
+
+  subroutine map_radial_quadrature_node(left,right,node,q,eta,measure)
+    real(knd), intent(in) :: left,right,node,q
+    real(knd), intent(out) :: eta,measure
+    real(knd) :: root,lower,width,t
+    ! eta=sqrt(q)*sinh(t) preserves each original panel and removes nearby
+    ! square-root singularities.
+    root=sqrt(q)
+    lower=asinh(left/root)
+    width=asinh(right/root)-lower
+    t=lower+(node+1.0_knd)*width/2.0_knd
+    eta=root*sinh(t)
+    if(node==-1.0_knd) eta=left
+    if(node==1.0_knd) eta=right
+    measure=width*sqrt(q+eta*eta)
+  end subroutine
+#endif
+
+#ifdef USE_QUAD
+  subroutine profcn_set_integral_sums_quad(available_callback, sum_callback) bind(C)
+    use iso_c_binding, only: c_funptr, c_f_procpointer
+    type(c_funptr), value :: available_callback, sum_callback
+
+    ! Optional callbacks preserve standalone Fortran linkage and the original fallback.
+   call invalidate_degree_replay()
+    call c_f_procpointer(available_callback, pint_exact_available_proc)
+    call c_f_procpointer(sum_callback, pint_exact_sum_proc)
+  end subroutine
+
+  logical function pint_exact_sums_enabled() result(enabled)
+    use iso_c_binding, only: c_int
+    enabled = .false.
+    if(.not. associated(pint_exact_available_proc)) return
+    if(.not. associated(pint_exact_sum_proc)) return
+    enabled = pint_exact_available_proc() == 1_c_int
+  end function
+#endif
+
+  subroutine prepare_bouwkamp_cache(c, m)
+    real(knd), intent(in) :: c
+    integer, intent(in) :: m
+    type(ieee_round_type) :: rounding
+
+    ! Reset both parity prefixes when any arithmetic input changes.
+    call ieee_get_rounding_mode(rounding)
+    if(bouwkamp_parameter /= c .or. bouwkamp_order /= m .or. &
+        bouwkamp_rounding /= rounding) bouwkamp_counts = 0
+    bouwkamp_parameter = c
+    bouwkamp_order = m
+    bouwkamp_rounding = rounding
+  end subroutine
+
+  subroutine paired_sine_cosine(argument, sine, cosine)
+    real(knd), intent(in) :: argument
+    real(knd), intent(out) :: sine, cosine
+#ifdef USE_QUAD
+    ! Share argument reduction between the two quad trigonometric evaluations.
+    call quad_sincos(argument, sine, cosine)
+#else
+    sine = sin(argument)
+    cosine = cos(argument)
+#endif
+  end subroutine
+
+  integer function decimal_exponent(value) result(power)
+    real(knd), intent(in) :: value
+#ifdef USE_QUAD
+    real(kind(1.0d0)) :: estimate
+    real(knd) :: lower, upper
+    ! Verify the integer exponent in quad before using a cheap initial estimate.
+    if(value >= real(tiny(1.0d0), knd) .and. value <= real(huge(1.0d0), knd)) then
+      estimate = log10(real(value, kind(1.0d0)))
+      power = int(estimate)
+      if(value >= 1.0_knd) then
+        lower = 10.0_knd ** power
+        upper = 10.0_knd ** (power + 1)
+      else
+        lower = 10.0_knd ** (power - 1)
+        upper = 10.0_knd ** power
+      end if
+      if(value > lower .and. value < upper) return
+    end if
+#endif
+    power = int(log10(value))
+  end function
 
   logical function cache_real_equal(a, b)
     real(knd), intent(in) :: a, b
-    real(knd) :: scale, tol
 
-    ! Use a precision-scaled tolerance so cache lookup is robust to the small
-    ! roundoff differences introduced by repeated calls from C++.
-    scale = max(1.0_knd, max(abs(a), abs(b)))
-    tol = 64.0_knd * epsilon(1.0_knd) * scale
-    cache_real_equal = abs(a - b) <= tol
+    ! Distinct native arguments require their own special-function values.
+    cache_real_equal = a == b
   end function
 
   logical function cache_real_vector_equal(a, b, n)
@@ -95,11 +1490,103 @@ module prolate_swf
     cache_real_vector_equal = .true.
   end function
 
+  logical function add_auxiliary_cache_bytes(bytes, element_bytes, rows, columns) result(fits)
+    integer(int64), intent(inout) :: bytes
+    integer, intent(in) :: element_bytes, rows
+    integer, optional, intent(in) :: columns
+    integer(int64) :: row_bytes, column_count
+
+    ! Bound each product before multiplication, including impossible array dimensions.
+    fits = .false.
+    if(bytes < 0 .or. bytes > auxiliary_cache_budget .or. element_bytes <= 0 .or. rows < 0) return
+    column_count = 1
+    if(present(columns)) column_count = int(columns, int64)
+    if(column_count < 0) return
+    if(int(rows, int64) > (auxiliary_cache_budget - bytes) / element_bytes) return
+    row_bytes = int(rows, int64) * element_bytes
+    if(row_bytes > 0) then
+      if(column_count > (auxiliary_cache_budget - bytes) / row_bytes) return
+    end if
+    bytes = bytes + row_bytes * column_count
+    fits = .true.
+  end function
+
+  integer(int64) function auxiliary_cache_retained_bytes() result(bytes)
+    integer :: slot
+
+    bytes = gauss_cache%bytes
+    do slot = 1, size(pleg_cache)
+      bytes = bytes + pleg_cache(slot)%bytes
+    end do
+    do slot = 1, size(qleg_cache)
+      bytes = bytes + qleg_cache(slot)%bytes
+    end do
+    do slot = 1, size(pint_cache)
+      bytes = bytes + pint_cache(slot)%bytes
+    end do
+  end function
+
+  subroutine clear_gauss_cache()
+    gauss_cache%valid = .false.
+    gauss_cache%bytes = 0
+    if(allocated(gauss_cache%x)) deallocate(gauss_cache%x)
+    if(allocated(gauss_cache%w)) deallocate(gauss_cache%w)
+  end subroutine
+
+  subroutine clear_pint_cache_slot(idx)
+    integer, intent(in) :: idx
+    type(pint_cache_entry) :: empty
+
+    pint_cache(idx) = empty
+  end subroutine
+
+  subroutine clear_auxiliary_cache_slot(slot)
+    integer, intent(in) :: slot
+    integer :: idx
+
+    idx = slot
+    if(idx <= size(pleg_cache)) then
+      call clear_pleg_cache_slot(idx)
+      return
+    end if
+    idx = idx - size(pleg_cache)
+    if(idx <= size(qleg_cache)) then
+      call clear_qleg_cache_slot(idx)
+      return
+    end if
+    idx = idx - size(qleg_cache)
+    if(idx == 1) then
+      call clear_gauss_cache()
+      return
+    end if
+    call clear_pint_cache_slot(idx - 1)
+  end subroutine
+
+  logical function reserve_auxiliary_cache_bytes(requested) result(fits)
+    integer(int64), intent(in) :: requested
+    integer :: visited, slots
+
+    ! Evict retained results only, never shorten the caller's computed support.
+    fits = .false.
+    if(requested < 0 .or. requested > auxiliary_cache_budget) return
+    slots = size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+    do visited = 0, slots
+      if(auxiliary_cache_retained_bytes() <= auxiliary_cache_budget - requested) then
+        fits = .true.
+        return
+      end if
+      if(visited == slots) exit
+      call clear_auxiliary_cache_slot(auxiliary_cache_next)
+      auxiliary_cache_next = mod(auxiliary_cache_next, slots) + 1
+    end do
+  end function
+
   subroutine clear_pleg_cache_slot(idx)
     integer, intent(in) :: idx
 
     ! Reset and deallocate one cache slot before it is reused.
     pleg_cache(idx)%valid = .false.
+    pleg_cache(idx)%bytes = 0
     pleg_cache(idx)%m = -1
     pleg_cache(idx)%iopd = -1
     pleg_cache(idx)%narg = 0
@@ -186,10 +1673,23 @@ module prolate_swf
         pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
         coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
-    integer :: idx, ncoef
+    integer :: idx, ncoef, allocation_status, real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
-    ! Reuse a matching slot when possible; otherwise take a free or round-robin
-    ! replacement slot.
+    ! Retain only the prefix copied by load_pleg_cache, preserving the maxp key.
+    ncoef = min(lim + 2, maxp)
+    ! Oversized tables remain solely in the caller's complete workspaces.
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes, narg)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxt, ncoef)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, &
+        2 * real_bytes + 2 * integer_bytes, maxt)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 8 * real_bytes, ncoef)) return
+
+    ! Reuse a matching slot or replace one entry in round-robin order.
     idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
     if(idx == 0) then
       idx = 1
@@ -205,23 +1705,58 @@ module prolate_swf
     end if
 
     call clear_pleg_cache_slot(idx)
-    allocate(pleg_cache(idx)%barg(narg))
-    allocate(pleg_cache(idx)%pr(maxt, maxp))
-    allocate(pleg_cache(idx)%pdr(maxt, maxp))
-    allocate(pleg_cache(idx)%pdnorm(maxt))
-    allocate(pleg_cache(idx)%pnorm(maxt))
-    allocate(pleg_cache(idx)%ipdnorm(maxt))
-    allocate(pleg_cache(idx)%ipnorm(maxt))
-    allocate(pleg_cache(idx)%alpha(maxp))
-    allocate(pleg_cache(idx)%beta(maxp))
-    allocate(pleg_cache(idx)%gamma(maxp))
-    allocate(pleg_cache(idx)%coefa(maxp))
-    allocate(pleg_cache(idx)%coefb(maxp))
-    allocate(pleg_cache(idx)%coefc(maxp))
-    allocate(pleg_cache(idx)%coefd(maxp))
-    allocate(pleg_cache(idx)%coefe(maxp))
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    ! Stop on the first failed allocation and discard any partially stored entry.
+    allocate(pleg_cache(idx)%barg(narg), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pr(maxt, ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pdr(maxt, ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pdnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%ipdnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%ipnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%alpha(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%beta(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%gamma(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefa(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefb(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefc(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefd(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefe(ncoef), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status /= 0) then
+      call clear_pleg_cache_slot(idx)
+      return
+    end if
 
     pleg_cache(idx)%valid = .true.
+    pleg_cache(idx)%bytes = requested_bytes
     pleg_cache(idx)%m = m
     pleg_cache(idx)%iopd = iopd
     pleg_cache(idx)%narg = narg
@@ -241,7 +1776,6 @@ module prolate_swf
     pleg_cache(idx)%coefc = 0.0_knd
     pleg_cache(idx)%coefd = 0.0_knd
     pleg_cache(idx)%coefe = 0.0_knd
-    ncoef = min(lim + 2, maxp)
     pleg_cache(idx)%pr(1:maxt, 1:ncoef) = pr(1:maxt, 1:ncoef)
     if(iopd == 1 .or. iopd == 3) then
       pleg_cache(idx)%pdr(1:maxt, 1:ncoef) = pdr(1:maxt, 1:ncoef)
@@ -296,6 +1830,7 @@ module prolate_swf
     integer, intent(in) :: idx
 
     qleg_cache(idx)%valid = .false.
+    qleg_cache(idx)%bytes = 0
     qleg_cache(idx)%m = -1
     qleg_cache(idx)%lnum = 0
     qleg_cache(idx)%limq = 0
@@ -341,8 +1876,16 @@ module prolate_swf
     integer, intent(in) :: m, lnum, limq, maxq, ndec, iqdml, iqml, itermpq
     real(knd), intent(in) :: x1, qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
     integer, intent(in) :: iqdl(lnum), iql(lnum)
-    integer :: idx
+    integer :: idx, allocation_status, real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxq)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, &
+        2 * real_bytes + 2 * integer_bytes, lnum)) return
     idx = find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
     if(idx == 0) then
       idx = 1
@@ -358,14 +1901,30 @@ module prolate_swf
     end if
 
     call clear_qleg_cache_slot(idx)
-    allocate(qleg_cache(idx)%qdr(maxq))
-    allocate(qleg_cache(idx)%qr(maxq))
-    allocate(qleg_cache(idx)%qdl(lnum))
-    allocate(qleg_cache(idx)%ql(lnum))
-    allocate(qleg_cache(idx)%iqdl(lnum))
-    allocate(qleg_cache(idx)%iql(lnum))
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    allocate(qleg_cache(idx)%qdr(maxq), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%qr(maxq), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%qdl(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%ql(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%iqdl(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%iql(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status /= 0) then
+      call clear_qleg_cache_slot(idx)
+      return
+    end if
 
     qleg_cache(idx)%valid = .true.
+    qleg_cache(idx)%bytes = requested_bytes
     qleg_cache(idx)%m = m
     qleg_cache(idx)%lnum = lnum
     qleg_cache(idx)%limq = limq
@@ -422,25 +1981,1016 @@ module prolate_swf
   subroutine gauss_cached(ndec, n, x, w)
     integer, intent(in) :: ndec, n
     real(knd), intent(out) :: x(n), w(n)
+    integer :: allocation_status
+    integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1 .and. n==65) then
+      x=radial_kronrod_nodes
+      w=radial_kronrod_weights
+      return
+    end if
+#endif
     if(gauss_cache%valid) then
       if(gauss_cache%ndec == ndec .and. gauss_cache%n == n) then
         x(1:n) = gauss_cache%x(1:n)
         w(1:n) = gauss_cache%w(1:n)
         return
       end if
-      if(allocated(gauss_cache%x)) deallocate(gauss_cache%x)
-      if(allocated(gauss_cache%w)) deallocate(gauss_cache%w)
     end if
 
     call gauss(ndec, n, x, w)
-    allocate(gauss_cache%x(n))
-    allocate(gauss_cache%w(n))
+    requested_bytes = 0
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * (storage_size(1.0_knd) / 8), n)) return
+    call clear_gauss_cache()
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    allocate(gauss_cache%x(n), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(gauss_cache%w(n), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status /= 0) then
+      call clear_gauss_cache()
+      return
+    end if
     gauss_cache%valid = .true.
+    gauss_cache%bytes = requested_bytes
     gauss_cache%ndec = ndec
     gauss_cache%n = n
     gauss_cache%x(1:n) = x(1:n)
     gauss_cache%w(1:n) = w(1:n)
+  end subroutine
+
+  integer function pint_geometry_entry_bytes(entry) result(bytes)
+    type(pint_geometry_entry), intent(in) :: entry
+    integer :: values
+
+    values = 0
+    if(allocated(entry%wg)) values = values + size(entry%wg)
+    if(allocated(entry%xg)) values = values + size(entry%xg)
+    if(allocated(entry%geometry)) values = values + size(entry%geometry)
+    if(allocated(entry%basis)) values = values + size(entry%basis)
+    if(allocated(entry%kernels)) values = values + size(entry%kernels)
+    bytes = values * (storage_size(1.0_knd) / 8)
+  end function
+
+  integer function pint_geometry_retained_bytes() result(bytes)
+    integer :: slot
+
+    ! Include fixed keys and array descriptors as well as allocated native values.
+    bytes = size(pint_geometry_cache) * (storage_size(pint_geometry_cache) / 8)
+    do slot = 1, size(pint_geometry_cache)
+      bytes = bytes + pint_geometry_entry_bytes(pint_geometry_cache(slot))
+    end do
+  end function
+
+#ifdef USE_QUAD
+  subroutine profcn_retain_geometry_order_quad(order) bind(C)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), value, intent(in) :: order
+    type(pint_geometry_entry) :: empty
+    integer :: slot
+
+    ! Release completed orders while retaining the current degree-refinement tables.
+    do slot = 1, size(pint_geometry_cache)
+      if(pint_geometry_cache(slot)%valid .and. pint_geometry_cache(slot)%m /= order) &
+          pint_geometry_cache(slot) = empty
+    end do
+  end subroutine
+#endif
+
+  subroutine prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
+      step1, step2, x1sm1, dec, twomi, alpha, beta, lim, idx)
+    integer, intent(in) :: m, ndec, ngau, ngqs, lim
+    real(knd), intent(in) :: x1, wg(ngau), xg(ngau), step1, step2, x1sm1, dec, twomi
+    real(knd), intent(in) :: alpha(:), beta(:)
+    integer, intent(out) :: idx
+    type(pint_geometry_entry), pointer :: entry
+    type(pint_geometry_entry) :: empty
+    integer :: node, k, i, degree, retained_degrees, capacity, allocation_status, candidate
+    integer :: real_bytes, remaining_values, requested_degrees, previous_capacity, available_bytes
+    real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
+    real(knd) :: window_base, window_power, legendre_power, coef, sargb
+    real(knd), allocatable :: expanded_basis(:,:)
+#ifdef USE_QUAD
+    real(knd) :: mapped_measure
+    real(knd) :: parity_forward(size(alpha)), parity_diagonal(size(alpha))
+    real(knd) :: parity_backward(size(alpha)), eta_squared
+#endif
+    character(len=256) :: allocation_message
+
+    ! Geometry and recurrence prefixes are independent of frequency and final degree.
+    real_bytes = storage_size(x1) / 8
+#ifdef USE_QUAD
+    idx = 0
+    if(lim < 0 .or. lim > huge(lim) - 5) return
+    if(lim > size(alpha) - 4 .or. lim > size(beta) - 4) return
+    requested_degrees = 2 * ((lim + 1) / 2) + 4
+#else
+    requested_degrees = 2 * ((lim + 1) / 2) + 2
+#endif
+    do idx = 1, size(pint_geometry_cache)
+      entry => pint_geometry_cache(idx)
+      if(.not. entry%valid) cycle
+      if(entry%m /= m .or. entry%x1 /= x1 .or. entry%ndec /= ndec) cycle
+      if(entry%ngau /= ngau .or. entry%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(entry%quadrature_rule /= radial_quadrature_mode) cycle
+#endif
+      if(any(entry%wg /= wg) .or. any(entry%xg /= xg)) cycle
+      exit
+    end do
+    if(idx > size(pint_geometry_cache)) then
+      idx = 0
+      if(ngau <= 0 .or. ngqs <= 0) return
+      if(ngau > pint_geometry_cache_bytes / real_bytes / 2) return
+      remaining_values = pint_geometry_cache_bytes / real_bytes - 2 * ngau
+      if(ngqs > remaining_values / ngau / 7) return
+
+      ! Replace an old key only when admitting a new geometry or order.
+      available_bytes = pint_geometry_cache_bytes - pint_geometry_retained_bytes()
+      candidate = pint_geometry_next
+      if(available_bytes / real_bytes < 2 * ngau + 7 * ngau * ngqs .and. &
+          .not. pint_geometry_cache(candidate)%valid) then
+        do i = 1, size(pint_geometry_cache)
+          candidate = mod(pint_geometry_next + i - 2, size(pint_geometry_cache)) + 1
+          if(pint_geometry_cache(candidate)%valid) exit
+        end do
+      end if
+      available_bytes = available_bytes + pint_geometry_entry_bytes(pint_geometry_cache(candidate))
+      remaining_values = available_bytes / real_bytes - 2 * ngau
+      if(remaining_values < 0) return
+      if(ngqs > remaining_values / ngau / 7) return
+      idx = candidate
+      entry => pint_geometry_cache(idx)
+      entry = empty
+      allocate(entry%wg(ngau), stat=allocation_status, errmsg=allocation_message)
+      if(allocation_status == 0) then
+        allocate(entry%xg(ngau), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%geometry(5, ngau * ngqs), &
+            stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status /= 0) then
+        entry = empty
+        idx = 0
+        return
+      end if
+      entry%wg = wg
+      entry%xg = xg
+      entry%m = m
+      entry%x1 = x1
+      entry%ndec = ndec
+      entry%ngau = ngau
+      entry%ngqs = ngqs
+#ifdef USE_QUAD
+      entry%quadrature_rule = radial_quadrature_mode
+#endif
+
+      ! Retain precisely the node prefix selected by the original window cutoff.
+      node = 0
+      node_steps: do k = 1, ngqs
+        if(k == 1) then
+          etal = 0.0_knd
+          etau = step1
+          step = step1
+        else
+          etal = step1 + (real(k, knd) - 2.0_knd) * step2
+          etau = etal + step2
+          step = step2
+        end if
+        etcoef1 = (etau + etal) / 2.0_knd
+        etcoef2 = (etau - etal) / 2.0_knd
+        do i = 1, ngau
+          etai = etcoef1 + xg(i) * etcoef2
+#ifdef USE_QUAD
+          if(radial_quadrature_mode==1) &
+              call map_radial_quadrature_node(etal,etau,xg(i),x1sm1,etai,mapped_measure)
+#endif
+          etaim1 = 1.0_knd - etai * etai
+          argb = x1sm1 + etai * etai
+          window_base = x1sm1 * etaim1 / argb
+#ifdef USE_QUAD
+          window_power = window_base ** (m / 2)
+          if(mod(m, 2) /= 0) window_power = window_power * sqrt(window_base)
+          legendre_power = etaim1 ** (m / 2)
+          if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+#else
+          window_power = window_base ** (0.5_knd * m)
+          legendre_power = etaim1 ** (0.5_knd * m)
+#endif
+          coef = step * window_power
+#ifdef USE_QUAD
+          if(radial_quadrature_mode==1) then
+            coef=mapped_measure*window_power
+          else
+#endif
+            if(coef < dec) exit node_steps
+#ifdef USE_QUAD
+          end if
+#endif
+          sargb = sqrt(argb)
+          node = node + 1
+          entry%geometry(:, node) = [etai, coef, sargb, 1.0_knd / sargb, twomi * legendre_power]
+        end do
+      end do node_steps
+      entry%nodes = node
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      if(node > 0 .and. node <= remaining_values / 5) then
+        allocate(entry%kernels(3, node), stat=allocation_status, errmsg=allocation_message)
+        if(allocation_status /= 0) then
+          if(allocated(entry%kernels)) deallocate(entry%kernels)
+        end if
+      end if
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      capacity = min(requested_degrees, 2 * ((remaining_values / max(1, node)) / 2))
+      if(capacity < 2) then
+        entry = empty
+        idx = 0
+        return
+      end if
+      allocate(entry%basis(capacity, node), stat=allocation_status, errmsg=allocation_message)
+      if(allocation_status /= 0) then
+        entry = empty
+        idx = 0
+        return
+      end if
+      entry%valid = .true.
+      pint_geometry_next = mod(idx, size(pint_geometry_cache)) + 1
+    end if
+
+    ! Grow a matching prefix only into free budget, preserving an uncached tail.
+    previous_capacity = size(entry%basis, 1)
+    if(requested_degrees > previous_capacity) then
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      ! Amortize prefix copies with even capacity growth within the retained budget.
+      capacity = min(max(requested_degrees, previous_capacity + 2 * (previous_capacity / 4)), &
+          previous_capacity + 2 * ((remaining_values / max(1, entry%nodes)) / 2))
+      if(capacity > previous_capacity) then
+        allocate(expanded_basis(capacity, entry%nodes), &
+            stat=allocation_status, errmsg=allocation_message)
+        if(allocation_status == 0) then
+#ifdef USE_QUAD
+          expanded_basis(1:entry%degrees - 1:2,:) = entry%basis(1:entry%degrees - 1:2,:)
+#else
+          expanded_basis(1:entry%degrees,:) = entry%basis(1:entry%degrees,:)
+#endif
+          call move_alloc(expanded_basis, entry%basis)
+        end if
+      end if
+    end if
+
+    ! Extend the cached prefix using the unchanged recurrence in native precision.
+    retained_degrees = min(requested_degrees, size(entry%basis, 1))
+    if(retained_degrees <= entry%degrees) return
+#ifdef USE_QUAD
+    ! Eliminate alternate degrees from the recurrence in DLMF 14.10.3.
+    do degree = 3, retained_degrees - 3, 2
+      parity_forward(degree) = alpha(degree + 1) * alpha(degree)
+      parity_diagonal(degree) = beta(degree + 1) &
+          + alpha(degree + 1) * beta(degree) / alpha(degree - 1)
+      parity_backward(degree) = -alpha(degree + 1) * beta(degree) &
+          * beta(degree - 1) / alpha(degree - 1)
+    end do
+    do node = 1, entry%nodes
+      etai = entry%geometry(1, node)
+      eta_squared = etai * etai
+      if(entry%degrees < 2) entry%basis(1, node) = entry%geometry(5, node)
+      if(entry%degrees < 4 .and. retained_degrees >= 4) then
+        entry%basis(3, node) = (alpha(2) * alpha(1) * eta_squared + beta(2)) &
+            * entry%basis(1, node)
+      end if
+      do degree = max(3, entry%degrees - 1), retained_degrees - 3, 2
+        entry%basis(degree + 2, node) = (parity_forward(degree) * eta_squared &
+            + parity_diagonal(degree)) * entry%basis(degree, node) &
+            + parity_backward(degree) * entry%basis(degree - 2, node)
+      end do
+    end do
+#else
+    do node = 1, entry%nodes
+      etai = entry%geometry(1, node)
+      if(entry%degrees == 0) then
+        entry%basis(1, node) = entry%geometry(5, node)
+        entry%basis(2, node) = alpha(1) * etai * entry%basis(1, node)
+      end if
+      do degree = max(2, entry%degrees), retained_degrees - 2, 2
+        entry%basis(degree + 1, node) = alpha(degree) * etai * entry%basis(degree, node) &
+            + beta(degree) * entry%basis(degree - 1, node)
+        entry%basis(degree + 2, node) = alpha(degree + 1) * etai * entry%basis(degree + 1, node) &
+            + beta(degree + 1) * entry%basis(degree, node)
+      end do
+    end do
+#endif
+    entry%degrees = retained_degrees
+  end subroutine
+
+  subroutine pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+      wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+      norme, pnorm, ipnorm, coefme, coefmo)
+    integer, intent(in) :: m, lnum, limint, maxint, maxlp, maxmp, ndec, ngau, ngqs
+    real(knd), intent(in) :: c, x1, wg(ngau), xg(ngau)
+    real(knd), intent(out) :: rpint1(maxint), rpint2(maxint), pint1(maxint), &
+        pint2(maxint), pint3(maxint), pint4(maxint), pnorm(maxlp), coefme, coefmo
+    integer, intent(out) :: norme(maxmp), ipnorm(maxlp)
+    integer :: idx, prefix_idx, prefix_limint, prefix_odd, allocation_status
+    integer :: real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
+#ifdef USE_QUAD
+    logical :: parity_integrals, quadrature_pair_valid
+    real(knd), allocatable :: quadrature_pair_work(:,:)
+    integer :: quadrature_pair_prefix
+
+    radial_quadrature_cache_index=0
+    quadrature_pair_valid=.false.
+    quadrature_pair_prefix=0
+    parity_integrals = limint >= 0 .and. limint <= maxint - 4 .and. limint <= huge(limint) - 5
+#endif
+
+    ! Radial quadrature is independent of incidence and receive angles.
+    do idx = 1, size(pint_cache)
+      if(.not. pint_cache(idx)%valid) cycle
+      if(pint_cache(idx)%m /= m .or. pint_cache(idx)%lnum /= lnum) cycle
+      if(pint_cache(idx)%c /= c .or. pint_cache(idx)%x1 /= x1) cycle
+      if(pint_cache(idx)%limint /= limint .or. pint_cache(idx)%ndec /= ndec) cycle
+      if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+      if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
+      if(.not.checked_moment_cache_eligible(idx)) cycle
+#endif
+      if(size(pint_cache(idx)%pint1) /= maxint) cycle
+      if(size(pint_cache(idx)%pnorm) /= maxlp) cycle
+      if(size(pint_cache(idx)%norme) /= maxmp) cycle
+      if(any(pint_cache(idx)%wg /= wg) .or. any(pint_cache(idx)%xg /= xg)) cycle
+      rpint1 = pint_cache(idx)%rpint1
+      rpint2 = pint_cache(idx)%rpint2
+      pint1 = pint_cache(idx)%pint1
+      pint2 = pint_cache(idx)%pint2
+      pint3 = pint_cache(idx)%pint3
+      pint4 = pint_cache(idx)%pint4
+      pnorm = pint_cache(idx)%pnorm
+      norme = pint_cache(idx)%norme
+      ipnorm = pint_cache(idx)%ipnorm
+      coefme = pint_cache(idx)%coefme
+      coefmo = pint_cache(idx)%coefmo
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1 .and. pint_cache(idx)%moment_errors_valid) then
+        if(pint_exact_sums_enabled()) radial_quadrature_cache_index=idx
+      end if
+#endif
+      return
+    end do
+
+    ! Initialize unused parity entries so cached workspaces contain defined values.
+    rpint1 = 0.0_knd
+    rpint2 = 0.0_knd
+    pint1 = 0.0_knd
+    pint2 = 0.0_knd
+    pint3 = 0.0_knd
+    pint4 = 0.0_knd
+    pnorm = 0.0_knd
+    norme = 0
+    ipnorm = 0
+    prefix_idx = 0
+    prefix_limint = 0
+    ! Reuse completed quadrature sums when only the requested degree grows.
+    do idx = 1, size(pint_cache)
+      if(.not. pint_cache(idx)%valid) cycle
+      if(pint_cache(idx)%m /= m .or. pint_cache(idx)%c /= c) cycle
+      if(pint_cache(idx)%x1 /= x1 .or. pint_cache(idx)%ndec /= ndec) cycle
+      if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+      if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
+      if(.not.checked_moment_cache_eligible(idx)) cycle
+#endif
+      if(pint_cache(idx)%limint > limint .or. &
+          pint_cache(idx)%limint <= prefix_limint) cycle
+      if(any(pint_cache(idx)%wg /= wg) .or. any(pint_cache(idx)%xg /= xg)) cycle
+      prefix_odd = 2 * ((pint_cache(idx)%limint + 1) / 2) + 1
+      if(size(pint_cache(idx)%pint1) < prefix_odd .or. &
+          size(pint_cache(idx)%pint4) < prefix_odd + 1 .or. &
+          maxint < prefix_odd + 1) cycle
+#ifdef USE_QUAD
+      if(parity_integrals) then
+        if(size(pint_cache(idx)%pint4) < prefix_odd + 2 .or. maxint < prefix_odd + 2) cycle
+      end if
+#endif
+      prefix_idx = idx
+      prefix_limint = pint_cache(idx)%limint
+    end do
+    if(prefix_idx > 0) then
+      prefix_odd = 2 * ((prefix_limint + 1) / 2) + 1
+      pint1(1:prefix_odd:2) = pint_cache(prefix_idx)%pint1(1:prefix_odd:2)
+      pint2(1:prefix_odd:2) = pint_cache(prefix_idx)%pint2(1:prefix_odd:2)
+#ifdef USE_QUAD
+      if(parity_integrals) then
+        pint4(1:prefix_odd + 2) = pint_cache(prefix_idx)%pint4(1:prefix_odd + 2)
+      else
+#endif
+        pint4(2:prefix_odd + 1:2) = pint_cache(prefix_idx)%pint4(2:prefix_odd + 1:2)
+#ifdef USE_QUAD
+      end if
+#endif
+    end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1 .and. maxint>0) then
+      if(int(maxint,int64)<=auxiliary_cache_budget/(6_int64*(storage_size(0.0_knd)/8))) then
+        allocate(quadrature_pair_work(maxint,6),stat=allocation_status,errmsg=allocation_message)
+        if(allocation_status==0) then
+          quadrature_pair_work=0.0_knd
+          if(prefix_idx>0) then
+            if(pint_cache(prefix_idx)%moment_errors_valid) then
+              prefix_odd=2*((prefix_limint+1)/2)+1
+              quadrature_pair_work(1:prefix_odd+2,:)= &
+                  pint_cache(prefix_idx)%moment_errors(1:prefix_odd+2,:)
+              quadrature_pair_prefix=prefix_limint
+            end if
+          end if
+        end if
+      end if
+    end if
+    if(allocated(quadrature_pair_work)) then
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+          norme, pnorm, ipnorm, coefme, coefmo, resume_lim=prefix_limint, &
+          moment_errors=quadrature_pair_work, moment_error_prefix=quadrature_pair_prefix, &
+          moment_errors_valid=quadrature_pair_valid)
+    else
+#endif
+    call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+        ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+        norme, pnorm, ipnorm, coefme, coefmo, resume_lim=prefix_limint)
+#ifdef USE_QUAD
+    end if
+#endif
+
+    ! Allocate directly in the bounded cache without implicit duplicate copies.
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, ngau)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 6 * real_bytes, maxint)) return
+#ifdef USE_QUAD
+    if(quadrature_pair_valid) then
+      if(.not. add_auxiliary_cache_bytes(requested_bytes, 6 * real_bytes, maxint)) return
+    end if
+#endif
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes + integer_bytes, maxlp)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, integer_bytes, maxmp)) return
+    idx = pint_cache_next
+    call clear_pint_cache_slot(idx)
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    associate(entry => pint_cache(idx))
+      allocate(entry%wg(ngau), stat=allocation_status, errmsg=allocation_message)
+      if(allocation_status == 0) then
+        allocate(entry%xg(ngau), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%rpint1(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%rpint2(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint1(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint2(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint3(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint4(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pnorm(maxlp), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%norme(maxmp), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%ipnorm(maxlp), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status /= 0) then
+        call clear_pint_cache_slot(idx)
+        return
+      end if
+      entry%valid = .true.
+      entry%bytes = requested_bytes
+      entry%m = m
+      entry%lnum = lnum
+      entry%limint = limint
+      entry%ndec = ndec
+      entry%ngau = ngau
+      entry%ngqs = ngqs
+#ifdef USE_QUAD
+      entry%parity_integrals = parity_integrals
+      entry%quadrature_rule = radial_quadrature_mode
+      if(quadrature_pair_valid) then
+        call move_alloc(quadrature_pair_work,entry%moment_errors)
+        entry%moment_errors_valid=.true.
+        radial_quadrature_cache_index=idx
+      end if
+#endif
+      entry%c = c
+      entry%x1 = x1
+      entry%wg = wg
+      entry%xg = xg
+      entry%rpint1 = rpint1
+      entry%rpint2 = rpint2
+      entry%pint1 = pint1
+      entry%pint2 = pint2
+      entry%pint3 = pint3
+      entry%pint4 = pint4
+      entry%pnorm = pnorm
+      entry%norme = norme
+      entry%ipnorm = ipnorm
+      entry%coefme = coefme
+      entry%coefmo = coefmo
+    end associate
+    pint_cache_next = mod(pint_cache_next, size(pint_cache)) + 1
+  end subroutine
+
+  ! Exercise cache admission and native-value identity without a public control.
+#ifdef USE_QUAD
+  subroutine profcn_auxiliary_cache_audit_quad(checks) bind(C)
+#else
+  subroutine profcn_auxiliary_cache_audit(checks) bind(C)
+#endif
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(20)
+    integer, parameter :: degrees = 8, arguments = 3
+    real(knd) :: radial(degrees, 4, 3), angular(degrees, arguments, 2, 3), args(arguments)
+    integer :: radial_exponents(degrees, 4, 3), angular_exponents(degrees, arguments, 2, 3)
+    integer :: radial_accuracy(degrees, 3), angular_accuracy(degrees, arguments, 3)
+    integer :: slot, trial
+    integer(int64) :: previous_budget, requested_bytes
+    logical :: admitted
+
+    checks = 0
+    previous_budget = auxiliary_cache_budget
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+      call clear_auxiliary_cache_slot(slot)
+    end do
+    requested_bytes = 0
+    admitted = add_auxiliary_cache_bytes(requested_bytes, &
+        storage_size(1.0_knd) / 8, huge(1), huge(1))
+    checks(1) = merge(1, 0, .not. admitted .and. requested_bytes == 0)
+    args = [0.1_knd, 0.4_knd, 0.7_knd]
+    radial = 0.0_knd
+    angular = 0.0_knd
+    radial_exponents = 0
+    angular_exponents = 0
+    radial_accuracy = 0
+    angular_accuracy = 0
+    do trial = 1, 3
+      if(trial == 3) then
+        checks(2) = merge(1, 0, auxiliary_cache_retained_bytes() > 0 .and. &
+            auxiliary_cache_retained_bytes() <= auxiliary_cache_bytes)
+        admitted = reserve_auxiliary_cache_bytes(auxiliary_cache_bytes + 1)
+        checks(3) = merge(1, 0, .not. admitted)
+        admitted = reserve_auxiliary_cache_bytes(auxiliary_cache_bytes)
+        checks(4) = merge(1, 0, admitted .and. auxiliary_cache_retained_bytes() == 0)
+        auxiliary_cache_budget = 0
+      end if
+      call profcn(6.0_knd, 2, degrees, 2, 0.07_knd, 2, 1, arguments, args, &
+          radial(:,1,trial), radial_exponents(:,1,trial), &
+          radial(:,2,trial), radial_exponents(:,2,trial), &
+          radial(:,3,trial), radial_exponents(:,3,trial), &
+          radial(:,4,trial), radial_exponents(:,4,trial), &
+          radial_accuracy(:,trial), angular(:,:,1,trial), angular_exponents(:,:,1,trial), &
+          angular(:,:,2,trial), angular_exponents(:,:,2,trial), angular_accuracy(:,:,trial))
+    end do
+    checks(5) = merge(1, 0, all(radial(:,:,1) == radial(:,:,2)) .and. &
+        all(angular(:,:,:,1) == angular(:,:,:,2)) .and. &
+        all(radial_exponents(:,:,1) == radial_exponents(:,:,2)) .and. &
+        all(angular_exponents(:,:,:,1) == angular_exponents(:,:,:,2)) .and. &
+        all(radial_accuracy(:,1) == radial_accuracy(:,2)) .and. &
+        all(angular_accuracy(:,:,1) == angular_accuracy(:,:,2)))
+    checks(6) = merge(1, 0, all(radial(:,:,1) == radial(:,:,3)) .and. &
+        all(angular(:,:,:,1) == angular(:,:,:,3)) .and. &
+        all(radial_exponents(:,:,1) == radial_exponents(:,:,3)) .and. &
+        all(angular_exponents(:,:,:,1) == angular_exponents(:,:,:,3)) .and. &
+        all(radial_accuracy(:,1) == radial_accuracy(:,3)) .and. &
+        all(angular_accuracy(:,:,1) == angular_accuracy(:,:,3)))
+    checks(7) = merge(1, 0, auxiliary_cache_retained_bytes() == 0)
+    call audit_auxiliary_cache_arguments(checks(8:12))
+    call audit_pint_prefix(checks(13:15))
+    call audit_pleg_storage(checks(16:20))
+    auxiliary_cache_budget = previous_budget
+  end subroutine
+
+  subroutine audit_pleg_storage(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(5)
+    integer, parameter :: psize = 512, plim = 16, grown_limit = 24, trials = 6
+    real(knd) :: args(1,trials), pr(1,psize,trials), pdr(1,psize,trials)
+    real(knd), allocatable :: coefficients(:,:,:)
+    real(knd) :: pnorm(1,trials), pdnorm(1,trials)
+    integer :: ipnorm(1,trials), ipdnorm(1,trials)
+    integer :: slot, trial, requested_size, requested_limit, saved_limit, ncoef, cache_slot
+    integer :: digits_native, exponent_range, real_bytes, integer_bytes
+    integer(int64) :: expected_bytes
+
+    allocate(coefficients(psize,8,trials))
+    checks = 1
+    digits_native = precision(1.0_knd)
+    exponent_range = range(1.0_knd) - 1
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+      call clear_auxiliary_cache_slot(slot)
+    end do
+    args = 0.4_knd
+    pr = 0.0_knd
+    pdr = 0.0_knd
+    coefficients = 0.0_knd
+    ! Exercise unchanged matching with deliberately oversized caller workspaces.
+    do trial = 1, trials
+      requested_size = psize
+      requested_limit = plim
+      if(trial == 3) then
+        requested_size = psize / 2
+        requested_limit = plim / 2
+      end if
+      if(trial >= 4) requested_limit = grown_limit
+      ncoef = requested_limit + 2
+      cache_slot = find_pleg_cache(2,1,digits_native,exponent_range, &
+          args(:,trial),1,1,requested_limit,requested_size)
+      if(trial == 2 .and. cache_slot == 0) checks(2) = 0
+      if(trial == 3 .and. cache_slot == 0) checks(3) = 0
+      if(trial == 4 .and. cache_slot /= 0) checks(4) = 0
+      if(trial == 5 .and. cache_slot == 0) checks(4) = 0
+      if(trial == 6) then
+        do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+          call clear_auxiliary_cache_slot(slot)
+        end do
+        auxiliary_cache_budget = 0
+      end if
+      saved_limit = 0
+      call pleg_cached(2,requested_limit,requested_size,saved_limit,1,digits_native, &
+          exponent_range,args(:,trial),1,1,pr(:,1:requested_size,trial), &
+          pdr(:,1:requested_size,trial),pdnorm(:,trial),ipdnorm(:,trial),pnorm(:,trial), &
+          ipnorm(:,trial),coefficients(1:requested_size,1,trial), &
+          coefficients(1:requested_size,2,trial),coefficients(1:requested_size,3,trial), &
+          coefficients(1:requested_size,4,trial),coefficients(1:requested_size,5,trial), &
+          coefficients(1:requested_size,6,trial),coefficients(1:requested_size,7,trial), &
+          coefficients(1:requested_size,8,trial))
+      if(trial == 1) then
+        cache_slot = find_pleg_cache(2,1,digits_native,exponent_range,args(:,trial),1,1,plim,psize)
+        if(cache_slot == 0) then
+          checks(1) = 0
+        else
+          associate(entry => pleg_cache(cache_slot))
+            expected_bytes = int(10 * ncoef + 3, int64) * real_bytes + 2 * integer_bytes
+            if(entry%maxp /= psize .or. entry%lim /= plim .or. &
+                size(entry%pr,2) /= ncoef .or. size(entry%pdr,2) /= ncoef .or. &
+                any([size(entry%alpha),size(entry%beta),size(entry%gamma), &
+                size(entry%coefa),size(entry%coefb),size(entry%coefc), &
+                size(entry%coefd),size(entry%coefe)] /= ncoef) .or. &
+                entry%bytes /= expected_bytes .or. &
+                auxiliary_cache_retained_bytes() /= expected_bytes) checks(1) = 0
+          end associate
+        end if
+        if(find_pleg_cache(2,1,digits_native,exponent_range,args(:,trial),1,1,plim,psize+1) /= 0) &
+            checks(3) = 0
+      end if
+    end do
+    ! Compare every defined value, including coefficients and normalization exponents.
+    do trial = 2, trials
+      if(trial == 4) cycle
+      slot = 1
+      ncoef = plim + 2
+      if(trial == 3) ncoef = plim / 2 + 2
+      if(trial >= 5) then
+        slot = 4
+        ncoef = grown_limit + 2
+      end if
+      if(.not. (all(pr(:,1:ncoef,trial) == pr(:,1:ncoef,slot)) .and. &
+          all(pdr(:,1:ncoef,trial) == pdr(:,1:ncoef,slot)) .and. &
+          all(coefficients(3:ncoef,:,trial) == coefficients(3:ncoef,:,slot)) .and. &
+          all(pnorm(:,trial) == pnorm(:,slot)) .and. all(pdnorm(:,trial) == pdnorm(:,slot)) .and. &
+          all(ipnorm(:,trial) == ipnorm(:,slot)) .and. all(ipdnorm(:,trial) == ipdnorm(:,slot)))) &
+          checks(min(trial,5)) = 0
+    end do
+    if(auxiliary_cache_retained_bytes() /= 0) checks(5) = 0
+    auxiliary_cache_budget = auxiliary_cache_bytes
+  end subroutine
+
+  subroutine audit_auxiliary_cache_arguments(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(5)
+    integer, parameter :: plim = 8, psize = plim + 2, qlim = 12, qsize = qlim + 8, qdegrees = 4
+    real(knd) :: scalar_cases(8), p_cases(6), q_cases(3), adjacent, shifted_argument
+    real(knd) :: parg(1,3), pr(1,psize,3), pdr(1,psize,3), pnorm(1,3), pdnorm(1,3)
+    real(knd) :: coefficients(psize,8,3), qratios(qsize,2,3), qvalues(qdegrees,2,3), qnormal(3,3)
+    integer :: ipnorm(1,3), ipdnorm(1,3), qexponents(qdegrees,2,3), qnormal_exponents(3,3)
+    integer :: sample, trial, slot, saved_limit, digits_native, exponent_range, direction
+
+    checks = 1
+    digits_native = precision(1.0_knd)
+    exponent_range = range(1.0_knd) - 1
+    scalar_cases = [0.4_knd, -0.4_knd, 1.0_knd, -1.0_knd, &
+        nearest(1.0_knd,-1.0_knd), nearest(-1.0_knd,1.0_knd), 1.0e-6_knd, -1.0e-6_knd]
+    ! Adjacent values must remain distinct on both sides of zero and the endpoints.
+    do sample = 1, size(scalar_cases)
+      if(.not. cache_real_equal(scalar_cases(sample), scalar_cases(sample))) checks(1) = 0
+      do direction = -1, 1, 2
+        adjacent = nearest(scalar_cases(sample), real(direction,knd))
+        if(cache_real_equal(scalar_cases(sample), adjacent)) checks(1) = 0
+        if(cache_real_vector_equal([scalar_cases(sample)], [adjacent], 1)) checks(1) = 0
+      end do
+    end do
+    p_cases = [0.4_knd, -0.4_knd, 1.0e-6_knd, -1.0e-6_knd, &
+        nearest(nearest(1.0_knd,-1.0_knd),-1.0_knd), &
+        nearest(nearest(-1.0_knd,1.0_knd),1.0_knd)]
+    ! Compare a changed PLEG argument with a fresh cache-disabled evaluation.
+    do sample = 1, size(p_cases)
+      shifted_argument = nearest(p_cases(sample), sign(1.0_knd,p_cases(sample)))
+      do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+        call clear_auxiliary_cache_slot(slot)
+      end do
+      auxiliary_cache_budget = auxiliary_cache_bytes
+      coefficients = 0.0_knd
+      do trial = 1, 3
+        parg(1,trial) = shifted_argument
+        if(trial == 1) parg(1,trial) = p_cases(sample)
+        if(trial == 2) then
+          if(find_pleg_cache(2,1,digits_native,exponent_range, &
+              [p_cases(sample)],1,1,plim,psize) == 0) &
+              checks(2) = 0
+          if(find_pleg_cache(2,1,digits_native,exponent_range, &
+              [shifted_argument],1,1,plim,psize) /= 0) &
+              checks(2) = 0
+        end if
+        if(trial == 3) then
+          do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+            call clear_auxiliary_cache_slot(slot)
+          end do
+          auxiliary_cache_budget = 0
+        end if
+        saved_limit = 0
+        call pleg_cached(2,plim,psize,saved_limit,1,digits_native,exponent_range,parg(:,trial), &
+            1,1,pr(:,:,trial),pdr(:,:,trial),pdnorm(:,trial),ipdnorm(:,trial),pnorm(:,trial), &
+            ipnorm(:,trial),coefficients(:,1,trial),coefficients(:,2,trial), &
+            coefficients(:,3,trial), &
+            coefficients(:,4,trial),coefficients(:,5,trial),coefficients(:,6,trial), &
+            coefficients(:,7,trial),coefficients(:,8,trial))
+      end do
+      ! PLEG leaves coefficient entries below m+1 unwritten.
+      if(.not. (all(parg(:,2) == parg(:,3)) .and. all(pr(:,:,2) == pr(:,:,3)) .and. &
+          all(pdr(:,:,2) == pdr(:,:,3)) .and. all(pnorm(:,2) == pnorm(:,3)) .and. &
+          all(pdnorm(:,2) == pdnorm(:,3)) .and. all(ipnorm(:,2) == ipnorm(:,3)) .and. &
+          all(ipdnorm(:,2) == ipdnorm(:,3)) .and. &
+          all(coefficients(3:,:,2) == coefficients(3:,:,3)))) checks(3) = 0
+    end do
+    q_cases = [0.07_knd, 1.0e-6_knd, nearest(1.0_knd,-1.0_knd)]
+    ! QLEG uses positive xi-1, including values much smaller than unity.
+    do sample = 1, size(q_cases)
+      shifted_argument = nearest(q_cases(sample), 1.0_knd)
+      do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+        call clear_auxiliary_cache_slot(slot)
+      end do
+      auxiliary_cache_budget = auxiliary_cache_bytes
+      do trial = 1, 3
+        adjacent = shifted_argument
+        if(trial == 1) adjacent = q_cases(sample)
+        if(trial == 2) then
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,q_cases(sample),digits_native) == 0) &
+              checks(4) = 0
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,shifted_argument,digits_native) /= 0) &
+              checks(4) = 0
+        end if
+        if(trial == 3) then
+          do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+            call clear_auxiliary_cache_slot(slot)
+          end do
+          auxiliary_cache_budget = 0
+        end if
+        call qleg_cached(4,qdegrees,qlim,qsize,adjacent,digits_native, &
+            qratios(:,1,trial),qnormal(1,trial),qnormal_exponents(1,trial), &
+            qvalues(:,1,trial),qexponents(:,1,trial),qratios(:,2,trial), &
+            qnormal(2,trial),qnormal_exponents(2,trial),qvalues(:,2,trial), &
+            qexponents(:,2,trial),qnormal(3,trial),qnormal_exponents(3,trial))
+      end do
+      ! For m=4, QLEG leaves recurrence entry 8 unwritten.
+      if(.not. (all(qratios(1:7,:,2) == qratios(1:7,:,3)) .and. &
+          all(qratios(9:qsize,:,2) == qratios(9:qsize,:,3)) .and. &
+          all(qvalues(:,:,2) == qvalues(:,:,3)) .and. &
+          all(qexponents(:,:,2) == qexponents(:,:,3)) .and. &
+          all(qnormal(:,2) == qnormal(:,3)) .and. &
+          all(qnormal_exponents(:,2) == qnormal_exponents(:,3)))) checks(5) = 0
+    end do
+  end subroutine
+
+#ifdef USE_QUAD
+  logical function audit_pint_roundoff(m, lim, observed, original, pnorm, ipnorm, &
+      basis, kernels) result(agrees)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    integer, intent(in) :: m, lim, ipnorm(:)
+    real(knd), intent(in) :: observed(:,:), original(:,:), pnorm(:), basis(:,:), kernels(:,:)
+    real(knd) :: bounds(size(observed,1),6), alpha(size(observed,1)), beta(size(observed,1))
+    real(knd) :: absolute_sum, magnitude, allowance, denominator, factor, roundoff
+    real(knd) :: twom, first_scale, second_scale
+    integer :: degree, node, kernel, column, last_odd, extra_odd, row, numerator, divisor
+
+    ! Bound summation differences by absolute products, including cancellation and underflow.
+    agrees = .false.
+    last_odd = 2 * ((lim + 1) / 2) + 1
+    extra_odd = last_odd + 2
+    if(size(basis,1) < extra_odd .or. extra_odd > size(observed,1)) return
+    if(size(basis,2) /= size(kernels,2) .or. size(kernels,1) /= 3) return
+    if(any(.not. ieee_is_finite(observed)) .or. any(.not. ieee_is_finite(original))) return
+    bounds = 0.0_knd
+    roundoff = (8.0_knd * size(kernels,2) + 32.0_knd) * epsilon(1.0_knd)
+    if(roundoff >= 0.25_knd) return
+    do degree = 1, extra_odd, 2
+      do kernel = 1, 3
+        if(degree == extra_odd .and. kernel < 3) cycle
+        column = kernel + 2
+        if(kernel == 3) column = 6
+        absolute_sum = 0.0_knd
+        do node = 1, size(kernels,2)
+          absolute_sum = absolute_sum + &
+              abs(basis(degree,node) * kernels(kernel,node))
+        end do
+        if(.not. ieee_is_finite(absolute_sum)) return
+        ! With epsilon=2u this exceeds both gamma(2N) bounds and rounding of the L1 sum.
+        bounds(degree,column) = nearest(roundoff * absolute_sum + &
+            (8.0_knd * size(kernels,2) + 32.0_knd) * tiny(1.0_knd), 1.0_knd)
+      end do
+    end do
+
+    ! Propagate the raw-moment bounds through the unchanged neighboring-degree recurrence.
+    twom = real(m, knd) + real(m, knd)
+    alpha(1) = (twom + 1.0_knd) * pnorm(1) / pnorm(2)
+    alpha(1) = alpha(1) * 10.0_knd ** (ipnorm(1) - ipnorm(2))
+    alpha(2) = (twom + 3.0_knd) * pnorm(2) / (pnorm(3) * 2.0_knd)
+    alpha(2) = alpha(2) * 10.0_knd ** (ipnorm(2) - ipnorm(3))
+    do degree = 2, extra_odd - 1
+      if(degree > 2) alpha(degree) = alpha(degree - 2) * (twom + degree - 1) &
+          * (twom + degree + degree - 1) * (degree - 2) &
+          / ((degree - 1) * (twom + degree) * (twom + degree + degree - 5))
+      beta(degree) = -(twom + degree - 1) / (twom + degree)
+    end do
+    do column = 5, 6
+      kernel = column
+      if(column == 5) kernel = 4
+      do degree = 1, extra_odd - 2, 2
+        if(column == 5 .and. degree > lim) cycle
+        magnitude = abs(observed(degree+2,kernel)) + abs(original(degree+2,kernel)) &
+            + abs(beta(degree+1)) * (abs(observed(degree,kernel)) + abs(original(degree,kernel)))
+        allowance = (bounds(degree+2,kernel) + abs(beta(degree+1)) * bounds(degree,kernel) &
+            + 8.0_knd * epsilon(1.0_knd) * magnitude) / abs(alpha(degree+1))
+        bounds(degree+1,column) = nearest(allowance * (1.0_knd + 16.0_knd * epsilon(1.0_knd)) &
+            + 8.0_knd * tiny(1.0_knd), 1.0_knd)
+      end do
+    end do
+
+    ! A ratio is certified only when its denominator remains separated from zero.
+    do degree = 3, lim, 2
+      do column = 1, 2
+        do row = degree, degree + 1
+          kernel = column + 2
+          first_scale = twom + degree - 1
+          second_scale = degree - 1
+          if(row == degree + 1) then
+            kernel = column + 4
+            first_scale = twom + degree
+            second_scale = degree
+          end if
+          numerator = row
+          divisor = row - 2
+          denominator = nearest(abs(original(divisor,kernel)) - bounds(divisor,kernel), -1.0_knd)
+          if(denominator <= 0.0_knd) return
+          factor = first_scale / second_scale
+          allowance = factor * (bounds(numerator,kernel) + &
+              abs(original(numerator,kernel) / original(divisor,kernel)) * bounds(divisor,kernel)) &
+              / denominator + 8.0_knd * epsilon(1.0_knd) &
+              * (abs(observed(row,column)) + abs(original(row,column)))
+          bounds(row,column) = nearest(allowance * (1.0_knd + 16.0_knd * epsilon(1.0_knd)) &
+              + 8.0_knd * tiny(1.0_knd), 1.0_knd)
+        end do
+      end do
+    end do
+    if(any(.not. ieee_is_finite(bounds))) return
+    agrees = all(abs(observed - original) <= bounds)
+  end function
+#endif
+
+  subroutine audit_pint_prefix(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(3)
+    integer, parameter :: m = 2, ndec = 2, ngau = 24, ngqs = 3
+    integer, parameter :: maxint_high = 27, maxlp_high = 17, maxmp = 7
+    real(knd), parameter :: c = 6.0_knd, x1 = 0.07_knd
+    real(knd) :: wg(ngau), xg(ngau), cached(maxint_high,6), direct(maxint_high,6)
+#ifdef USE_QUAD
+    real(knd) :: fresh(maxint_high,6)
+#endif
+    real(knd) :: cached_pnorm(maxlp_high), direct_pnorm(maxlp_high)
+    real(knd) :: cached_coefme, cached_coefmo, direct_coefme, direct_coefmo
+    integer :: cached_norme(maxmp), direct_norme(maxmp)
+    integer :: cached_ipnorm(maxlp_high), direct_ipnorm(maxlp_high)
+    integer :: stage, lnum, limint, maxint, maxlp, slot
+    logical :: prior_present, exact, baseline_exact
+
+    checks = 0
+    baseline_exact = .false.
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pint_cache)
+      call clear_pint_cache_slot(slot)
+    end do
+    call gauss_cached(ndec, ngau, xg, wg)
+    do stage = 1, 4
+      lnum = 7 + min(stage, 3)
+      limint = lnum + 3 * ndec + int(c)
+      maxint = limint + 5
+      maxlp = lnum + m + 5
+      prior_present = stage == 1
+      if(stage > 1 .and. stage < 4) then
+        do slot = 1, size(pint_cache)
+          if(pint_cache(slot)%valid) then
+            if(pint_cache(slot)%limint == limint - 1) prior_present = .true.
+          end if
+        end do
+      end if
+      if(stage == 4) then
+        do slot = 1, size(pint_cache)
+          call clear_pint_cache_slot(slot)
+        end do
+        prior_present = .true.
+        do slot = 1, size(pint_cache)
+          if(pint_cache(slot)%valid) prior_present = .false.
+        end do
+      end if
+      cached = 0.0_knd
+      direct = 0.0_knd
+      cached_pnorm = 0.0_knd
+      direct_pnorm = 0.0_knd
+      cached_norme = 0
+      direct_norme = 0
+      cached_ipnorm = 0
+      direct_ipnorm = 0
+      call pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, cached(1:maxint,1), cached(1:maxint,2), &
+          cached(1:maxint,3), cached(1:maxint,4), cached(1:maxint,5), &
+          cached(1:maxint,6), cached_norme, cached_pnorm(1:maxlp), &
+          cached_ipnorm(1:maxlp), cached_coefme, cached_coefmo)
+#ifdef USE_QUAD
+      ! Prefix reuse must reproduce a fresh evaluation on the same summation route exactly.
+      fresh = 0.0_knd
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, fresh(1:maxint,1), fresh(1:maxint,2), &
+          fresh(1:maxint,3), fresh(1:maxint,4), fresh(1:maxint,5), &
+          fresh(1:maxint,6), direct_norme, direct_pnorm(1:maxlp), &
+          direct_ipnorm(1:maxlp), direct_coefme, direct_coefmo)
+      if(any(fresh /= cached)) return
+#endif
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, direct(1:maxint,1), direct(1:maxint,2), &
+          direct(1:maxint,3), direct(1:maxint,4), direct(1:maxint,5), &
+          direct(1:maxint,6), direct_norme, direct_pnorm(1:maxlp), &
+          direct_ipnorm(1:maxlp), direct_coefme, direct_coefmo, use_geometry_cache=.false.)
+      exact = all(cached(1:maxint,:) == direct(1:maxint,:))
+#ifdef USE_QUAD
+      if(.not. exact .and. pint_exact_sums_enabled()) then
+        do slot = 1, size(pint_geometry_cache)
+          if(.not. pint_geometry_cache(slot)%valid) cycle
+          if(pint_geometry_cache(slot)%m /= m .or. pint_geometry_cache(slot)%x1 /= x1) cycle
+          if(pint_geometry_cache(slot)%kernel_c /= c) cycle
+          if(pint_geometry_cache(slot)%ngau /= ngau .or. &
+              pint_geometry_cache(slot)%ngqs /= ngqs) cycle
+          if(.not. allocated(pint_geometry_cache(slot)%basis) .or. &
+              .not. allocated(pint_geometry_cache(slot)%kernels)) cycle
+          exact = audit_pint_roundoff(m, limint, cached(1:maxint,:), direct(1:maxint,:), &
+              cached_pnorm, cached_ipnorm, pint_geometry_cache(slot)%basis, &
+              pint_geometry_cache(slot)%kernels)
+          exit
+        end do
+      end if
+#endif
+      exact = exact .and. all(cached_norme == direct_norme) .and. &
+          all(cached_pnorm(1:maxlp) == direct_pnorm(1:maxlp)) .and. &
+          all(cached_ipnorm(1:maxlp) == direct_ipnorm(1:maxlp)) .and. &
+          cached_coefme == direct_coefme .and. cached_coefmo == direct_coefmo
+      if(stage == 1) baseline_exact = exact
+      if(stage > 1) checks(stage - 1) = merge(1, 0, baseline_exact .and. prior_present .and. exact)
+    end do
+    do slot = 1, size(pint_cache)
+      call clear_pint_cache_slot(slot)
+    end do
   end subroutine
 
   subroutine profcn(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
@@ -681,6 +3231,9 @@ module prolate_swf
       if(x1 < 1.0e-12_knd) ngau =2400
       if(x1 <= 0.5e0_knd) maxpdr = maxpdr + int(2.e0_knd * c + 100.0e0_knd * x1) + 400
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1) ngau=65
+#endif
     maxq = maxint + maxm + maxm
     maxdr = maxpdr / 2 + 1
     maxp = max(maxp, maxpdr)
@@ -718,7 +3271,8 @@ module prolate_swf
   subroutine profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
            r1c, ir1e, r1dc, ir1de, r2c, &
            ir2e, r2dc, ir2de, naccr, &
-           s1c, is1e, s1dc, is1de, naccs)
+           s1c, is1e, s1dc, is1de, naccs, coefficient_values, coefficient_lengths, &
+           coefficient_status)
 
 !  purpose:     Batched wrapper around profcn for consecutive orders
 !               m = m_start, ..., m_start + m_count - 1.
@@ -734,6 +3288,8 @@ module prolate_swf
                   ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
                   is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
                   naccs(lnum, narg, m_count)
+    real(knd), optional, intent(out) :: coefficient_values(:,:,:)
+    integer, optional, intent(out) :: coefficient_lengths(:,:), coefficient_status
     kindd = 8
     kindq = 16
 
@@ -760,6 +3316,11 @@ module prolate_swf
     is1e = 0
     is1de = 0
     naccs = 0
+    if(present(coefficient_values)) then
+      coefficient_values = 0.0_knd
+      coefficient_lengths = 0
+      coefficient_status = 0
+    end if
 
     ! Request a consecutive block of orders from main.
     mnum = m_count
@@ -791,6 +3352,9 @@ module prolate_swf
       if(x1 < 1.0e-12_knd) ngau =2400
       if(x1 <= 0.5e0_knd) maxpdr = maxpdr + int(2.e0_knd * c + 100.0e0_knd * x1) + 400
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1) ngau=65
+#endif
     maxq = maxint + maxm + maxm
     maxdr = maxpdr / 2 + 1
     maxp = max(maxp, maxpdr)
@@ -805,7 +3369,8 @@ module prolate_swf
           x1, ngau, arg, narg, neta, maxd, maxdr, maxint, maxj, maxlp, &
           maxm, maxmp, maxn, maxp, maxpdr, maxq, maxt, jnenmax, &
           kindd, kindq, ndec, nex, r1c, ir1e, r1dc, ir1de, r2c, ir2e, &
-          r2dc, ir2de, naccr, s1c, is1e, s1dc, is1de, naccs)
+          r2dc, ir2de, naccr, s1c, is1e, s1dc, is1de, naccs, &
+          coefficient_values, coefficient_lengths, coefficient_status)
 
     end subroutine
 
@@ -814,7 +3379,7 @@ module prolate_swf
              maxint, maxj, maxlp, maxm, maxmp, maxn, maxp, maxpdr, &
              maxq, maxt, jnenmax, kindd, kindq, ndec, nex, qr1, ir1, &
              qr1d, ir1d, qr2, ir2, qr2d, ir2d, nar, s1, is1, s1d, is1d, &
-             nas)
+             nas, coefficient_values, coefficient_lengths, coefficient_status)
 
 !  purpose:     To coordinate the calculation of both the prolate
 !               spheroidal radial and angular functions and their
@@ -972,6 +3537,15 @@ module prolate_swf
          r2ic, r2dic, r2lc, r2dlc, r2nc, r2dnc, sgn, termpq, x, xb, &
          xbninp, x1, wm, wronc, wront, wronca, wroncb
     character chr
+#ifdef USE_QUAD
+    logical :: radial_integral_selected, radial_error_valid_here, degree_replay_eligible
+    integer :: degree_replay_bessel_limit,degree_replay_neumann_limit,degree_replay_ratio_count, &
+            degree_replay_input_state(28),degree_replay_action
+    integer :: degree_replay_integer_outputs(31)
+    real(knd) :: degree_replay_input_scalars(5),degree_replay_real_outputs(18)
+    real(knd) :: radial_value_error,radial_derivative_error
+    integer :: radial_error_slot
+#endif
 !
 !  integer and real(knd) arrays with dimension lnum
     dimension iqdl(lnum), iql(lnum), ifajo(lnum)
@@ -983,6 +3557,8 @@ module prolate_swf
 !  real(knd) and integer arrays with dimensions lnum and narg
     real(knd) s1(lnum, narg, mnum), s1d(lnum, narg, mnum)
     dimension is1(lnum, narg, mnum), is1d(lnum, narg, mnum), nas(lnum, narg, mnum)
+    real(knd), optional, intent(inout) :: coefficient_values(:,:,:)
+    integer, optional, intent(inout) :: coefficient_lengths(:,:), coefficient_status
 !
 !  real(knd) arrays with dimension maxd
     real(knd) enr(maxd), bliste(maxd), gliste(maxd), &
@@ -1047,7 +3623,11 @@ module prolate_swf
     integer, volatile :: neemax
     dimension nees(100), naccsav(100), neeb(jnenmax), limpsv(jnenmax), &
          limnsv(jnenmax), jelimsv(jnenmax)
+    integer :: pint_available, pint_full_upper, pint_required
 !
+#ifdef USE_QUAD
+    call clear_radial_retry_ledger()
+#endif
     ! These tables exceed common thread stack limits at high modal orders.
     ! Explicit allocation keeps their storage on the heap with every compiler.
     ! Local allocatables are released automatically when main returns.
@@ -1055,6 +3635,11 @@ module prolate_swf
     allocate(pdr(maxt, maxp), pdrat(maxt, maxp), pr(maxt, maxp), prat(maxt, maxp))
     allocate(pratbsv(jnenmax, maxp), prattsv(jnenmax, maxp), pdratsv(jnenmax, maxp))
 !
+#ifdef USE_QUAD
+    call prepare_radial_quadrature_results(lnum,mnum)
+    if(mnum==1.and.ioprad==2.and.iopang==0.and.present(coefficient_values)) &
+      call begin_radial_retry_ledger(mmin,lnum,c,x1,ndec,nex,maxd,maxlp,maxn,maxp)
+#endif
     dec = 10.0e0_knd ** (-ndec - 1)
     if(ioprad /= 0) x = x1 + 1.0e0_knd
     jtest = ndec - minacc - 2
@@ -1073,14 +3658,19 @@ if (debug) then
      if(knd == kindq .and. ioprad /= 0) write(40, 30) x, c
 30    format(1x,'x = ',e39.30,/,1x,'c = ',e39.30)
 end if
-     nc = int(log10(c))
+     nc = decimal_exponent(c)
      if(nc < 0) nc = 0
      if(ioprad == 2) wront = 1.0e0_knd / (c * x1 * (x1 + 2.0e0_knd))
      ibflag1 = 0
      neemax = 1
       do 900 mi = 1, mnum
       m = mmin + minc * (mi - 1)
+#ifdef USE_QUAD
+      if(degree_replay_available()) call degree_replay_begin_proc(m,lnum,c,x1)
+#endif
+      jang = 0
       m2 = m + m
+      call prepare_bouwkamp_cache(c, m)
 if (debug) then
        if(knd == kindd .and. iopang /= 0) write(50, 35) c, m
  35     format(1x,'c = ',e23.14,'; m = ',i5)
@@ -1101,6 +3691,8 @@ end if
       iopneu = 0
       iopeta = 0
       iopint = 1
+      pint_available = 0
+      pint_full_upper = 0
       jintm = 0
       iopd = 3
       limcsav = 0
@@ -1239,6 +3831,10 @@ end if
        naccetas = minacc
        if(li == 1) naccrsav = minacc
        if(li > 1) naccrsav = naccr
+#ifdef USE_QUAD
+       radial_integral_selected=.false.
+       radial_error_valid_here=.false.
+#endif
        naccr = -1
        r2c = 0.0e0_knd
        ir2e = 0
@@ -1318,10 +3914,18 @@ end if
        j = jlowe
         do 158 i = limdle, limd, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(1)) then
+          bliste(j) = bouwkamp_tables(j, 1)
+        else
         bliste(j) = c4 * real(i, knd) * real((i - 1), knd)* &
              real((m2 + i), knd) * real((m2 + i - 1), knd)/ &
              (real((m2 + i2 - 1), knd) * real((m2 + i2 - 1), knd)* &
              real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 1) = bliste(j)
+            bouwkamp_counts(1) = j
+          end if
+        end if
         j = j + 1
 158       continue
 !
@@ -1329,9 +3933,17 @@ end if
        j = jlowe
         do 159 i = limdle - 1, limd + 1, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(2)) then
+          gliste(j) = bouwkamp_tables(j, 2)
+        else
         gliste(j) = real((m + i - 1), knd) * real((m + i), knd) + 0.5e0_knd* &
              c2 * ((1.0e0_knd - real((m2 * m2 - 1), knd)/ &
              (real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 2) = gliste(j)
+            bouwkamp_counts(2) = j
+          end if
+        end if
         j = j + 1
 159       continue
        go to 163
@@ -1342,10 +3954,18 @@ end if
        j = jlowo
         do 161 i = limdlo, limd, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(3)) then
+          blisto(j) = bouwkamp_tables(j, 3)
+        else
         blisto(j) = c4 * real(i, knd) * real((i - 1), knd)* &
              real((m2 + i), knd) * real((m2 + i - 1), knd)/ &
              (real((m2 + i2 - 1), knd) * real((m2 + i2 - 1), knd)* &
              real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 3) = blisto(j)
+            bouwkamp_counts(3) = j
+          end if
+        end if
         j = j + 1
 161       continue
 !
@@ -1353,9 +3973,17 @@ end if
        j = jlowo
         do 162 i = limdlo - 1, limd + 1, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(4)) then
+          glisto(j) = bouwkamp_tables(j, 4)
+        else
         glisto(j) = real((m + i - 1), knd) * real((m + i), knd) + 0.5e0_knd* &
              c2 * (1.0e0_knd - real((m2 * m2 - 1), knd)/ &
              (real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd)))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 4) = glisto(j)
+            bouwkamp_counts(4) = j
+          end if
+        end if
        j = j + 1
 162      continue
 163      continue
@@ -1378,12 +4006,112 @@ end if
 175      limdlo = limd + 1
        if(2 * (limd / 2) /= limd) limdlo = limd + 2
        jlowo = (limd - 1) / 2 + 1
-176      call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
+176      continue
+#ifdef USE_QUAD
+       ! Reconstruct support and eigenpairs before matching a complete downstream degree stage.
+       degree_replay_eligible=.false.
+       degree_replay_action=0
+       if(present(coefficient_values).and.present(coefficient_lengths).and. &
+           present(coefficient_status)) then
+         degree_replay_eligible=mnum==1.and.ioprad==2.and.iopang==0.and.li>1.and.x1>0.0_knd.and. &
+             iopneu==2.and.iopint==0.and.iopleg==0.and.iopeta==0.and.naccneu>0.and. &
+             .not.radial_retry_tracking.and.coefficient_status==0.and.eigval>eigvalp.and. &
+             .not.debug.and..not.output
+       end if
+       if(degree_replay_eligible) degree_replay_eligible=degree_replay_available()
+       if(degree_replay_eligible) then
+         degree_replay_ratio_count=limd/2-ix
+         degree_replay_bessel_limit=jbes+jbes+20+int(sqrt(c))
+         degree_replay_neumann_limit=min(limdneu,limp1-2,limd)
+         degree_replay_input_state=[iflag,jbes,jmf,jneu,naccneu,naccneup,naccrp,naccrsav, &
+             lowacc,istartr2,legstart,nflag,ibflag1,ibflag2,jflagleg,minacc,ndec,nex,ipcoefn,limd, &
+             degree_replay_bessel_limit,degree_replay_neumann_limit,iopleg,iopneu,iopint, &
+             iopeta,lowtest,nacctest]
+         degree_replay_input_scalars=[c,x1,factor,pcoefn,eigval]
+         degree_replay_action=degree_replay_probe_proc(m,lnum,l,degree_replay_ratio_count, &
+             degree_replay_bessel_limit,degree_replay_neumann_limit,limj,maxlp,limn1,limp1, &
+             degree_replay_input_state,degree_replay_input_scalars,enr,sbesf,sbesdf,sbesn,sbesdr, &
+             ibese,sneuf,sneudf,sneun,sneudr,ineue,prat1,size(coefficient_values,1), &
+             coefficient_values(:,li,mi),coefficient_lengths(li,mi), &
+             degree_replay_real_outputs,degree_replay_integer_outputs)
+         if(degree_replay_action==1) then
+           sgn=degree_replay_real_outputs(1)
+           d01=degree_replay_real_outputs(2)
+           dmfnorm=degree_replay_real_outputs(3)
+           dmlmf=degree_replay_real_outputs(4)
+           dmsnorm=degree_replay_real_outputs(5)
+           dmlms=degree_replay_real_outputs(6)
+           factor=degree_replay_real_outputs(7)
+           r1c=degree_replay_real_outputs(8)
+           r1dc=degree_replay_real_outputs(9)
+           r2c=degree_replay_real_outputs(10)
+           r2dc=degree_replay_real_outputs(11)
+           dfnorm=degree_replay_real_outputs(12)
+           dmlf=degree_replay_real_outputs(13)
+           r2nc=degree_replay_real_outputs(14)
+           r2dnc=degree_replay_real_outputs(15)
+           wronca=degree_replay_real_outputs(16)
+           wroncb=degree_replay_real_outputs(17)
+           wronc=degree_replay_real_outputs(18)
+           id01=degree_replay_integer_outputs(1)
+           idmfe=degree_replay_integer_outputs(2)
+           idmlmfe=degree_replay_integer_outputs(3)
+           idmse=degree_replay_integer_outputs(4)
+           idmlmse=degree_replay_integer_outputs(5)
+           jmf=degree_replay_integer_outputs(6)
+           jsub=degree_replay_integer_outputs(7)
+           iflag=degree_replay_integer_outputs(8)
+           jbes=degree_replay_integer_outputs(9)
+           ir1e=degree_replay_integer_outputs(10)
+           ir1de=degree_replay_integer_outputs(11)
+           ir2e=degree_replay_integer_outputs(12)
+           ir2de=degree_replay_integer_outputs(13)
+           idfe=degree_replay_integer_outputs(14)
+           idmlfe=degree_replay_integer_outputs(15)
+           ir2est=degree_replay_integer_outputs(16)
+           jneu=degree_replay_integer_outputs(17)
+           naccneu=degree_replay_integer_outputs(18)
+           naccneup=degree_replay_integer_outputs(19)
+           nflag=degree_replay_integer_outputs(20)
+           naccr=degree_replay_integer_outputs(21)
+           nacce=degree_replay_integer_outputs(22)
+           ir2ne=degree_replay_integer_outputs(23)
+           ir2dne=degree_replay_integer_outputs(24)
+           limr1=degree_replay_integer_outputs(25)
+           limneu=degree_replay_integer_outputs(26)
+           nsubw=degree_replay_integer_outputs(27)
+           iopleg=degree_replay_integer_outputs(28)
+           iopneu=degree_replay_integer_outputs(29)
+           iopint=degree_replay_integer_outputs(30)
+           iopeta=degree_replay_integer_outputs(31)
+           eigvalp=eigval
+           go to 680
+         end if
+       end if
+#endif
+       if(present(coefficient_values) .and. iopang == 0) then
+         call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
+             dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
+             dmlms, idmlmse, jmf, jsub, coefficient_values(:,li,mi), &
+             coefficient_lengths(li,mi), coefficient_status)
+       else
+         call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
              dmlms, idmlmse, jmf, jsub)
-       if(li /= 1 .and. eigval <= eigvalp) go to 900
+         if(present(coefficient_values)) then
+           call normalized_legendre_coefficients(l, m, limd, enr, dmlms, idmlmse, &
+               coefficient_values(:,li,mi), coefficient_lengths(li,mi), coefficient_status)
+         end if
+       end if
+       if(li /= 1 .and. eigval <= eigvalp) then
+         ! Report incomplete coefficient output without changing legacy control flow.
+         if(present(coefficient_status)) coefficient_status = max(coefficient_status, 2)
+         go to 900
+       end if
        if(l == m .and. jsub > jtest .and. iopneu /= 0) iopneu = 0
        if(l == m .and. jsub > jtest .and. iopleg /= 0) iopleg = 0
+       ! Restore the integral path if joining-factor cancellation disabled the initial method.
+       if(l == m .and. ioprad == 2 .and. iopleg == 0 .and. iopneu == 0 .and. iopint == 0) iopint = 1
        eigvalp = eigval
 !
 !  determine prolate radial functions of the first kind
@@ -1436,7 +4164,7 @@ end if
      dold = dnew
      end do
     end if
-    iterm = int(log10(abs(dfnorm)))
+    iterm = decimal_exponent(abs(dfnorm))
     dfnorm = dfnorm * (10.0e0_knd ** (-iterm))
     idfe = iterm
     dmlf = 1.0e0_knd / dfnorm
@@ -1447,24 +4175,24 @@ end if
     if(ix == 0) then
      if(l > 0) coefr1e = coefr1e * rl / (rl - 1.0e0_knd)
      r1c = coefr1e * d01 * dmlf
-     iterm = int(log10(abs(r1c)))
+     iterm = decimal_exponent(abs(r1c))
      r1c = r1c * (10.0e0_knd ** (-iterm))
      ir1e = id01 + idmlfe + iterm
      r1dc = c * c * coefr1e * d01 * dmlf * ((enr(1) / 15.0e0_knd)-&
        (1.0e0_knd / 3.0e0_knd))
-     iterm = int(log10(abs(r1dc)))
+     iterm = decimal_exponent(abs(r1dc))
      r1dc = r1dc * (10.0e0_knd ** (-iterm))
      ir1de = id01 + idmlfe + iterm
     end if
     if(ix == 1) then
      if(l > 1) coefr1o = coefr1o * (rl - 1.0e0_knd) / rl
      r1c = c * coefr1o * d01 * dmlf / 3.0e0_knd
-     iterm = int(log10(abs(r1c)))
+     iterm = decimal_exponent(abs(r1c))
      r1c = r1c * (10.0e0_knd ** (-iterm))
      ir1e = id01 + idmlfe + iterm
      r1dc = c * c * c * coefr1o * d01 * dmlf * ((enr(1) / 35.0e0_knd)- &
        (1.0e0_knd / 15.0e0_knd) + (1.0e0_knd / (3.0e0_knd * c * c)))
-     iterm = int(log10(abs(r1dc)))
+     iterm = decimal_exponent(abs(r1dc))
      r1dc = r1dc * (10.0e0_knd ** (-iterm))
      ir1de = id01 + idmlfe + iterm
     end if
@@ -1492,12 +4220,12 @@ end if
              nex, iflag, sbesf, sbesdf, sbesn, ibese, sbesdr, &
              d01, id01, r1c, ir1e, r1dc, ir1de, dfnorm, jbes, &
              factor)
-       iterm = int(log10(abs(dfnorm)))
+       iterm = decimal_exponent(abs(dfnorm))
        dfnorm = dfnorm * (10.0e0_knd ** (-iterm))
        idfe = iterm
        dmlf = 1.0e0_knd / dfnorm
        idmlfe = -idfe
-       if(ioprad == 2) ir2est = int(log10(wront)) - ir1de + 1
+       if(ioprad == 2) ir2est = decimal_exponent(wront) - ir1de + 1
 if (debug) then
        if(knd == kindd) write(40, 180) r1c, ir1e, r1dc, ir1de
        if(knd == kindq) write(40, 185) r1c, ir1e, r1dc, ir1de
@@ -1515,32 +4243,71 @@ end if
 !  calculation using integration technique
        if(iopint == 0) go to 230
        if(iopint == 2) go to 190
-       limint = lnum + 3 * ndec + int(c)
+       pint_full_upper = lnum + 3 * ndec + int(c)
+       pint_available = max(lnum, 3 * ndec + int(c) + 1)
        if(igau == 0) call gauss_cached(ndec, ngau, xr, wr)
        igau = 1
        ngqs = 10
        if(c > 2000.0e0_knd) ngqs = int(ngqs * (c / 2000.0e0_knd)* &
                      (c / 2000.0e0_knd))
-       call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+       call pint_cached(c, m, lnum, x1, pint_available, maxint, maxlp, maxmp, ndec, &
             wr, xr, ngau, ngqs, rpint1, rpint2, pint1, &
             pint2, pint3, pint4, norme, pnormint, ipnormint, &
             coefme, coefmo)
 190      continue
        if(iopint == 1) limint = 3 * ndec + int(c)
        if(iopint == 2) limint = jintm + jintm + 20 + int(sqrt(c))
+       ! Extend the same quadrature only when r2int can index a new degree.
+       pint_required = max(l - m + 1, limint + 1)
+       if(pint_required > pint_available .and. pint_available > 0 .and. &
+           pint_available < pint_full_upper) then
+         pint_available = min(pint_required, pint_full_upper)
+         call pint_cached(c, m, lnum, x1, pint_available, maxint, maxlp, maxmp, ndec, &
+              wr, xr, ngau, ngqs, rpint1, rpint2, pint1, &
+              pint2, pint3, pint4, norme, pnormint, ipnormint, &
+              coefme, coefmo)
+       end if
+#ifdef USE_QUAD
+       radial_error_valid_here=.false.
+       if(radial_quadrature_mode==1 .and. &
+           .not.(radial_quadrature_even_only==1 .and. mod(l-m,2)==1)) then
+         radial_error_slot=radial_quadrature_cache_index
+         if(radial_error_slot>0 .and. pint_exact_sums_enabled()) then
+           if(pint_cache(radial_error_slot)%valid .and. &
+               pint_cache(radial_error_slot)%moment_errors_valid) then
+             if(pint_cache(radial_error_slot)%m==m .and. pint_cache(radial_error_slot)%c==c .and. &
+                 pint_cache(radial_error_slot)%x1==x1 .and. &
+                 pint_cache(radial_error_slot)%limint==pint_available .and. &
+                 pint_cache(radial_error_slot)%ndec==ndec .and. &
+                 pint_cache(radial_error_slot)%ngau==65 .and. &
+                 pint_cache(radial_error_slot)%ngqs==10 .and. &
+                 pint_cache(radial_error_slot)%quadrature_rule==1) then
+               call r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
+                   maxint,maxmp,maxlp,radial_error_slot,norme,pnormint,ipnormint,coefme,coefmo, &
+                   pint1,pint2,pint3,pint4,r2ic,ir2ie,r2dic,ir2die,jint,coefn,icoefn, &
+                   radial_value_error,radial_derivative_error,radial_error_valid_here)
+             end if
+           end if
+         end if
+       end if
+       if(.not.radial_error_valid_here) then
+#endif
        call r2int(l, m, c, x, limint, ndec, maxd, enr, d01, id01, &
              maxint, maxmp, maxlp, rpint1, rpint2, pint1, pint2, &
              pint3, pint4, norme, pnormint, ipnormint, coefme, &
              coefmo, r2ic, ir2ie, r2dic, ir2die, jint, coefn, &
              icoefn)
+#ifdef USE_QUAD
+       end if
+#endif
        iopint = 2
        if(jint > jintm) jintm = jint
        wronca = r1c * r2dic * 10.0e0_knd ** (ir1e+ir2die)
        wroncb = r2ic * r1dc * 10.0e0_knd ** (ir2ie+ir1de)
        wronc = wronca - wroncb
-       naccint = -int(log10(abs((wronc - wront) / wront) + dec))
+       naccint = -decimal_exponent(abs((wronc - wront) / wront) + dec)
        if(naccint < 0) naccint = 0
-       nsubw = -int(log10(abs(wronc / wronca) + dec))
+       nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
        if(nsubw < 0) nsubw = 0
        if(naccint > 1) naccint = naccint + nsubw
        if(naccint > ndec - 1) naccint = ndec - 1
@@ -1554,6 +4321,9 @@ end if
         if(naccint >= naccr) then
         naccr = naccint
         r2c = r2ic
+#ifdef USE_QUAD
+        radial_integral_selected=.true.
+#endif
         ir2e = ir2ie
         r2dc = r2dic
         ir2de = ir2die
@@ -1622,6 +4392,8 @@ end if
 270       continue
         end do
 280      continue
+       ! A single retained degree needs only the initialized even joining factor.
+       if(lnum == 1) go to 310
        fajo(2) = -c * fajo(1) / (rm2 - 3.0e0_knd)
        ifajo(2) = ifajo(1)
         do jl = 3, lnum - 1, 2
@@ -1668,6 +4440,9 @@ end if
        if(naccleg <= naccr) go to 320
        naccr = naccleg
        r2c = r2lc
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
        ir2e = ir2le
        r2dc = r2dlc
        ir2de = ir2dle
@@ -1752,9 +4527,9 @@ end if
        wronca = r1c * r2dnc * 10.0e0_knd ** (ir1e+ir2dne)
        wroncb = r2nc * r1dc * 10.0e0_knd ** (ir2ne+ir1de)
        wronc = wronca - wroncb
-       naccneu = -int(log10(abs((wronc - wront) / wront) + dec))
+       naccneu = -decimal_exponent(abs((wronc - wront) / wront) + dec)
        if(naccneu < 0) naccneu = 0
-       nsubw = -int(log10(abs(wronc / wronca) + dec))
+       nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
        if(nsubw < 0) nsubw = 0
        if(naccneu > 1) naccneu = naccneu + nsubw
        if(naccneu > ndec - 1) naccneu = ndec - 1
@@ -1769,6 +4544,9 @@ end if
        naccr = naccneu
        iopneu = 2
        r2c = r2nc
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
        ir2e = ir2ne
        r2dc = r2dnc
        ir2de = ir2dne
@@ -1938,11 +4716,11 @@ end if
        if(li < 3) go to 540
         do jl = 3, li + ix, 2
         pcoefe = pcoefe * pratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pcoefe)))
+        iterm = decimal_exponent(abs(pcoefe))
         pcoefe = pcoefe * 10.0e0_knd ** (-iterm)
         ipcoefe = ipcoefe + iterm
         pdcoefe = pdcoefe * pdratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pdcoefe)))
+        iterm = decimal_exponent(abs(pdcoefe))
         pdcoefe = pdcoefe * 10.0e0_knd ** (-iterm)
         ipdcoefe = ipdcoefe + iterm
         end do
@@ -1950,11 +4728,11 @@ end if
        if(li < 4) go to 540
         do jl = 4, li + 1 - ix, 2
         pcoefo = pcoefo * pratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pcoefo)))
+        iterm = decimal_exponent(abs(pcoefo))
         pcoefo = pcoefo * 10.0e0_knd ** (-iterm)
         ipcoefo = ipcoefo + iterm
         pdcoefo = pdcoefo * pdratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pdcoefo)))
+        iterm = decimal_exponent(abs(pdcoefo))
         pdcoefo = pdcoefo * 10.0e0_knd ** (-iterm)
         ipdcoefo = ipdcoefo + iterm
         end do
@@ -1963,26 +4741,26 @@ end if
        pcoefet = pcoefo
        ipcoefet = ipcoefo
        pcoefo = pcoefo * pratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pcoefo)))
+       iterm = decimal_exponent(abs(pcoefo))
        pcoefo = pcoefo * 10.0e0_knd ** (-iterm)
        ipcoefo = ipcoefo + iterm
        pdcoefet = pdcoefo
        ipdcoefet = ipdcoefo
        pdcoefo = pdcoefo * pdratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pdcoefo)))
+       iterm = decimal_exponent(abs(pdcoefo))
        pdcoefo = pdcoefo * 10.0e0_knd ** (-iterm)
        ipdcoefo = ipdcoefo + iterm
        go to 560
 550      pcoefet = pcoefe
        ipcoefet = ipcoefe
        pcoefe = pcoefe * pratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pcoefe)))
+       iterm = decimal_exponent(abs(pcoefe))
        pcoefe = pcoefe * 10.0e0_knd ** (-iterm)
        ipcoefe = ipcoefe + iterm
        pdcoefet = pdcoefe
        ipdcoefet = ipdcoefe
        pdcoefe = pdcoefe * pdratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pdcoefe)))
+       iterm = decimal_exponent(abs(pdcoefe))
        pdcoefe = pdcoefe * 10.0e0_knd ** (-iterm)
        ipdcoefe = ipdcoefe + iterm
 560      continue
@@ -2044,6 +4822,9 @@ end if
            nacciop == 0)) then
         naccr = naccetas
         r2c = r2ec
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
         ir2e = ir2ee
         r2dc = r2dec
         ir2de = ir2dee
@@ -2141,6 +4922,33 @@ end if
        r2dc = 0.0e0_knd
        ir2de = 0
 680      continue
+#ifdef USE_QUAD
+       ! Store only the unchanged stable Neumann route before fresh output and scheduling updates.
+       if(degree_replay_eligible.and.degree_replay_action/=1.and.degree_replay_available()) then
+         degree_replay_real_outputs=[sgn,d01,dmfnorm,dmlmf,dmsnorm,dmlms,factor,r1c,r1dc,r2c,r2dc, &
+             dfnorm,dmlf,r2nc,r2dnc,wronca,wroncb,wronc]
+         degree_replay_integer_outputs=[id01,idmfe,idmlmfe,idmse,idmlmse,jmf,jsub,iflag,jbes, &
+             ir1e,ir1de,ir2e,ir2de,idfe,idmlfe,ir2est,jneu,naccneu,naccneup,nflag,naccr,nacce, &
+             ir2ne,ir2dne,limr1,limneu,nsubw,iopleg,iopneu,iopint,iopeta]
+         call degree_replay_finish_proc(l,merge(1,0,iopneu==2.and.iopint==0.and.iopleg==0.and. &
+             iopeta==0.and.naccneu>minacc.and.naccr>0.and.limr1==degree_replay_bessel_limit.and. &
+             limneu==degree_replay_neumann_limit),jmf,degree_replay_ratio_count,enr, &
+             size(coefficient_values,1),coefficient_values(:,li,mi),coefficient_lengths(li,mi), &
+             coefficient_status,degree_replay_real_outputs,degree_replay_integer_outputs)
+       end if
+       if(radial_quadrature_count==lnum .and. mi==1 .and. ioprad==2) then
+         radial_quadrature_errors(li,:)=0.0_knd
+         radial_quadrature_valid(li)=1
+         if(radial_integral_selected) then
+           radial_quadrature_valid(li)=0
+           if(radial_error_valid_here) then
+             radial_quadrature_errors(li,:)=[radial_value_error,radial_derivative_error]
+             radial_quadrature_valid(li)=1
+           end if
+         end if
+         if(radial_quadrature_even_only==1 .and. mod(l-m,2)==1) radial_quadrature_valid(li)=0
+       end if
+#endif
 if (output) then
        if(nacce /= 1) chr = 'w'
        if(nacce == 1) chr = 'e'
@@ -2185,17 +4993,26 @@ end if
              x,' c = ', c,' m = ',m,' l = ',l
         end if
         end if
-720      if(iopang == 0) go to 850
+720      continue
+#ifdef USE_QUAD
+       if(ioprad==2.and.mi==1.and.iopang==0.and.present(coefficient_values)) &
+         call capture_radial_retry_degree(li,m,eigval,limd,limdneu,dmfnorm,idmfe,naccr, &
+             jsub,radial_integral_selected)
+#endif
+       if(iopang == 0) go to 850
 !
 !  determine first kind prolate angular function
        if(l == m) lims1 = 3 * ndec + int(c)
        if(l /= m) lims1 = jang + jang + 20 + int(sqrt(c))
        if(lims1 > maxp) lims1 = maxp
+       jang_previous = jang
        call s1leg(l, m, iopang, iopnorm, barg, narg, lims1, ndec, maxt, &
              maxd, maxp, enr, pr, pdr, pdnorm, ipdnorm, pnorm, &
              ipnorm, pdtempe, ipdtempe, pdtempo, ipdtempo, &
              ptempe, iptempe, ptempo, iptempo, dmlms, idmlmse, &
              s1c, is1e, s1dc, is1de, dmlms1, idmlms1e, naccs, jang)
+       ! An exactly zero angular mode supplies no new convergence estimate.
+       if(jang == 0) jang = jang_previous
         do 810 jarg = 1, narg
         s1(li, jarg, mi) = s1c(jarg)
         s1d(li, jarg, mi) = s1dc(jarg)
@@ -2349,7 +5166,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
-    real(knd) adec, aj, dcon, dec, dnew, dmlms, dmlms1, dnewd, dold, &
+    real(knd) adec, dcon, dec, dnew, dmlms, dmlms1, dnewd, dold, &
          doldd, factor, fterm, rm2, rm2m1, rm2m3, rm2p1, s1, s1d
     real(knd) barg(maxt), enr(maxd), pdr(maxt, maxp), pdnorm(maxt), &
          pnorm(maxt), pr(maxt, maxp), pdtemp(maxt), ptemp(maxt), &
@@ -2361,6 +5178,11 @@ end if
         ipdtempe(maxt), iptempe(maxt), ipdtempo(maxt), &
         iptempo(maxt), is1de(maxt), is1e(maxt), naccs(maxt)
 !
+    ! Disabled angular derivatives must not expose uninitialized workspace.
+    if(iopang /= 2) then
+      s1dc = 0.0_knd
+      is1de = 0
+    end if
     dec = 10.0e0_knd ** (-ndec - 1)
     dcon = dec
     adec = 1000.0e0_knd * dec
@@ -2416,7 +5238,10 @@ end if
 50    pdtemp(k) = pdtempe(k)
      ipdtemp(k) = ipdtempe(k)
      go to 100
-60    if(abs(barg(k)) < adec) go to 80
+60    if(abs(barg(k)) < adec) then
+       if(iopang /= 2) go to 100
+       go to 80
+      end if
      ptempo(k) = ptempo(k) * pr(k, l - m + 1)
      if(abs(ptempo(k)) < 1.0e+10_knd) go to 70
      ptempo(k) = ptempo(k) * (1.0e-10_knd)
@@ -2440,28 +5265,7 @@ end if
     factor = 1.0e0_knd
     ifactor = 0
     if(iopnorm == 0) go to 210
-    if(m == 0) go to 170
-     do 160 j = 1, m
-     aj = j
-     factor = factor * (aj + aj) * (aj + aj - 1.0e0_knd)
-     if(factor < 1.0e100_knd) go to 160
-     factor = factor * 1.0e-100_knd
-     ifactor = ifactor + 100
-160    continue
-170   if(l == m) go to 190
-     do 180 j = 1, l - m
-     aj = j
-     factor = factor * (rm2 + aj) / (aj)
-     if(factor < 1.0e100_knd) go to 180
-     factor = factor * 1.0e-100_knd
-     ifactor = ifactor + 100
-180    continue
-190   factor = factor * 2.0e0_knd / (l + l + 1.0e0_knd)
-    factor = sqrt(factor)
-    ifactor = ifactor / 2
-    iterm = int(log10(factor))
-    factor = factor * (10.0e0_knd ** (-iterm))
-    ifactor = ifactor + iterm
+    call angular_legendre_normalization(l, m, factor, ifactor)
     dmlms1 = dmlms / factor
     idmlms1e = idmlmse - ifactor
 if (debug) then
@@ -2514,7 +5318,7 @@ end if
       j = j - 1
 270     continue
 280    s1c(k) = s1 * dmlms * ptemp(k) * pnorm(k) / factor
-     if(s1c(k) /= 0.0e0_knd) iterm = int(log10(abs(s1c(k))))
+     if(s1c(k) /= 0.0e0_knd) iterm = decimal_exponent(abs(s1c(k)))
      if(s1c(k) == 0.0e0_knd) iterm = 0
      s1c(k) = s1c(k) * (10.0e0_knd ** (-iterm))
      is1e(k) = iptemp(k) + ipnorm(k) + iterm + idmlmse - ifactor
@@ -2566,7 +5370,7 @@ end if
       j = j - 1
 350     continue
 360    s1dc(k) = s1d * dmlms * pdtemp(k) * pdnorm(k) / factor
-     if(s1dc(k) /= 0.0e0_knd) iterm = int(log10(abs(s1dc(k))))
+     if(s1dc(k) /= 0.0e0_knd) iterm = decimal_exponent(abs(s1dc(k)))
      if(s1dc(k) == 0.0e0_knd) iterm = 0
      s1dc(k) = s1dc(k) * 10.0e0_knd ** (-iterm)
      is1de(k) = ipdtemp(k) + ipdnorm(k) + iterm + idmlmse - ifactor
@@ -2788,7 +5592,7 @@ end if
 !  compute r1 and r1d
     r1temp = r1top * sbesn(l + 1) / r1bot
     if(ix == 1) r1temp = r1temp * con
-    iterm = int(log10(abs(r1temp)))
+    iterm = decimal_exponent(abs(r1temp))
     ir1e = ir1tope + ibese(l + 1) + iterm
     r1c = r1temp * (10.0e0_knd ** (-iterm))
     if(abs(r1c) >= 1.0e0_knd) go to 140
@@ -2800,7 +5604,7 @@ end if
     r1dstore = r1d * con
     ndsub = 0
     if(ix == 1) r1d = r1d * con - r1temp / (x1 * x * (x1 + 2.0e0_knd))
-    if(ix == 1) ndsub = -int(log10(abs(r1d / r1dstore)))
+    if(ix == 1) ndsub = -decimal_exponent(abs(r1d / r1dstore))
     if(ndsub < 0) ndsub = 0
     if(iflagd == 0) go to 150
     term = x1 * (x1 + 2.0e0_knd) * sbesdr(2) * sbesn(2)
@@ -2818,7 +5622,7 @@ if (debug) then
     if(ix == 1 .and. ndsub > 0) write(40, 160) ndsub
 160   format(24x,'subtraction error in forming r1d =',i3,' digits.')
 end if
-    iterm = int(log10(abs(r1d)))
+    iterm = decimal_exponent(abs(r1d))
     ir1de = ir1tope + ibese(l + 1) + iterm
     r1dc = r1d * (10.0e0_knd ** (-iterm))
     if(abs(r1dc) >= 1.0e0_knd) go to 170
@@ -2942,7 +5746,7 @@ end if
      do 10 i = 1, m
      ri = i
      coefn = coefn / (ri + ri)
-     iterm = int(log10(abs(coefn)))
+     iterm = decimal_exponent(abs(coefn))
      coefn = coefn * 10.0e0_knd ** (-iterm)
      icoefn = icoefn + iterm
 10    continue
@@ -3003,13 +5807,13 @@ end if
      j = j - 1
 50    continue
 60   continue
-    isub = int(log10(abs(r2pos / r2temp) + dec))
-    isubd = int(log10(abs(r2dpos / r2dtemp) + dec))
+    isub = decimal_exponent(abs(r2pos / r2temp) + dec)
+    isubd = decimal_exponent(abs(r2dpos / r2dtemp) + dec)
     if(isubd < 0) isubd = 0
     r2temp = r2temp * coefl * pnorm(l - m + 1)
     if(ix == 0) r2temp = r2temp * pint1(l - m + 1)
     if(ix == 1) r2temp = r2temp * pint3(l - m + 1) * x
-    iterm = int(log10(abs(r2temp)))
+    iterm = decimal_exponent(abs(r2temp))
     ir2e = iterm + ipnorm(l - m + 1) + icoefl
     r2c = r2temp * 10.0e0_knd ** (-iterm)
     if(abs(r2c) >= 1.0e0_knd) go to 70
@@ -3018,8 +5822,8 @@ end if
 70   r2dtemp = -r2dtemp * coefl * pnorm(l - m + 1) * c * x
     if(ix == 0) r2dtemp = r2dtemp * pint2(l - m + 1) + r2temp * coefme
     if(ix == 1) r2dtemp = r2dtemp * pint4(l - m + 1) * x + r2temp * coefmo
-    if(ix == 0) jsub = int(log10(abs(r2temp * coefme / r2dtemp) + dec))
-    if(ix == 1) jsub = int(log10(abs(r2temp * coefmo / r2dtemp) + dec))
+    if(ix == 0) jsub = decimal_exponent(abs(r2temp * coefme / r2dtemp) + dec)
+    if(ix == 1) jsub = decimal_exponent(abs(r2temp * coefmo / r2dtemp) + dec)
     if(jsub < 0) jsub = 0
     isub = max(isub, isubd + jsub)
 if (debug) then
@@ -3027,7 +5831,7 @@ if (debug) then
 80   format(8x,'r2int: converged in ',i6,' terms; ',i6, &
         ' available; ',i3,' and ',i3,' digits of sub. error.')
 end if
-    jterm = int(log10(abs(r2dtemp)))
+    jterm = decimal_exponent(abs(r2dtemp))
     ir2de = jterm + ipnorm(l - m + 1) + icoefl
     r2dc = r2dtemp * 10.0e0_knd ** (-jterm)
     if(abs(r2dc) >= 1.0e0_knd) go to 90
@@ -3229,13 +6033,13 @@ end if
     idnegjf = idneg + id01
     if(m == 0) idnegjf = id01
     fajo(l - m + 1) = fajo(l - m + 1) * dmfnorm * dnegjf / dfnorm
-    iterm = int(log10(abs(fajo(l - m + 1))))
+    iterm = decimal_exponent(abs(fajo(l - m + 1)))
     fajo(l - m + 1) = fajo(l - m + 1) * ten ** (-iterm)
     ifajo(l - m + 1) = ifajo(l - m + 1) + idnegjf + idmfe - idfe + iterm
-    iterm = -int(log10(abs(c * x1 * (x1 + 2.0e0_knd) * r1dc)))
-    itermq = int(log10(abs(fajo(l - m + 1) * termpq / ql(l - m + 1))))
+    iterm = -decimal_exponent(abs(c * x1 * (x1 + 2.0e0_knd) * r1dc))
+    itermq = decimal_exponent(abs(fajo(l - m + 1) * termpq / ql(l - m + 1)))
     itestq = iterm + itermq - ir1de + itermpq + ifajo(l - m + 1) - iql(l - m + 1) + ndec + 3
-    itermp = int(log10(abs(fajo(l - m + 1) / (dnegjf * termpq))))
+    itermp = decimal_exponent(abs(fajo(l - m + 1) / (dnegjf * termpq)))
     itestp = iterm + itermp - ir1de - idnegjf - itermpq + ifajo(l - m + 1) + ndec + 3
 !
 !  begin calculation of series for r2
@@ -3258,7 +6062,7 @@ end if
      dnewd = doldd / (qdr(j + j + imxp) * qdr(j + j + imxp - 1) * enr(j))
      qdsum = qdsum + dnewd
      if(dnewd > 0.0e0_knd) qdsump = qdsump + dnewd
-      if(int(log10(abs(qsum))) + iscale > itestq .and. iflagq == 0) &
+      if(decimal_exponent(abs(qsum)) + iscale > itestq .and. iflagq == 0) &
         then
       r2c = 0.0e0_knd
       r2dc = 0.0e0_knd
@@ -3311,20 +6115,20 @@ end if
     jleg = j
     if(jleg > lim1) jleg = lim1
 45   nsqsum = 0
-    if(qsum * qsump /= 0.0e0_knd) nsqsum = int(log10(abs(qsump / qsum)))
+    if(qsum * qsump /= 0.0e0_knd) nsqsum = decimal_exponent(abs(qsump / qsum))
     if(nsqsum > ndec) nsqsum = ndec
     if(nsqsum < 0) nsqsum = 0
     nsqdsum = 0
     if(qdsum * qdsump /= 0.0e0_knd) nsqdsum= &
-                 int(log10(abs(qdsump / qdsum)))
+                 decimal_exponent(abs(qdsump / qdsum))
     if(nsqdsum > ndec) nsqdsum = ndec
     if(nsqdsum < 0) nsqdsum = 0
     qsum = qsum * ql(l - m + 1) / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qsum)))
+    iterm = decimal_exponent(abs(qsum))
     qsum = qsum * (10.0e0_knd ** (-iterm))
     iqsum = iql(l - m + 1) - ifajo(l - m + 1) - itermpq + iscale + iterm
     qdsum = qdsum * qdl(l - m + 1) / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qdsum)))
+    iterm = decimal_exponent(abs(qdsum))
     qdsum = qdsum * (10.0e0_knd ** (-iterm))
     iqdsum = iqdl(l - m + 1) - ifajo(l - m + 1) - itermpq + iscale + iterm
     qdsum = qdsum * (10.0e0_knd ** (iqdsum - iqsum))
@@ -3364,23 +6168,23 @@ end if
      end do
      nsqnsum = 0
     if(qnsum * qnsump /= 0.0e0_knd) nsqnsum= &
-             int(log10(abs(qnsump / qnsum)))
+             decimal_exponent(abs(qnsump / qnsum))
     if(nsqnsum > ndec) nsqnsum = ndec
     if(nsqnsum < 0) nsqnsum = 0
     nsqnsum = max(nsqnsum, nsdneg)
     nsqndsum = 0
     if(qndsum * qndsump /= 0.0e0_knd) nsqndsum= &
-             int(log10(abs(qndsump / qndsum)))
+             decimal_exponent(abs(qndsump / qndsum))
     if(nsqndsum > ndec) nsqndsum = ndec
     if(nsqndsum < 0) nsqndsum = 0
     nsqndsum = max(nsqndsum, nsdneg)
 80   qnsum = qnsum * qml * d01 / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qnsum)))
+    iterm = decimal_exponent(abs(qnsum))
     qnsum = qnsum * (10.0e0_knd ** (-iterm))
     iqnsum = iqml + id01 - ifajo(l - m + 1) - itermpq + iterm
     qnsum = qnsum * (10.0e0_knd ** (iqnsum - iqsum))
     qndsum = qndsum * qdml * d01 / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qndsum)))
+    iterm = decimal_exponent(abs(qndsum))
     qndsum = qndsum * (10.0e0_knd ** (-iterm))
     iqndsum = iqdml + id01 - ifajo(l - m + 1) - itermpq + iterm
     qndsum = qndsum * (10.0e0_knd ** (iqndsum - iqsum))
@@ -3421,7 +6225,7 @@ end if
      if(dnew > 0.0e0_knd) psump = psump + dnew
      dnewd = doldd * drhor(j) * pdrx(j + j - ix)
      pdsum = pdsum + dnewd
-      if(int(log10(abs(psum))) > itestp .and. iflagp == 0) then
+      if(decimal_exponent(abs(psum)) > itestp .and. iflagp == 0) then
       r2c = 0.0e0_knd
       r2dc = 0.0e0_knd
       ir2e = 0
@@ -3455,31 +6259,31 @@ end if
     pdsum = spdsum
     psump = spsump
     pdsump = spdsump
-    ntestm = -int(log10(testm))
-    ntestdm = -int(log10(testdm))
+    ntestm = -decimal_exponent(testm)
+    ntestdm = -decimal_exponent(testdm)
     if(ntestm > ndec) ntestm = ndec
     if(ntestdm > ndec) ntestdm = ndec
     nspsum = 0
-    if(psum * psump /= 0.0e0_knd) nspsum = int(log10(abs(psump / psum)))
+    if(psum * psump /= 0.0e0_knd) nspsum = decimal_exponent(abs(psump / psum))
     if(nspsum > ndec) nspsum = ndec
     if(nspsum < 0) nspsum = 0
     nspsum = max(ndec - ntestm, nspsum, nsdrho)
     nspdsum = 0
     if(pdsum * pdsump /= 0.0e0_knd) nspdsum= &
-             int(log10(abs(pdsump / pdsum)))
+             decimal_exponent(abs(pdsump / pdsum))
     if(nspdsum > ndec) nspdsum = ndec
     if(nspdsum < 0) nspdsum = 0
     nspdsum = max(ndec - ntestdm, nspdsum, nsdrho)
     psum = psum * dnegjf * termpq / fajo(l - m + 1)
     iterm = 0
-    if(psum /= 0.0e0_knd) iterm = int(log10(abs(psum)))
+    if(psum /= 0.0e0_knd) iterm = decimal_exponent(abs(psum))
     psum = psum * (10.0e0_knd ** (-iterm))
     ipsum = idnegjf + itermpq - ifajo(l - m + 1) + iterm
     psum = psum * (10.0e0_knd ** (ipsum - iqsum))
     pdsum = pdsum * dnegjf * termpq / fajo(l - m + 1)
     if(m /= 0) pdsum = pdsum * rm * (x1 + 1.0e0_knd) / (x1 * (x1 + 2.0e0_knd))
     iterm = 0
-    if(pdsum /= 0.0e0_knd) iterm = int(log10(abs(pdsum)))
+    if(pdsum /= 0.0e0_knd) iterm = decimal_exponent(abs(pdsum))
     pdsum = pdsum * (10.0e0_knd ** (-iterm))
     ipdsum = idnegjf + itermpq - ifajo(l - m + 1) + iterm
     pdsum = pdsum * (10.0e0_knd ** (ipdsum - iqsum))
@@ -3487,13 +6291,13 @@ end if
     r2c = qsum + qnsum + psum
     r2dc = qdsum + qndsum + pdsum
     nqs = 0
-    if(qsum / r2c /= 0.0e0_knd) nqs = int(log10(abs(qsum / r2c)))
+    if(qsum / r2c /= 0.0e0_knd) nqs = decimal_exponent(abs(qsum / r2c))
     nqns = 0
     if(qnsum / r2c /= 0.0e0_knd) &
-           nqns = int(log10(abs(qnsum / r2c)))
+           nqns = decimal_exponent(abs(qnsum / r2c))
     nps = 0
     if(psum / r2c /= 0.0e0_knd) &
-           nps = int(log10(abs(psum / r2c)))
+           nps = decimal_exponent(abs(psum / r2c))
     nsqsum = nsqsum + nqs
     if(nsqsum < 0) nsqsum = 0
     if(nsqsum > ndec) nsqsum = ndec
@@ -3508,14 +6312,14 @@ end if
     if(psum / r2c == 0.0e0_knd) nspsum = 0
     nsub = max(nsqsum, nsqnsum, nspsum)
     nqds = 0
-    if(qdsum / r2dc /= 0.0e0_knd) nqds = int(log10(abs(qdsum / r2dc)))
+    if(qdsum / r2dc /= 0.0e0_knd) nqds = decimal_exponent(abs(qdsum / r2dc))
     nqnds = 0
     if(qndsum / r2dc /= 0.0e0_knd) &
-           nqnds = int(log10(abs(qndsum / r2dc)))
+           nqnds = decimal_exponent(abs(qndsum / r2dc))
     if(qnsum == 0.0e0_knd .and. qndsum == 0.0e0_knd) iopqnsum = 0
     npds = 0
     if(pdsum / r2dc /= 0.0e0_knd) &
-           npds = int(log10(abs(pdsum / r2dc)))
+           npds = decimal_exponent(abs(pdsum / r2dc))
     if(psum == 0.0e0_knd .and. pdsum == 0.0e0_knd) ioppsum = 0
     nsqdsum = nsqdsum + nqds
     if(nsqdsum < 0) nsqdsum = 0
@@ -3535,10 +6339,10 @@ end if
     wronca = r1c * r2dc * 10.0e0_knd ** (ir1e+iqsum)
     wroncb = r2c * r1dc * 10.0e0_knd ** (iqsum + ir1de)
     wronc = wronca - wroncb
-    naccleg = -int(log10(abs((wronc - wront) / wront) + dec))
+    naccleg = -decimal_exponent(abs((wronc - wront) / wront) + dec)
     if(naccleg < 0) naccleg = 0
     if(naccleg > ndec - 1) naccleg = ndec - 1
-    nsubw = -int(log10(abs(wronc / wronca) + dec))
+    nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
     if(nsubw < 0) nsubw = 0
     if(naccleg > 1) naccleg = naccleg + nsubw
     itest = ndec - 2 - nsubw - max(nsub, nsubd)
@@ -3566,14 +6370,14 @@ end if
      nsub = max(nsub, jsub, nsdneg)
      nsubd = max(nsubd, jsub, nsdneg)
      end if
-    iterm = int(log10(abs(r2c)))
+    iterm = decimal_exponent(abs(r2c))
     r2c = r2c * (10.0e0_knd ** (-iterm))
     ir2e = iqsum + iterm
     if(abs(r2c) >= 1.0e0_knd) go to 170
     r2c = r2c * 10.0e0_knd
     ir2e = ir2e - 1
 170   continue
-    iterm = int(log10(abs(r2dc)))
+    iterm = decimal_exponent(abs(r2dc))
     r2dc = r2dc * (10.0e0_knd ** (-iterm))
     ir2de = iqsum + iterm
     if(abs(r2dc) >= 1.0e0_knd) go to 180
@@ -3776,7 +6580,12 @@ end if
      txd = sumdp
      jds = j
 60    continue
-     if(test + testd < dconf) go to 90
+     if(test + testd < dconf) then
+#ifdef USE_QUAD
+       if(radial_retry_tracking) radial_retry_converged=.true.
+#endif
+       go to 90
+     end if
       if(abs(r2temp) > teste) then
       r2temp = r2temp * testeo
       r2dtemp = r2dtemp * testeo
@@ -3800,16 +6609,16 @@ end if
     sumdp = txd
 90   continue
     jneu = max(js, jds)
-    naccs1 = int(log10(abs(tx / r2temp) + dconf))
+    naccs1 = decimal_exponent(abs(tx / r2temp) + dconf)
     if(naccs1 < 0) naccs1 = 0
     if(naccs1 > ndec) naccs1 = ndec
-    naccs2 = int(log10(abs(txd / r2dtemp) + dconf))
+    naccs2 = decimal_exponent(abs(txd / r2dtemp) + dconf)
     if(naccs2 < 0) naccs2 = 0
     if(naccs2 > ndec) naccs2 = ndec
-    jtestm = -int(log10(testm + dconf))
+    jtestm = -decimal_exponent(testm + dconf)
     if(jtestm < 0) jtestm = 0
     if(jtestm > ndec) jtestm = ndec
-    jtestdm = -int(log10(testdm + dconf))
+    jtestdm = -decimal_exponent(testdm + dconf)
     if(jtestdm < 0) jtestdm = 0
     if(jtestdm > ndec) jtestdm = ndec
 if (debug) then
@@ -3825,7 +6634,7 @@ end if
 !  combining results to form the radial function characteristics
 !  r2c and r2dc and corresponding exponents ir2e and ir2de
     r2c = r2temp * sneun(l + 1) * pcoefn / dmfnorm
-    iterm = int(log10(abs(r2c)))
+    iterm = decimal_exponent(abs(r2c))
     ir2e = ineue(l + 1) + ipcoefn - idmfe + iterm + iscale
     r2c = r2c * 10.0e0_knd ** (-iterm)
     if(abs(r2c) >= 1.0e0_knd) go to 110
@@ -3834,7 +6643,7 @@ end if
 110   continue
     r2dc = r2dcoef * r2c + (c * r2dtemp * sneun(l + 1) * sneudr(l + 1) * pcoefn/ &
        dmfnorm) * 10.0e0_knd ** (ineue(l + 1) + ipcoefn - idmfe+iscale-ir2e)
-    iterm = int(log10(abs(r2dc)))
+    iterm = decimal_exponent(abs(r2dc))
     ir2de = ir2e + iterm
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
     if(abs(r2dc) >= 1.0e0_knd) go to 120
@@ -4049,10 +6858,10 @@ end if
 40   continue
     jden = j
     numsub = 0
-    if(sumdp /= 0.0e0_knd) numsub = int(log10(abs(sumdp / denom)))
+    if(sumdp /= 0.0e0_knd) numsub = decimal_exponent(abs(sumdp / denom))
     if(numsub < 0) numsub = 0
     if(numsub > ndec) numsub = ndec
-    naccd = ndec - max(2, int(log10(c))) - numsub
+    naccd = ndec - max(2, decimal_exponent(c)) - numsub
     if(naccd < 0) naccd = 0
     r2est = abs(sumcoef * denom)
     r2test = r2est * dconi
@@ -4215,37 +7024,37 @@ end if
     jeta = max(js, jds1, jds2, jden)
     jds = max(jds1, jds2)
     jtestm = ndec
-    if(testm /= 0.0e0_knd) jtestm = -int(log10(testm))
+    if(testm /= 0.0e0_knd) jtestm = -decimal_exponent(testm)
     if(jtestm < 0) jtestm = 0
     if(jtestm > ndec) jtestm = ndec
     jtestdm1 = ndec
      if(testdm1 /= 0.0e0_knd) then
-     jtestdm1 = -int(log10(testdm1))
+     jtestdm1 = -decimal_exponent(testdm1)
      end if
     if(jtestdm1 < 0) jtestdm1 = 0
     if(jtestdm1 > ndec) jtestdm1 = ndec
     jtestdm2 = ndec
      if(testdm2 /= 0.0e0_knd) then
-     jtestdm2 = -int(log10(testdm2))
+     jtestdm2 = -decimal_exponent(testdm2)
      end if
     if(jtestdm2 < 0) jtestdm2 = 0
     if(jtestdm2 > ndec) jtestdm2 = ndec
     jtestdm = min(jtestdm1, jtestdm2)
     naccns1 = 0
      if(abs(tx * r2temp) /= 0.0e0_knd) then
-     naccns1 = int(log10(abs(tx / r2temp)))
+     naccns1 = decimal_exponent(abs(tx / r2temp))
      end if
     if(naccns1 < 0) naccns1 = 0
     if(naccns1 > ndec) naccns1 = ndec
     r2dtemp = r2dtemp1 + r2dtemp2
     naccns2 = 0
      if(abs((txd1 + txd2) * r2dtemp) /= 0.0e0_knd) then
-     naccns2 = int(log10(abs((txd1 + txd2) / r2dtemp)))
+     naccns2 = decimal_exponent(abs((txd1 + txd2) / r2dtemp))
      end if
     if(naccns2 < 0) naccns2 = 0
     if(naccns2 > ndec) naccns2 = ndec
      if(abs(r2dtemp1 * r2dtemp2) /= 0.0e0_knd) then
-     icord = int(log10(abs(r2dtemp1 / r2dtemp2)))
+     icord = decimal_exponent(abs(r2dtemp1 / r2dtemp2))
      if(icord > 0) jtestdm2 = jtestdm2 + icord
      if(icord < 0) jtestdm1 = jtestdm1 - icord
      jtestdm = min(jtestdm1, jtestdm2)
@@ -4270,12 +7079,12 @@ end if
 !  r2c and r2dc and corresponding exponents ir2e and ir2de
     r2c = r2temp * sneun(l + 1) * pcoefn / denom
     iterm = 0
-    if(r2c /= 0.0e0_knd) iterm = int(log10(abs(r2c)))
+    if(r2c /= 0.0e0_knd) iterm = decimal_exponent(abs(r2c))
     ir2e = ineue(l + 1) + ipcoefn + iterm + iscale
     r2c = r2c * 10.0e0_knd ** (-iterm)
     r2dc = r2dcoef1 * r2dtemp * sneun(l + 1) * pdcoefn / denom
     iterm = 0
-    if(r2dc /= 0.0e0_knd) iterm = int(log10(abs(r2dc)))
+    if(r2dc /= 0.0e0_knd) iterm = decimal_exponent(abs(r2dc))
     ir2de = ineue(l + 1) + ipdcoefn + iterm + iscale
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
 if (debug) then
@@ -4295,8 +7104,8 @@ end if
     wronc = wronca - wroncb
     wront = 1.0e0_knd / (c * x1 * (x1 + 2.0e0_knd))
     wroncm = max(abs(wronca), abs(wroncb))
-    nsubw =-int(log10(abs(wronc / wroncm) + dec))
-    nacceta = -int(log10(abs((wronc - wront) / wront) + dec))
+    nsubw =-decimal_exponent(abs(wronc / wroncm) + dec)
+    nacceta = -decimal_exponent(abs((wronc - wront) / wront) + dec)
     if(nacceta < 0) nacceta = 0
     if(nacceta > ndec - 1) nacceta = ndec - 1
     nacciop = 0
@@ -4313,12 +7122,12 @@ end if
     nacceta = naccn - nsubw
     r2c = r2c * wront / wronc
     iterm = 0
-    if(r2c /= 00.0e0_knd) iterm = int(log10(abs(r2c)))
+    if(r2c /= 00.0e0_knd) iterm = decimal_exponent(abs(r2c))
     ir2e = ir2e + iterm
     r2c = r2c * 10.0e0_knd ** (-iterm)
     r2dc = r2dc * wront / wronc
     iterm = 0
-    if(r2dc /= 00.0e0_knd) iterm = int(log10(abs(r2dc)))
+    if(r2dc /= 00.0e0_knd) iterm = decimal_exponent(abs(r2dc))
     ir2de = ir2de + iterm
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
 160   if(abs(r2c) >= 1.0e0_knd) go to 170
@@ -4631,9 +7440,438 @@ end if
     end subroutine
 !
 !
+  real(knd) function normalization_align(mantissa, shift) result(value)
+    implicit none
+    real(knd), intent(in) :: mantissa
+    integer(int64), intent(in) :: shift
+
+    ! Discard only values below the native subnormal range when aligning sums.
+    value = 0.0_knd
+    if(shift < int(minexponent(1.0_knd) - digits(1.0_knd), int64)) return
+    value = scale(mantissa, int(shift))
+  end function normalization_align
+
+  subroutine normalization_split(value, mantissa, power)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_int
+#endif
+    implicit none
+    real(knd), intent(in) :: value
+    real(knd), intent(out) :: mantissa
+    integer, intent(out) :: power
+#ifdef USE_QUAD
+    integer(c_int) :: quad_power
+#endif
+
+    ! Extract both exact binary components in one quad library call.
+#ifdef USE_QUAD
+    mantissa = quad_fraction_exponent(value, quad_power)
+    power = int(quad_power, kind(power))
+#else
+    mantissa = fraction(value)
+    power = exponent(value)
+#endif
+  end subroutine normalization_split
+
+  subroutine normalization_square_step(mantissa, power, ratio, weight, upward, valid)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    real(knd), intent(inout) :: mantissa
+    integer(int64), intent(inout) :: power
+    real(knd), intent(in) :: ratio, weight
+    logical, intent(in) :: upward
+    logical, intent(out) :: valid
+    real(knd) :: ratio_fraction, weight_fraction, product
+    integer :: ratio_power, weight_power, product_power
+
+    valid = .false.
+    if(.not. ieee_is_finite(ratio) .or. .not. ieee_is_finite(weight)) return
+    if(weight <= 0.0_knd) return
+    if(ratio == 0.0_knd) then
+      if(.not. upward) return
+      mantissa = 0.0_knd
+      valid = .true.
+      return
+    end if
+    if(mantissa == 0.0_knd) then
+      valid = .true.
+      return
+    end if
+
+    ! Form ratio squares from bounded fractions without overflowing the ratio.
+    call normalization_split(abs(ratio), ratio_fraction, ratio_power)
+    call normalization_split(weight, weight_fraction, weight_power)
+    if(upward) then
+      product = mantissa * ratio_fraction * ratio_fraction * weight_fraction
+      power = power + 2_int64 * ratio_power + weight_power
+    else
+      product = mantissa / ratio_fraction / ratio_fraction * weight_fraction
+      power = power - 2_int64 * ratio_power + weight_power
+    end if
+    if(.not. ieee_is_finite(product) .or. product <= 0.0_knd) return
+    call normalization_split(product, mantissa, product_power)
+    power = power + product_power
+    valid = .true.
+  end subroutine normalization_square_step
+
+  subroutine normalization_add_square(total, correction, total_power, term, term_power)
+    implicit none
+    real(knd), intent(inout) :: total, correction
+    integer(int64), intent(inout) :: total_power
+    real(knd), intent(in) :: term
+    integer(int64), intent(in) :: term_power
+    real(knd) :: aligned, updated
+    integer :: renormalize
+
+    ! Accumulate the positive sum with native compensation at a common scale.
+    if(term == 0.0_knd) return
+    if(term_power > total_power) then
+      total = normalization_align(total, total_power - term_power)
+      correction = normalization_align(correction, total_power - term_power)
+      total_power = term_power
+    end if
+    aligned = normalization_align(term, term_power - total_power)
+    updated = total + aligned
+    if(total >= aligned) then
+      correction = correction + ((total - updated) + aligned)
+    else
+      correction = correction + ((aligned - updated) + total)
+    end if
+    total = updated
+    call normalization_split(total, updated, renormalize)
+    total = updated
+    correction = scale(correction, -renormalize)
+    total_power = total_power + renormalize
+  end subroutine normalization_add_square
+
+
+  subroutine joint_meixner_coefficients(l, m, limd, enr, factors, dec, sgn, &
+      dmsnorm, idmse, dmlms, idmlmse, schedule_index, values, length, status)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: l, m, limd
+    real(knd), intent(in) :: enr(:), factors(:,:), dec, sgn
+    real(knd), intent(out) :: dmsnorm, dmlms, values(:)
+    integer, intent(out) :: idmse, idmlmse, schedule_index, length
+    integer, intent(inout) :: status
+    integer :: parity, seed_index, last_ratio, j, offset, output_index, pass, increment, first, last
+    integer :: normalization_slot, cached_steps, shift, step, decimal_shift, &
+        ratio_power, product_power
+    integer(int64) :: powers(0:limd/2), current_power, total_power, remaining, &
+        decimal_power, half_power
+    real(knd) :: fractions(0:limd/2), twice_m, normalization_step, ratio, current, next_value
+    real(knd) :: total, correction, term, updated, norm_total, norm_root, ratio_fraction, product
+    logical :: ordinary, recorded_schedule
+
+    ! The full Meixner norm is the sum of squared unit-norm Legendre coefficients.
+    ! Schulz et al. (1998), Applied Optics 37:7875-7896, Eqs. (A14), (A18)-(A20).
+    ! Retain every available coefficient in both directions, including later lobes.
+    parity=modulo(l-m,2)
+    seed_index=(l-m-parity)/2
+    last_ratio=limd/2-parity
+    values=0.0_knd
+    length=l-m+1
+    if(seed_index<0 .or. last_ratio<seed_index .or. last_ratio>size(enr)) go to 900
+    twice_m=real(2*m,knd)
+    call prepare_legendre_normalization(m,2*last_ratio+parity-1,normalization_slot)
+    cached_steps=0
+    if(normalization_slot>0) then
+      if(allocated(legendre_normalization_cache(normalization_slot)%steps)) &
+          cached_steps=size(legendre_normalization_cache(normalization_slot)%steps)
+    end if
+
+    ! Ordinary amplitudes avoid exponent work only when every operation stays representable.
+    ordinary=.true.
+    total=1.0_knd
+    correction=0.0_knd
+    fractions(seed_index)=1.0_knd
+    schedule_index=last_ratio
+    recorded_schedule=.false.
+    do pass=1,2
+      current=1.0_knd
+      first=seed_index+1
+      last=last_ratio
+      increment=1
+      if(pass==2) then
+        first=seed_index
+        last=1
+        increment=-1
+      end if
+      do j=first,last,increment
+        offset=2*(j-1)+parity
+        if(offset<cached_steps) then
+          normalization_step=legendre_normalization_cache(normalization_slot)%steps(offset+1)
+        else
+          normalization_step=legendre_normalization_step(twice_m,offset)
+        end if
+        ratio=enr(j)*normalization_step
+        if(.not.ieee_is_finite(ratio)) go to 100
+        if(enr(j)/=0.0_knd .and. ratio==0.0_knd) go to 100
+        if(ratio/=0.0_knd .and. abs(ratio)<tiny(1.0_knd)) go to 100
+        if(pass==1) then
+          next_value=current*ratio
+          output_index=j
+        else
+          if(ratio==0.0_knd) go to 100
+          next_value=current/ratio
+          output_index=j-1
+        end if
+        if(.not.ieee_is_finite(next_value)) go to 100
+        if(current/=0.0_knd .and. ratio/=0.0_knd .and. next_value==0.0_knd) go to 100
+        if(next_value/=0.0_knd .and. abs(next_value)<tiny(1.0_knd)) go to 100
+        current=next_value
+        fractions(output_index)=current
+        term=current*current
+        if(.not.ieee_is_finite(term)) go to 100
+        if(current/=0.0_knd .and. term==0.0_knd) go to 100
+        updated=total+term
+        if(.not.ieee_is_finite(updated)) go to 100
+        if(total>=term) then
+          correction=correction+((total-updated)+term)
+        else
+          correction=correction+((term-updated)+total)
+        end if
+        total=updated
+        if(pass==1 .and. .not.recorded_schedule) then
+          if(term/(total+correction)<dec) then
+            schedule_index=j
+            recorded_schedule=.true.
+          end if
+        end if
+      end do
+    end do
+    norm_total=total+correction
+    if(.not.ieee_is_finite(norm_total) .or. norm_total<=0.0_knd) go to 100
+    norm_root=sqrt(norm_total)
+    call normalization_split(norm_total,total,shift)
+    total_power=int(shift,int64)
+    go to 200
+
+100 ordinary=.false.
+    total=0.5_knd
+    total_power=1_int64
+    correction=0.0_knd
+    fractions(seed_index)=0.5_knd
+    powers(seed_index)=1_int64
+    schedule_index=last_ratio
+    recorded_schedule=.false.
+    do pass=1,2
+      current=0.5_knd
+      current_power=1_int64
+      first=seed_index+1
+      last=last_ratio
+      increment=1
+      if(pass==2) then
+        first=seed_index
+        last=1
+        increment=-1
+      end if
+      do j=first,last,increment
+        offset=2*(j-1)+parity
+        if(offset<cached_steps) then
+          normalization_step=legendre_normalization_cache(normalization_slot)%steps(offset+1)
+        else
+          normalization_step=legendre_normalization_step(twice_m,offset)
+        end if
+        if(.not.ieee_is_finite(enr(j)) .or. .not.ieee_is_finite(normalization_step)) go to 900
+        if(normalization_step<=0.0_knd) go to 900
+        if(enr(j)==0.0_knd) then
+          if(pass==2) go to 900
+          current=0.0_knd
+          current_power=0_int64
+        else if(current/=0.0_knd) then
+          ratio=enr(j)*normalization_step
+          if(ieee_is_finite(ratio) .and. abs(ratio)>=tiny(1.0_knd)) then
+            call normalization_split(ratio,ratio_fraction,ratio_power)
+          else
+            call normalization_split(enr(j),ratio_fraction,ratio_power)
+            ratio_fraction=ratio_fraction*normalization_step
+            call normalization_split(ratio_fraction,product,product_power)
+            ratio_fraction=product
+            ratio_power=ratio_power+product_power
+          end if
+          if(pass==1) then
+            product=current*ratio_fraction
+            current_power=current_power+int(ratio_power,int64)
+          else
+            product=current/ratio_fraction
+            current_power=current_power-int(ratio_power,int64)
+          end if
+          if(.not.ieee_is_finite(product) .or. product==0.0_knd) go to 900
+          call normalization_split(product,current,product_power)
+          current_power=current_power+int(product_power,int64)
+        end if
+        output_index=j
+        if(pass==2) output_index=j-1
+        fractions(output_index)=current
+        powers(output_index)=current_power
+        term=current*current
+        call normalization_add_square(total,correction,total_power,term,2_int64*current_power)
+        if(pass==1 .and. .not.recorded_schedule) then
+          if(normalization_align(term,2_int64*current_power-total_power)/ &
+              (total+correction)<dec) then
+            schedule_index=j
+            recorded_schedule=.true.
+          end if
+        end if
+      end do
+    end do
+    total=total+correction
+    if(.not.ieee_is_finite(total) .or. total<=0.0_knd) go to 900
+    call normalization_split(total,norm_total,shift)
+    total=norm_total
+    total_power=total_power+int(shift,int64)
+    half_power=total_power/2_int64
+    norm_root=sqrt(scale(total,int(modulo(total_power,2_int64))))
+
+    ! Preserve the public decimal normalization contract from the completed binary sum.
+200 dmsnorm=total
+    remaining=total_power
+    decimal_power=0_int64
+    idmse=0
+    idmlmse=0
+    if(remaining<0_int64) go to 900
+    if(remaining>4_int64*(int(huge(idmse),int64)+2_int64)) go to 900
+    do while(remaining>0_int64)
+      step=int(min(remaining,int(maxexponent(1.0_knd)/2,int64)))
+      dmsnorm=scale(dmsnorm,step)
+      decimal_shift=decimal_exponent(dmsnorm)
+      dmsnorm=dmsnorm/(10.0_knd**decimal_shift)
+      decimal_power=decimal_power+decimal_shift
+      remaining=remaining-step
+    end do
+    if(decimal_power>int(huge(idmse),int64)) go to 900
+    idmse=int(decimal_power)
+    if(modulo(idmse,2)/=0) then
+      idmse=idmse-1
+      dmsnorm=10.0_knd*dmsnorm
+    end if
+    dmlms=sgn/sqrt(dmsnorm)
+    idmlmse=-idmse/2
+
+    ! Rescale retained signed coefficients without another ratio recurrence.
+    do j=0,last_ratio
+      if(ordinary) then
+        current=sgn*(fractions(j)/norm_root)
+      else
+        current=normalization_align(sgn*(fractions(j)/norm_root),powers(j)-half_power)
+      end if
+      if(.not.ieee_is_finite(current)) go to 900
+      output_index=2*j+parity+1
+      if(j>seed_index .and. current/=0.0_knd) length=output_index
+      if(output_index<=size(values)) values(output_index)=current
+    end do
+    if(size(values)<length) status=max(status,1)
+    return
+
+    ! Retain the unchanged implementation if the joint route cannot certify its arithmetic.
+900 continue
+    call complete_meixner_normalization(l,m,limd,enr,factors,dec,sgn, &
+        dmsnorm,idmse,dmlms,idmlmse,schedule_index)
+    call normalized_legendre_coefficients(l,m,limd,enr,dmlms,idmlmse,values,length,status)
+  end subroutine joint_meixner_coefficients
+
+  subroutine complete_meixner_normalization(l, m, limd, enr, factors, dec, sgn, &
+                                           dmsnorm, idmse, dmlms, idmlmse, schedule_index)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite, ieee_value, ieee_quiet_nan
+    implicit none
+    integer, intent(in) :: l, m, limd
+    real(knd), intent(in) :: enr(:), factors(:,:), dec, sgn
+    real(knd), intent(out) :: dmsnorm, dmlms
+    integer, intent(out) :: idmse, idmlmse, schedule_index
+    integer :: parity, seed_index, last_ratio, j, index, step, decimal_shift
+    integer(int64) :: total_power, term_power, remaining, decimal_power
+    real(knd) :: total, correction, term, weight, relative_term
+    logical :: valid, recorded_schedule
+
+    parity = modulo(l - m, 2)
+    seed_index = (l - m - parity) / 2
+    last_ratio = limd / 2 - parity
+    schedule_index = last_ratio
+    idmse = 0
+    idmlmse = 0
+    if(seed_index < 0 .or. last_ratio < seed_index .or. last_ratio > size(enr)) go to 900
+    if(limd > size(factors, 2) .or. size(factors, 1) < 6) go to 900
+    total = 0.5_knd
+    total_power = 1_int64
+    correction = 0.0_knd
+    term = 0.5_knd
+    term_power = 1_int64
+    recorded_schedule = .false.
+
+    ! Include every available forward coefficient, including later oscillating lobes.
+    do index = seed_index + 1, last_ratio
+      j = 2 * index + parity
+      if(size(factors, 1) >= 11) then
+        weight = factors(10, j)
+      else
+        weight = (factors(3, j) / factors(1, j)) * &
+                 (factors(4, j) / factors(2, j)) * (factors(5, j) / factors(6, j))
+      end if
+      call normalization_square_step(term, term_power, enr(index), weight, .true., valid)
+      if(.not. valid) go to 900
+      call normalization_add_square(total, correction, total_power, term, term_power)
+      if(.not. recorded_schedule) then
+        relative_term = normalization_align(term, term_power - total_power) / (total + correction)
+        if(relative_term < dec) then
+          schedule_index = index
+          recorded_schedule = .true.
+        end if
+      end if
+    end do
+
+    ! Include every backward coefficient even when the forward sum required scaling.
+    term = 0.5_knd
+    term_power = 1_int64
+    do index = seed_index, 1, -1
+      j = 2 * index + parity
+      if(size(factors, 1) >= 11) then
+        weight = factors(11, j)
+      else
+        weight = (factors(1, j) / factors(3, j)) * &
+                 (factors(2, j) / factors(4, j)) * (factors(6, j) / factors(5, j))
+      end if
+      call normalization_square_step(term, term_power, enr(index), weight, .false., valid)
+      if(.not. valid) go to 900
+      call normalization_add_square(total, correction, total_power, term, term_power)
+    end do
+
+    ! Convert the packed binary sum to the existing decimal normalization contract.
+    total = total + correction
+    if(.not. ieee_is_finite(total) .or. total <= 0.0_knd) go to 900
+    call normalization_split(total, dmsnorm, decimal_shift)
+    total_power = total_power + decimal_shift
+    remaining = total_power
+    decimal_power = 0_int64
+    if(remaining < 0_int64) go to 900
+    if(remaining > 4_int64 * (int(huge(idmse), int64) + 2_int64)) go to 900
+    do while(remaining > 0_int64)
+      step = int(min(remaining, int(maxexponent(1.0_knd) / 2, int64)))
+      dmsnorm = scale(dmsnorm, step)
+      decimal_shift = decimal_exponent(dmsnorm)
+      dmsnorm = dmsnorm / (10.0_knd ** decimal_shift)
+      decimal_power = decimal_power + decimal_shift
+      remaining = remaining - step
+    end do
+    if(decimal_power > int(huge(idmse), int64)) go to 900
+    idmse = int(decimal_power)
+    if(modulo(idmse, 2) /= 0) then
+      idmse = idmse - 1
+      dmsnorm = 10.0_knd * dmsnorm
+    end if
+    dmlms = sgn / sqrt(dmsnorm)
+    idmlmse = -idmse / 2
+    return
+
+900 dmsnorm = ieee_value(0.0_knd, ieee_quiet_nan)
+    dmlms = dmsnorm
+  end subroutine complete_meixner_normalization
+
+
     subroutine dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
-             dmlms, idmlmse, jnorm, jsub)
+             dmlms, idmlmse, jnorm, jsub, coefficient_values, coefficient_length, &
+             coefficient_status)
 !
 !  purpose:     To compute d coefficient ratios from n values and to
 !               calculate the normalization of the d coefficients.
@@ -4691,9 +7929,18 @@ end if
 !    use param
 !
 !  real(knd) scalars and array
-    real(knd) aj, aj2, arr, c, coef, csq, dec, dmfnorm, dmsnorm, dmlmf, &
+    real(knd) aj, aj2, arr, c, csq, dec, dmfnorm, dmsnorm, dmlmf, &
          dmlms, d01, ea, rm2, sgn, sump, ten, term, teste, testeo
     real(knd) enr(maxd)
+    real(knd), allocatable, save :: ratio_numerators(:,:), ratio_denominators(:,:)
+    real(knd), allocatable, save :: normalization_factors(:,:)
+    real(knd), save :: ratio_parameter = -1.0_knd
+    integer, save :: ratio_order = -1, ratio_counts(2) = 0
+    integer, save :: normalization_order = -1, normalization_count = 0
+    integer :: parity_index
+    real(knd), optional, intent(out) :: coefficient_values(:)
+    integer, optional, intent(out) :: coefficient_length
+    integer, optional, intent(inout) :: coefficient_status
 !
     ten = 10.0e0_knd
     rm2 = m + m
@@ -4709,14 +7956,67 @@ end if
     lm2 = (l - m) / 2
     ix = l - m - 2 * lm2
     lim2 = limd / 2 - ix
+    ! Reuse the unchanged integer factors in both normalization sums across degrees.
+    if(allocated(normalization_factors)) then
+      if(size(normalization_factors, 2) < limd) deallocate(normalization_factors)
+    end if
+    if(.not. allocated(normalization_factors)) then
+      allocate(normalization_factors(11, max(limd, 2 * maxd)))
+      normalization_count = 0
+    end if
+    if(normalization_order /= m) normalization_count = 0
+    normalization_order = m
+    do j = normalization_count + 1, limd
+      aj = j
+      aj2 = aj + aj
+      normalization_factors(1, j) = aj
+      normalization_factors(2, j) = aj - 1.0_knd
+      normalization_factors(3, j) = aj + rm2
+      normalization_factors(4, j) = aj + rm2m1
+      normalization_factors(5, j) = aj2 + rm2m3
+      normalization_factors(6, j) = aj2 + rm2p1
+      normalization_factors(7, j) = aj * (aj - 1.0_knd)
+      normalization_factors(8, j) = aj * (aj - 1.0_knd) * (aj2 + rm2p1)
+      normalization_factors(9, j) = (aj + rm2 - 1.0_knd) * (aj + rm2)
+      ! Reuse complete norm weights without changing the division or product order.
+      if(j >= 2) then
+        normalization_factors(10, j) = &
+            (normalization_factors(3, j) / normalization_factors(1, j)) * &
+            (normalization_factors(4, j) / normalization_factors(2, j)) * &
+            (normalization_factors(5, j) / normalization_factors(6, j))
+        normalization_factors(11, j) = &
+            (normalization_factors(1, j) / normalization_factors(3, j)) * &
+            (normalization_factors(2, j) / normalization_factors(4, j)) * &
+            (normalization_factors(6, j) / normalization_factors(5, j))
+      end if
+    end do
+    normalization_count = max(normalization_count, limd)
+    ! Reuse coefficient-conversion factors shared by every degree of each parity.
+    if(allocated(ratio_numerators)) then
+      if(size(ratio_numerators, 1) < maxd) then
+        deallocate(ratio_numerators, ratio_denominators)
+      end if
+    end if
+    if(.not. allocated(ratio_numerators)) then
+      allocate(ratio_numerators(maxd, 2), ratio_denominators(maxd, 2))
+      ratio_counts = 0
+    end if
+    if(ratio_order /= m .or. ratio_parameter /= c) ratio_counts = 0
+    ratio_order = m
+    ratio_parameter = c
+    parity_index = ix + 1
+    do i = ratio_counts(parity_index) + 1, lim2
+      arr = ix + i + i
+      ea = arr + arr + rm2
+      ratio_numerators(i, parity_index) = (ea - 1.0_knd) * (ea + 1.0_knd)
+      ratio_denominators(i, parity_index) = (arr + rm2) * (arr + rm2 - 1.0_knd) * csq
+    end do
+    ratio_counts(parity_index) = max(ratio_counts(parity_index), lim2)
     sgn = 1.0e0_knd
      do 20 i = 1, lim2
-     arr = ix + i + i
-     ea = arr + arr + rm2
      if(i > lm2) go to 10
      if(enr(i) < (0.0e0_knd)) sgn = sgn * (-1.0e0_knd)
-10    enr(i) = (ea - 1.0e0_knd) * (ea + 1.0e0_knd) * enr(i) / ((arr + rm2)* &
-          (arr + rm2 - 1.0e0_knd) * csq)
+10    enr(i) = ratio_numerators(i, parity_index) * enr(i) / ratio_denominators(i, parity_index)
 20    continue
 !
 !  compute the Morse-Feshbach normalizing factor
@@ -4730,8 +8030,8 @@ end if
      do 30 j = jlow, limd, 2
      aj = j
      jterm = jterm + 1
-     term = term * (aj + rm2) * enr(jterm) * (aj + rm2 - 1.0e0_knd)/ &
-        (aj * (aj - 1.0e0_knd))
+     term = term * normalization_factors(3, j) * enr(jterm) * &
+        normalization_factors(4, j) / normalization_factors(7, j)
      if(term > 0.0e0_knd) sump = sump + term
      dmfnorm = dmfnorm + term
      if(abs(term / dmfnorm) < dec) go to 40
@@ -4749,8 +8049,8 @@ end if
     jterm = lm2
      do 50 j = jlow, 2,-2
      aj = j
-     term = term * aj * (aj - 1.0e0_knd) / ((aj + rm2 &
-        -1.0e0_knd) * (aj + rm2) * enr(jterm))
+     term = term * normalization_factors(1, j) * normalization_factors(2, j) / &
+        (normalization_factors(9, j) * enr(jterm))
      if(term > 0.0e0_knd) sump = sump + term
      jterm = jterm - 1
      dmfnorm = dmfnorm + term
@@ -4758,11 +8058,11 @@ end if
 50    continue
 60   continue
     if(dmfnorm == 0.0e0_knd) dmfnorm = dec
-    jsub = int(log10(abs(sump / dmfnorm) + dec))
+    jsub = decimal_exponent(abs(sump / dmfnorm) + dec)
     if(jsub < 0) jsub = 0
     if(jsub > ndec) jsub = ndec
     iterm = 0
-    if(dmfnorm /= 0.0e0_knd) iterm = int(log10(abs(dmfnorm)))
+    if(dmfnorm /= 0.0e0_knd) iterm = decimal_exponent(abs(dmfnorm))
     idmfe = idmfe + iterm
     dmfnorm = dmfnorm * (10.0e0_knd ** (-iterm))
     dmlmf = 1.0e0_knd / dmfnorm
@@ -4789,62 +8089,25 @@ end if
       id01 = id01 - nfac
       end if
 80    continue
-    iterm = int(log10(abs(d01)))
+    iterm = decimal_exponent(abs(d01))
     d01 = d01 * (10.0e0_knd ** (-iterm))
     id01 = id01 + iterm
 90   continue
 !
 !  compute the Meixner-Schafke normalizing factor
-    jflag = 0
-    idmse = 0
-    dmsnorm = 1.0e0_knd
-    coef = 1.0e0_knd
-    jlow = l - m + 2
-    jterm = lm2
-     do 150 j = jlow, limd, 2
-     aj = j
-     aj2 = aj + aj
-     jterm = jterm + 1
-     coef = coef * (aj + rm2) * enr(jterm) * (aj + rm2m1) * enr(jterm) &
-        *(aj2 + rm2m3) / (aj * (aj - 1.0e0_knd) * (aj2 + rm2p1))
-     dmsnorm = dmsnorm + coef
-     if(abs(coef / dmsnorm) < dec) go to 160
-      if(abs(dmsnorm) > teste) then
-      dmsnorm = dmsnorm * testeo
-      coef = coef * testeo
-      idmse = idmse + nfac
-      jflag = 1
-      end if
-150    continue
-160   jlow = l - m
-    jn = jterm
+    if(present(coefficient_values)) then
+      call joint_meixner_coefficients(l, m, limd, enr, normalization_factors, dec, sgn, &
+          dmsnorm, idmse, dmlms, idmlmse, jn, coefficient_values, coefficient_length, &
+          coefficient_status)
+    else
+      call complete_meixner_normalization(l, m, limd, enr, normalization_factors, dec, sgn, &
+                                          dmsnorm, idmse, dmlms, idmlmse, jn)
+    end if
+    ! Keep the inherited workspace estimate separate from the complete positive sum.
     jnorm = max(jmf, jn)
-    if(jlow < 2 .or. jflag == 1) go to 180
-    coef = 1.0e0_knd
-    jterm = lm2
-    j = jlow
-     do 170 jj = 2, jlow, 2
-     aj = j
-     aj2 = aj + aj
-     coef = coef * aj * (aj - 1.0e0_knd) * (aj2 + rm2p1) / ((aj2 + rm2m3)* &
-         enr(jterm) * enr(jterm) * (aj + rm2) * (aj + rm2m1))
-     jterm = jterm - 1
-     j = j - 2
-     dmsnorm = dmsnorm + coef
-     if(abs(coef / dmsnorm) < dec) go to 180
-170    continue
-180   iterm = int(log10(dmsnorm))
-    dmsnorm = dmsnorm * ten ** (-iterm)
-    idmse = idmse + iterm
-     if(2 * (idmse / 2) /= idmse) then
-     idmse = idmse - 1
-     dmsnorm = ten * dmsnorm
-     end if
-    dmlms = sgn / sqrt(dmsnorm)
-    idmlmse = -idmse / 2
 if (debug) then
     write(50, 190) jn, lim2
-190   format(5x,' Meixner-Schafke normalization converged in ', &
+190   format(5x,' Meixner-Schafke scheduling index ', &
         i6,' terms; ',i6,' terms available.')
 end if
       continue
@@ -4852,6 +8115,207 @@ end if
     end subroutine
 !
 !
+    subroutine angular_legendre_normalization(l, m, factor, exponent)
+    implicit none
+    integer, intent(in) :: l, m
+    real(knd), intent(out) :: factor
+    integer, intent(out) :: exponent
+    integer :: slot, j, decimal_shift
+    integer(int64) :: mode_index
+    real(knd) :: aj, twice_m
+
+    ! Collisions replace entries without changing normalization or modal support.
+    mode_index = int(l, int64) * (int(l, int64) + 1) / 2 + int(m, int64)
+    slot = 1 + int(modulo(mode_index, int(size(angular_normalization_cache), int64)))
+    if(angular_normalization_cache(slot)%m == m .and. &
+        angular_normalization_cache(slot)%l == l) then
+      factor = angular_normalization_cache(slot)%factor
+      exponent = angular_normalization_cache(slot)%exponent
+      return
+    end if
+
+    ! Preserve the original scaled factorial products and their operation order.
+    factor = 1.0_knd
+    exponent = 0
+    twice_m = m + m
+    do j = 1, m
+      aj = j
+      factor = factor * (aj + aj) * (aj + aj - 1.0_knd)
+      if(factor < 1.0e100_knd) cycle
+      factor = factor * 1.0e-100_knd
+      exponent = exponent + 100
+    end do
+    do j = 1, l - m
+      aj = j
+      factor = factor * (twice_m + aj) / aj
+      if(factor < 1.0e100_knd) cycle
+      factor = factor * 1.0e-100_knd
+      exponent = exponent + 100
+    end do
+    factor = factor * 2.0_knd / (l + l + 1.0_knd)
+    factor = sqrt(factor)
+    exponent = exponent / 2
+    decimal_shift = decimal_exponent(factor)
+    factor = factor * (10.0_knd ** (-decimal_shift))
+    exponent = exponent + decimal_shift
+    angular_normalization_cache(slot) = angular_normalization_entry(m, l, exponent, factor)
+    end subroutine angular_legendre_normalization
+
+    pure function legendre_normalization_step(twice_m, offset) result(step)
+    implicit none
+    real(knd), intent(in) :: twice_m
+    integer, intent(in) :: offset
+    real(knd) :: step, r, norm_ratio
+
+    ! Preserve the existing native arithmetic used for each normalization factor.
+    r = real(offset, knd)
+    norm_ratio = ((r + twice_m + 2.0_knd) / (r + 2.0_knd)) * &
+                 ((r + twice_m + 1.0_knd) / (r + 1.0_knd)) * &
+                 ((2.0_knd * r + twice_m + 1.0_knd) / &
+                  (2.0_knd * r + twice_m + 5.0_knd))
+    step = sqrt(norm_ratio)
+    end function legendre_normalization_step
+
+    subroutine prepare_legendre_normalization(m, required_steps, slot)
+    implicit none
+    integer, intent(in) :: m, required_steps
+    integer, intent(out) :: slot
+    integer :: retained_steps, previous_steps, offset, allocation_status
+    real(knd) :: twice_m
+    real(knd), allocatable :: expanded_steps(:)
+    logical :: new_order
+    character(len=256) :: allocation_message
+
+    ! Reuse factors across frequencies and the exterior and interior expansions.
+    if(required_steps <= 0) then
+      slot = 0
+      return
+    end if
+    do slot = 1, size(legendre_normalization_cache)
+      if(legendre_normalization_cache(slot)%m /= m) cycle
+      if(allocated(legendre_normalization_cache(slot)%steps)) exit
+    end do
+    new_order = slot > size(legendre_normalization_cache)
+    if(new_order) slot = legendre_normalization_next
+    previous_steps = 0
+    if(.not. new_order) previous_steps = size(legendre_normalization_cache(slot)%steps)
+    retained_steps = min(max(0, required_steps), &
+        legendre_normalization_slot_bytes / (storage_size(1.0_knd) / 8))
+    if(retained_steps <= previous_steps) return
+
+    ! Allocation failure leaves existing entries intact and uses direct factors.
+    allocate(expanded_steps(retained_steps), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status /= 0) then
+      slot = 0
+      return
+    end if
+    if(previous_steps > 0) expanded_steps(1:previous_steps) = &
+        legendre_normalization_cache(slot)%steps
+    twice_m = real(2 * m, knd)
+    do offset = previous_steps, retained_steps - 1
+      expanded_steps(offset + 1) = legendre_normalization_step(twice_m, offset)
+    end do
+    call move_alloc(expanded_steps, legendre_normalization_cache(slot)%steps)
+    legendre_normalization_cache(slot)%m = m
+    if(new_order) legendre_normalization_next = mod(slot, size(legendre_normalization_cache)) + 1
+    end subroutine prepare_legendre_normalization
+
+    subroutine normalized_legendre_coefficients(l, m, limd, enr, seed, seed_exponent, &
+                                                values, length, status)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: l, m, limd, seed_exponent
+    real(knd), intent(in) :: enr(:), seed
+    real(knd), intent(out) :: values(:)
+    integer, intent(out) :: length
+    integer, intent(inout) :: status
+    integer :: parity, last_ratio, seed_index, j, offset, normalization_slot, cached_steps
+    real(knd) :: twice_m, ratio, normalization_step, seed_value, current_value
+
+    ! Express the existing Meixner coefficients in a unit-norm Legendre basis.
+    parity = modulo(l - m, 2)
+    last_ratio = limd / 2 - parity
+    seed_index = (l - m - parity) / 2
+    length = l - m + 1
+    values = 0.0_knd
+    if(last_ratio < seed_index .or. last_ratio > size(enr)) then
+      status = max(status, 2)
+      return
+    end if
+    seed_value = seed * 10.0_knd ** seed_exponent
+    if(.not. ieee_is_finite(seed_value) .or. seed_value == 0.0_knd) then
+      status = max(status, 2)
+      return
+    end if
+    if(length <= size(values)) values(length) = seed_value
+    twice_m = real(2 * m, knd)
+
+    ! Reuse Legendre norm ratios that depend only on order and coefficient index.
+    call prepare_legendre_normalization(m, 2 * last_ratio + parity - 1, normalization_slot)
+    cached_steps = 0
+    if(normalization_slot > 0) then
+      if(allocated(legendre_normalization_cache(normalization_slot)%steps)) &
+          cached_steps = size(legendre_normalization_cache(normalization_slot)%steps)
+    end if
+
+    ! Stream the unchanged recurrence and retain every representable nonzero coefficient.
+    current_value = seed_value
+    do j = seed_index + 1, last_ratio
+      offset = 2 * (j - 1) + parity
+      if(offset < cached_steps) then
+        normalization_step = legendre_normalization_cache(normalization_slot)%steps(offset + 1)
+      else
+        normalization_step = legendre_normalization_step(twice_m, offset)
+      end if
+      ratio = enr(j) * normalization_step
+      current_value = current_value * ratio
+      if(.not. ieee_is_finite(current_value)) status = max(status, 2)
+      if(current_value /= 0.0_knd) length = offset + 3
+      if(offset + 3 <= size(values)) values(offset + 3) = current_value
+    end do
+
+    ! Preserve the native normalization and phase while recursing downward.
+    current_value = seed_value
+    do j = seed_index, 1, -1
+      offset = 2 * (j - 1) + parity
+      if(offset < cached_steps) then
+        normalization_step = legendre_normalization_cache(normalization_slot)%steps(offset + 1)
+      else
+        normalization_step = legendre_normalization_step(twice_m, offset)
+      end if
+      ratio = enr(j) * normalization_step
+      if(ratio == 0.0_knd .or. .not. ieee_is_finite(ratio)) then
+        status = max(status, 2)
+        return
+      end if
+      current_value = current_value / ratio
+      if(.not. ieee_is_finite(current_value)) status = max(status, 2)
+      if(offset + 1 <= size(values)) values(offset + 1) = current_value
+    end do
+    if(size(values) < length) status = max(status, 1)
+    end subroutine normalized_legendre_coefficients
+
+    subroutine identity_legendre_coefficients(values, lengths, status)
+    implicit none
+    real(knd), intent(out) :: values(:,:,:)
+    integer, intent(out) :: lengths(:,:), status
+    integer :: degree_index, m_index
+
+    ! At zero spheroidal parameter each angular mode is one Legendre mode.
+    values = 0.0_knd
+    status = 0
+    do m_index = 1, size(lengths, 2)
+      do degree_index = 1, size(lengths, 1)
+        lengths(degree_index, m_index) = degree_index
+        if(degree_index <= size(values, 1)) then
+          values(degree_index, degree_index, m_index) = 1.0_knd
+        else
+          status = 1
+        end if
+      end do
+    end do
+    end subroutine identity_legendre_coefficients
+
     subroutine dalt (l, m, c, limdr, maxdr, maxmp, ndec, nex, ioppsum, &
              eigval, enrneg, drhor, dneg, idneg, nsdneg, nsdrho)
 !
@@ -4980,7 +8444,7 @@ end if
       end if
      end do
      if(nsdneg > ndec) nsdneg = ndec
-    iterm = int(log10(abs(dneg)))
+    iterm = decimal_exponent(abs(dneg))
     dneg = dneg * (ten ** (-iterm))
     idneg = idneg + iterm
 !
@@ -5258,7 +8722,7 @@ end if
        iterm = iterm + nfac
       end if
      end do
-     jterm = int(log10(term))
+     jterm = decimal_exponent(term)
      term = term * (ten ** (-jterm))
      iterm = iterm + jterm
     end if
@@ -5390,7 +8854,8 @@ end if
      jterm = int(ajterm)
      ipnorm(k) = ipnorm(k) + jterm
      pnorm(k) = pnorm(k) * (ten ** (ajterm - jterm))
-     if(iopd == 0) go to 130
+     ! Values-only requests retain the computed Legendre normalization.
+     if(iopd == 0) go to 140
      ajterm = log10(rm * abs(barg(k))) + (rm - 2.0e0_knd)* &
          log10(1.0e0_knd - bargs) / 2.0e0_knd
      jterm = int(ajterm)
@@ -5574,7 +9039,7 @@ end if
 80    continue
      end do
 90   continue
-    iterm = int(log10(abs(qml)))
+    iterm = decimal_exponent(abs(qml))
     qml = qml * 10.0e0_knd ** (-iterm)
     iqml = iqml + iterm
 !
@@ -5603,7 +9068,7 @@ end if
      qlow = qupp
      qupp = ql(1)
      end do
-130   iql(1) = int(log10(abs(ql(1))))
+130   iql(1) = decimal_exponent(abs(ql(1)))
     ql(1) = ql(1) * (10.0e0_knd ** (-iql(1)))
 !
 !  calculation of ratios of the first derivatives of q with respect
@@ -5638,7 +9103,7 @@ end if
     iqdl(1) = 0
     go to 160
 150   qdml = -rm * x * qml / x1d
-    iterm = int(log10(abs(qdml)))
+    iterm = decimal_exponent(abs(qdml))
     qdml = qdml * (10.0e0_knd ** (-iterm))
     iqdml = iqml + iterm
     qdl(1) = rm * (x * ql(1) - 2.0e0_knd * qml * (10.0e0_knd ** (iqml - iql(1)))) &
@@ -5665,9 +9130,15 @@ end if
     end subroutine
 !
 !
-    subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+    recursive subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
-            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo)
+            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, &
+#ifdef USE_QUAD
+            resume_lim, moment_errors, moment_error_prefix, moment_errors_valid)
+#else
+            resume_lim)
+#endif
+    use iso_c_binding, only: c_int
 !
 !  purpose:     To calculate integrals of the product of associated
 !               Legendre functions and kernels containing spherical
@@ -5725,23 +9196,97 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) ak, amo2, an, arg, argb, arn, bn, c, coef, coefme, &
          coefmo, coefo, coef1, coef2, coef4, darg, dec, etai, &
          etaim1, etais, etal, etau, etcoef1, etcoef2, rm, rn, sargb, &
          scal, sneu1, sneu2, sneu3, stemp0, step, step0, step1, step2, &
-         twom, twomi, x1, x1sm1
+         twom, twomi, x1, x1sm1, window_base, window_power, legendre_power, &
+         neumann_shift2, neumann_shift3
     real(knd) alpha(maxint), beta(maxint), p(maxint), pint1(maxint), &
          pint2(maxint), pint3(maxint), pint4(maxint), &
          pnorm(maxlp), rpint1(maxint), rpint2(maxint), &
-         sneun(maxmp), wg(ngau), xg(ngau), ynormn(maxmp)
+         sneun(maxmp), wg(ngau), xg(ngau), ynormn(maxmp), neumann_scale(maxmp)
 !
 !  integer arrays
     dimension norme(maxmp), ipnorm(maxlp)
+    logical, optional, intent(in) :: use_geometry_cache
+    integer, optional, intent(in) :: resume_lim
+#ifdef USE_QUAD
+    integer, optional, intent(in) :: moment_error_prefix
+    real(knd), optional, intent(inout) :: moment_errors(:,:)
+    logical, optional, intent(out) :: moment_errors_valid
+#endif
+    logical :: reuse_geometry, reuse_kernels, store_kernels, need_new_integrals
+    integer :: geometry_index, geometry_node, cached_degrees, prior_odd
+    type(pint_geometry_entry), pointer :: geometry_entry
+#ifdef USE_QUAD
+    logical :: parity_integrals, exact_integrals
+    integer :: recurrence_limit, required_degrees, extra_odd
+    integer :: coarse_prefix, coarse_node, coarse_weight_index, coarse_status
+    character(len=256) :: allocation_message
+    real(knd), allocatable :: coarse_kernels(:,:)
+    real(knd) :: mapped_measure, coarse_weight_ratio
+    logical :: paired_geometry_complete,checked_eligible,checked_used,discard_checked_prefix
+    integer(c_int) :: checked_status
+    real(knd) :: parity_forward(maxint), parity_diagonal(maxint), &
+        parity_backward(maxint), eta_squared
+#endif
 !
+#ifdef USE_QUAD
+    checked_eligible=.false.
+    checked_used=.false.
+    discard_checked_prefix=.false.
+    if(checked_radial_enabled.and.radial_quadrature_mode==1) then
+      if(checked_moment_callbacks_available()==1.and.x1*(x1+2.0_knd)>1.0_knd) &
+        checked_eligible=present(moment_errors).and.present(moment_errors_valid)
+    end if
+    if(m/=checked_moments_key_m.or.c/=checked_moments_key_c.or.x1/=checked_moments_key_x.or. &
+        radial_quadrature_mode/=checked_moments_key_mode) then
+      checked_moments_key_m=m
+      checked_moments_key_c=c
+      checked_moments_key_x=x1
+      checked_moments_key_mode=radial_quadrature_mode
+      checked_moments_rejected=.false.
+    end if
+    checked_eligible=checked_eligible.and..not.checked_moments_rejected
+    if(present(moment_errors)) then
+      if(size(moment_errors,1)>0.and.size(moment_errors,2)>=5) then
+        if(checked_eligible) then
+          discard_checked_prefix=moment_errors(1,5)/=1.0_knd
+        else
+          discard_checked_prefix=moment_errors(1,5)==1.0_knd
+        end if
+      end if
+    else if(radial_quadrature_mode==1) then
+      discard_checked_prefix=.true.
+    end if
+    if(discard_checked_prefix.and.present(moment_errors)) moment_errors=0.0_knd
+    if(present(moment_errors_valid)) moment_errors_valid=.false.
+#endif
+    nullify(geometry_entry)
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
     amo2 = 0.5e0_knd * m
     lim = limint
+#ifdef USE_QUAD
+    ! Keep the original direct calculation when extra parity support cannot fit.
+    parity_integrals = lim >= 0 .and. lim <= maxint - 4 .and. lim <= huge(lim) - 5
+    recurrence_limit = lim + 2
+    required_degrees = 2 * ((lim + 1) / 2) + 2
+    if(parity_integrals) then
+      recurrence_limit = lim + 4
+      required_degrees = required_degrees + 2
+    end if
+#endif
+    prior_odd = 0
+    if(present(resume_lim)) then
+      if(resume_lim > 0) prior_odd = 2 * ((resume_lim + 1) / 2) + 1
+    end if
+#ifdef USE_QUAD
+    if(discard_checked_prefix) prior_odd=0
+#endif
+    need_new_integrals = prior_odd < 2 * ((lim + 1) / 2) + 1
     step0 = 1.0e0_knd / ngqs
     coefme = (m * (x1 + 1.0e0_knd)) / x1sm1
     coefmo = (m * (x1 + 1.0e0_knd) ** 2 + x1sm1) / ((x1 + 1.0e0_knd) * x1sm1)
@@ -5770,8 +9315,8 @@ end if
      bn = n + n + 1
      pnorm(1) = pnorm(1) * an
      pnorm(2) = pnorm(2) * bn
-     iterm1 = int(log10(pnorm(1)))
-     iterm2 = int(log10(pnorm(2)))
+     iterm1 = decimal_exponent(pnorm(1))
+     iterm2 = decimal_exponent(pnorm(2))
      pnorm(1) = pnorm(1) * 10.0e0_knd ** (-iterm1)
      pnorm(2) = pnorm(2) * 10.0e0_knd ** (-iterm2)
      ipnorm(1) = ipnorm(1) + iterm1
@@ -5779,15 +9324,15 @@ end if
 40    continue
 50   twom = m + m
     pnorm(3) = pnorm(1) * (twom + 2) / 2
-    iterm3 = int(log10(pnorm(3)))
+    iterm3 = decimal_exponent(pnorm(3))
     pnorm(3) = pnorm(3) * 10.0e0_knd ** (-iterm3)
     ipnorm(3) = iterm3 + ipnorm(1)
     if(lnum < 4) go to 70
      do 60 il = 4, lnum, 2
      pnorm(il) = pnorm(il - 2) * (twom + il - 1) / (il - 1)
      pnorm(il + 1) = pnorm(il - 1) * (twom + il) / (il)
-     iterm1 = int(log10(pnorm(il)))
-     iterm2 = int(log10(pnorm(il + 1)))
+     iterm1 = decimal_exponent(pnorm(il))
+     iterm2 = decimal_exponent(pnorm(il + 1))
      ipnorm(il) = ipnorm(il - 2) + iterm1
      ipnorm(il + 1) = ipnorm(il - 1) + iterm2
      pnorm(il) = pnorm(il) * 10.0e0_knd ** (-iterm1)
@@ -5803,18 +9348,35 @@ end if
     alpha(2) = (twom + 3.0e0_knd) * pnorm(2) / (pnorm(3) * 2.0e0_knd)
     alpha(2) = alpha(2) * 10.0e0_knd ** (ipnorm(2) - ipnorm(3))
     beta(2) = -(twom + 1.0e0_knd) / (twom + 2.0e0_knd)
+#ifdef USE_QUAD
+     do 80 il = 3, recurrence_limit
+#else
      do 80 il = 3, lim + 2
+#endif
      alpha(il) = alpha(il - 2) * (twom + il - 1) * (twom + il + il - 1)* &
      (il - 2) / ((il - 1) * (twom + il) * (twom + il + il - 5))
      beta(il) = -(twom + il - 1) / (twom + il)
 80    continue
 !
      do 90 il = 1, lim + 2, 2
-     pint1(il) = 0.0e0_knd
-     pint2(il) = 0.0e0_knd
+     if(il > prior_odd) then
+       pint1(il) = 0.0e0_knd
+       pint2(il) = 0.0e0_knd
+#ifdef USE_QUAD
+       if(parity_integrals) then
+         pint4(il) = 0.0_knd
+       else
+#endif
+         pint4(il + 1) = 0.0e0_knd
+#ifdef USE_QUAD
+       end if
+#endif
+     end if
      pint3(il + 1) = 0.0e0_knd
-     pint4(il + 1) = 0.0e0_knd
 90    continue
+#ifdef USE_QUAD
+    if(parity_integrals .and. need_new_integrals) pint4(required_degrees - 1) = 0.0_knd
+#endif
 !
 !  calculation of the scaling exponents for the spherical Bessel
 !  functions required for the four types of integrals
@@ -5824,12 +9386,66 @@ end if
        twomi = twomi * (n + n - 1) / (n + n)
      end do
 110   continue
+#ifdef USE_QUAD
+    reuse_geometry = .true.
+#else
+    ! Double arithmetic is cheaper than retaining and copying these large tables.
+    reuse_geometry = .false.
+#endif
+    if(present(use_geometry_cache)) reuse_geometry = use_geometry_cache
+#ifdef USE_QUAD
+    if(checked_eligible) reuse_geometry=.false.
+#endif
+#ifdef USE_QUAD
+    if(.not. parity_integrals) reuse_geometry = .false.
+#endif
+    geometry_index = 0
+    cached_degrees = 0
+    reuse_kernels = .false.
+    store_kernels = .false.
+    if(reuse_geometry .and. (need_new_integrals &
+#ifdef USE_QUAD
+        .or. (radial_quadrature_mode==1 .and. present(moment_errors)) &
+#endif
+        )) &
+        call prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
+        step1, step2, x1sm1, dec, twomi, alpha, beta, lim, geometry_index)
+    if(geometry_index > 0) then
+      geometry_entry => pint_geometry_cache(geometry_index)
+#ifdef USE_QUAD
+      cached_degrees = min(geometry_entry%degrees, required_degrees)
+#else
+      cached_degrees = min(geometry_entry%degrees, 2 * ((lim + 1) / 2) + 2)
+#endif
+      if(allocated(geometry_entry%kernels)) then
+        reuse_kernels = geometry_entry%kernels_valid .and. geometry_entry%kernel_c == c
+        store_kernels = .not. reuse_kernels
+      end if
+    end if
+#ifdef USE_QUAD
+    ! Reuse eliminated recurrence coefficients only for an uncached basis tail.
+    if(parity_integrals .and. need_new_integrals .and. cached_degrees < required_degrees) then
+      do il = 3, required_degrees - 3, 2
+        parity_forward(il) = alpha(il + 1) * alpha(il)
+        parity_diagonal(il) = beta(il + 1) + alpha(il + 1) * beta(il) / alpha(il - 1)
+        parity_backward(il) = -alpha(il + 1) * beta(il) * beta(il - 1) / alpha(il - 1)
+      end do
+    end if
+    ! Sum complete stored products exactly when binary128 nearest rounding is supported.
+    exact_integrals = .false.
+    if(geometry_index > 0 .and. parity_integrals) then
+      if(cached_degrees >= required_degrees .and. allocated(geometry_entry%kernels)) &
+          exact_integrals = pint_exact_sums_enabled()
+    end if
+#endif
+    geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
+    call paired_sine_cosine(arg, sine_value, cosine_value)
     darg = 1.0e0_knd / arg
-    stemp0 = -cos(arg) * darg
-    norme(1) = int(log10(abs(stemp0)))
+    stemp0 = -cosine_value * darg
+    norme(1) = decimal_exponent(abs(stemp0))
     ynormn(1) = stemp0 * 10.0e0_knd ** (-norme(1))
-    ynormn(2) = stemp0 * darg - sin(arg) * darg
+    ynormn(2) = stemp0 * darg - sine_value * darg
     norme(2) = norme(1)
     ynormn(2) = ynormn(2) * 10.0e0_knd ** (-norme(1))
 !
@@ -5838,13 +9454,45 @@ end if
      arn = n + n - 1
      ynormn(n) = -ynormn(n - 2) + darg * rn * ynormn(n - 1)
      ynormn(n + 1) = -ynormn(n - 1) + darg * arn * ynormn(n)
-     norme(n + 1) = int(log10(abs(ynormn(n + 1))))
+     norme(n + 1) = decimal_exponent(abs(ynormn(n + 1)))
      scal = 10.0e0_knd ** (-norme(n + 1))
      ynormn(n + 1) = ynormn(n + 1) * scal
      ynormn(n) = ynormn(n) * scal
      norme(n + 1) = norme(n + 1) + norme(n - 1)
      norme(n) = norme(n + 1)
 120    continue
+!
+!  Reuse decimal scaling factors at every quadrature node.
+    neumann_scale(1) = 10.0e0_knd ** (-norme(1))
+    neumann_scale(2) = 10.0e0_knd ** (-norme(2))
+    do n = 3, m + 3, 2
+      neumann_scale(n) = 10.0e0_knd ** (-norme(n) + norme(n - 1))
+      neumann_scale(n + 1) = 10.0e0_knd ** (-norme(n + 1) + norme(n - 1))
+    end do
+    neumann_shift2 = 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
+    neumann_shift3 = 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
+#ifdef USE_QUAD
+    if(checked_eligible) then
+      checked_status=0
+      if(parity_integrals.and.size(moment_errors,1)==maxint.and.size(moment_errors,2)==6) then
+        checked_status=checked_moments_proc(int(m,c_int),c,x1sm1,10.0_knd**(-norme(m+1)), &
+            int(maxint,c_int),int(required_degrees,c_int), &
+            int(merge(1,prior_odd+2,prior_odd<1),c_int),pint1,pint2,pint4,moment_errors)
+      end if
+      if(checked_status/=1) then
+      checked_moments_rejected=.true.
+      moment_errors=0.0_knd
+      call pint(c,m,lnum,x1,limint,maxint,maxlp,maxmp,ndec,wg,xg,ngau,ngqs, &
+          rpint1,rpint2,pint1,pint2,pint3,pint4,norme,pnorm,ipnorm,coefme,coefmo, &
+          use_geometry_cache,0,moment_errors,0,moment_errors_valid)
+      return
+      end if
+      checked_used=.true.
+      moment_errors_valid=.true.
+      go to 190
+    end if
+#endif
+    if(.not. need_new_integrals) go to 190
 !
 !  gaussian quadrature integration loops. first dividing integrand
 !  into ngqs steps
@@ -5863,55 +9511,285 @@ end if
 !
 !  gaussian quadrature integration over each step
       do 170 i = 1, ngau
+      geometry_node = geometry_node + 1
+      if(geometry_index > 0) then
+        if(geometry_node > geometry_entry%nodes) go to 190
+        etai = geometry_entry%geometry(1, geometry_node)
+        etaim1 = 1.0e0_knd - etai * etai
+        coef = geometry_entry%geometry(2, geometry_node)
+        sargb = geometry_entry%geometry(3, geometry_node)
+        coefo = geometry_entry%geometry(4, geometry_node)
+      else
       etai = etcoef1 + xg(i) * etcoef2
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1) &
+          call map_radial_quadrature_node(etal,etau,xg(i),x1sm1,etai,mapped_measure)
+#endif
       etais = etai * etai
       etaim1 = 1.0e0_knd - etais
       argb = x1sm1 + etais
-      coef = step * ((x1sm1 * etaim1 / argb) ** amo2)
-      if(coef < dec) go to 190
+      window_base = x1sm1 * etaim1 / argb
+#ifdef USE_QUAD
+!  The exponent m/2 is integral or half integral, so general real powers are unnecessary.
+      window_power = window_base ** (m / 2)
+      if(mod(m, 2) /= 0) window_power = window_power * sqrt(window_base)
+#else
+      window_power = window_base ** amo2
+#endif
+      coef = step * window_power
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1) then
+        coef=mapped_measure*window_power
+      else
+#endif
+        if(coef < dec) go to 190
+#ifdef USE_QUAD
+      end if
+#endif
       sargb = sqrt(argb)
       coefo = 1.0e0_knd / sargb
-      arg = c * sargb
-      stemp0 = -cos(arg) / arg
-      sneun(1) = stemp0
-      sneun(1) = sneun(1) * 10.0e0_knd ** (-norme(1))
-      sneun(2) = stemp0 / arg - sin(arg) / arg
-      sneun(2) = sneun(2) * 10.0e0_knd ** (-norme(2))
-      darg = 1.0e0_knd / arg
-       do 150 n = 3, m + 3, 2
-       rn = n + n - 3
-       arn = n + n - 1
-       sneun(n) = -sneun(n - 2) + darg * rn * sneun(n - 1)
-       sneun(n + 1) = -sneun(n - 1) + darg * arn * sneun(n)
-       sneun(n + 1) = sneun(n + 1) * 10.0e0_knd ** (-norme(n + 1) + norme(n - 1))
-       sneun(n) = sneun(n) * 10.0e0_knd ** (-norme(n) + norme(n - 1))
+      end if
+      if(.not. reuse_kernels) then
+        arg = c * sargb
+        call paired_sine_cosine(arg, sine_value, cosine_value)
+        stemp0 = -cosine_value / arg
+        sneun(1) = stemp0
+        sneun(1) = sneun(1) * neumann_scale(1)
+        sneun(2) = stemp0 / arg - sine_value / arg
+        sneun(2) = sneun(2) * neumann_scale(2)
+        darg = 1.0e0_knd / arg
+         do 150 n = 3, m + 3, 2
+         rn = n + n - 3
+         arn = n + n - 1
+         sneun(n) = -sneun(n - 2) + darg * rn * sneun(n - 1)
+         sneun(n + 1) = -sneun(n - 1) + darg * arn * sneun(n)
+         sneun(n + 1) = sneun(n + 1) * neumann_scale(n + 1)
+         sneun(n) = sneun(n) * neumann_scale(n)
 150      continue
-      sneu1 = sneun(m + 1)
-      sneu2 = sneun(m + 2) * 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
-      sneu3 = sneun(m + 3) * 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
-      p(1) = twomi * (etaim1 ** amo2)
+        sneu1 = sneun(m + 1)
+        sneu2 = sneun(m + 2) * neumann_shift2
+        sneu3 = sneun(m + 3) * neumann_shift3
+        coef1 = coef * sneu1 * wg(i)
+        coef2 = coef * coefo * sneu2 * wg(i)
+#ifdef USE_QUAD
+        if(parity_integrals) then
+          coef4 = coef * coefo * coefo * sneu3 * wg(i)
+        else
+#endif
+          coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
+#ifdef USE_QUAD
+        end if
+#endif
+        if(store_kernels) geometry_entry%kernels(:, geometry_node) = [coef1, coef2, coef4]
+      else
+        coef1 = geometry_entry%kernels(1, geometry_node)
+        coef2 = geometry_entry%kernels(2, geometry_node)
+        coef4 = geometry_entry%kernels(3, geometry_node)
+      end if
+#ifdef USE_QUAD
+      if(exact_integrals) go to 170
+      if(parity_integrals) then
+        ! Only even degree offsets enter the first two integral families.
+        if(cached_degrees >= required_degrees) then
+          if(prior_odd < 1) then
+            pint1(1) = pint1(1) + coef1 * geometry_entry%basis(1, geometry_node)
+            pint2(1) = pint2(1) + coef2 * geometry_entry%basis(1, geometry_node)
+            pint4(1) = pint4(1) + coef4 * geometry_entry%basis(1, geometry_node)
+          end if
+          do il = max(2, prior_odd + 1), lim + 1, 2
+            pint1(il + 1) = pint1(il + 1) + coef1 * geometry_entry%basis(il + 1, geometry_node)
+            pint2(il + 1) = pint2(il + 1) + coef2 * geometry_entry%basis(il + 1, geometry_node)
+            pint4(il + 1) = pint4(il + 1) + coef4 * geometry_entry%basis(il + 1, geometry_node)
+          end do
+          extra_odd = required_degrees - 1
+          pint4(extra_odd) = pint4(extra_odd) + &
+              coef4 * geometry_entry%basis(extra_odd, geometry_node)
+        else
+          ! Continue the same recurrence when storage holds only a prefix or no table.
+          eta_squared = etai * etai
+          if(cached_degrees >= 2) then
+            p(1:cached_degrees - 1:2) = geometry_entry%basis(1:cached_degrees - 1:2, geometry_node)
+          else
+            legendre_power = etaim1 ** (m / 2)
+            if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+            p(1) = twomi * legendre_power
+          end if
+          if(prior_odd < 1) then
+            pint1(1) = pint1(1) + coef1 * p(1)
+            pint2(1) = pint2(1) + coef2 * p(1)
+            pint4(1) = pint4(1) + coef4 * p(1)
+          end if
+          do il = 2, lim + 1, 2
+            if(il + 1 > cached_degrees) then
+              if(il == 2) then
+                p(3) = (alpha(2) * alpha(1) * eta_squared + beta(2)) * p(1)
+              else
+                p(il + 1) = (parity_forward(il - 1) * eta_squared + parity_diagonal(il - 1)) &
+                    * p(il - 1) + parity_backward(il - 1) * p(il - 3)
+              end if
+            end if
+            if(il + 1 > prior_odd) then
+              pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
+              pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
+              pint4(il + 1) = pint4(il + 1) + coef4 * p(il + 1)
+            end if
+          end do
+          extra_odd = required_degrees - 1
+          if(extra_odd > cached_degrees) then
+            if(extra_odd == 3) then
+              p(3) = (alpha(2) * alpha(1) * eta_squared + beta(2)) * p(1)
+            else
+              p(extra_odd) = (parity_forward(extra_odd - 2) * eta_squared &
+                  + parity_diagonal(extra_odd - 2)) * p(extra_odd - 2) &
+                  + parity_backward(extra_odd - 2) * p(extra_odd - 4)
+            end if
+          end if
+          pint4(extra_odd) = pint4(extra_odd) + coef4 * p(extra_odd)
+        end if
+      else
+#endif
+      if(cached_degrees >= 2 * ((lim + 1) / 2) + 2) then
+        ! Sum new integrals directly from the complete cached degree block.
+        if(prior_odd < 1) then
+          pint1(1) = pint1(1) + coef1 * geometry_entry%basis(1, geometry_node)
+          pint2(1) = pint2(1) + coef2 * geometry_entry%basis(1, geometry_node)
+          pint4(2) = pint4(2) + coef4 * geometry_entry%basis(2, geometry_node)
+        end if
+        do il = max(2, prior_odd + 1), lim + 1, 2
+          pint1(il + 1) = pint1(il + 1) + coef1 * geometry_entry%basis(il + 1, geometry_node)
+          pint2(il + 1) = pint2(il + 1) + coef2 * geometry_entry%basis(il + 1, geometry_node)
+          pint4(il + 2) = pint4(il + 2) + coef4 * geometry_entry%basis(il + 2, geometry_node)
+        end do
+      else
+      if(cached_degrees > 0) then
+        p(1:cached_degrees) = geometry_entry%basis(1:cached_degrees, geometry_node)
+      else
+#ifdef USE_QUAD
+      legendre_power = etaim1 ** (m / 2)
+      if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+#else
+      legendre_power = etaim1 ** amo2
+#endif
+      p(1) = twomi * legendre_power
       p(2) = alpha(1) * etai * p(1)
-      coef1 = coef * sneu1 * wg(i)
-      coef2 = coef * coefo * sneu2 * wg(i)
-      coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
-      pint1(1) = pint1(1) + coef1 * p(1)
-      pint2(1) = pint2(1) + coef2 * p(1)
-      pint4(2) = pint4(2) + coef4 * p(2)
+      end if
+      if(prior_odd < 1) then
+        pint1(1) = pint1(1) + coef1 * p(1)
+        pint2(1) = pint2(1) + coef2 * p(1)
+        pint4(2) = pint4(2) + coef4 * p(2)
+      end if
 !
        do 160 il = 2, lim + 1, 2
+       ! Compute the complete uncached tail when the retained table reaches its memory limit.
+       if(il + 2 > cached_degrees) then
        p(il + 1) = alpha(il) * etai * p(il) + beta(il) * p(il - 1)
        p(il + 2) = alpha(il + 1) * etai * p(il + 1) + beta(il + 1) * p(il)
-       pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
-       pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
-       pint4(il + 2) = pint4(il + 2) + coef4 * p(il + 2)
+       end if
+       if(il + 1 > prior_odd) then
+         pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
+         pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
+         pint4(il + 2) = pint4(il + 2) + coef4 * p(il + 2)
+       end if
 160      continue
+      end if
+#ifdef USE_QUAD
+      end if
+#endif
 170     continue
 180    continue
 190   continue
+#ifdef USE_QUAD
+    if(exact_integrals .and. need_new_integrals) then
+      call pint_exact_sum_proc(geometry_entry%basis, geometry_entry%kernels, &
+          int(size(geometry_entry%basis, 1), c_int), int(geometry_entry%nodes, c_int), &
+          int(merge(1, prior_odd + 2, prior_odd < 1), c_int), int(lim + 2, c_int), &
+          int(required_degrees - 1, c_int), pint1, pint2, pint4)
+    end if
+#endif
+    if(store_kernels) then
+      geometry_entry%kernel_c = c
+      geometry_entry%kernels_valid = .true.
+    end if
+#ifdef USE_QUAD
+    if(.not.checked_used.and.radial_quadrature_mode==1.and. &
+        present(moment_errors).and.present(moment_errors_valid)) then
+      paired_geometry_complete=.false.
+      if(exact_integrals .and. ngau==65 .and. ngqs==10) then
+        if(geometry_entry%nodes==650 .and. geometry_entry%kernels_valid) then
+          paired_geometry_complete=size(moment_errors,1)>=maxint .and. &
+              size(moment_errors,2)==6 .and. &
+              associated(radial_quadrature_panel_proc)
+        end if
+      end if
+      if(paired_geometry_complete) then
+        allocate(coarse_kernels(3,650),stat=coarse_status,errmsg=allocation_message)
+        if(coarse_status==0) then
+          do coarse_node=1,650
+            coarse_weight_index=mod(coarse_node-1,65)+1
+            coarse_weight_ratio=radial_gauss_weights(coarse_weight_index)/ &
+                radial_kronrod_weights(coarse_weight_index)
+            coarse_kernels(:,coarse_node)=geometry_entry%kernels(:,coarse_node)*coarse_weight_ratio
+          end do
+          coarse_prefix=0
+          if(present(moment_error_prefix)) then
+            if(moment_error_prefix>0) coarse_prefix=2*((moment_error_prefix+1)/2)+1
+          end if
+          if(discard_checked_prefix) coarse_prefix=0
+          coarse_status=1
+          if(coarse_prefix<2*((lim+1)/2)+1) then
+            coarse_status=radial_quadrature_panel_proc(geometry_entry%basis, &
+                geometry_entry%kernels, &
+                coarse_kernels,int(size(geometry_entry%basis,1),c_int),650_c_int,65_c_int, &
+                int(merge(1,coarse_prefix+2,coarse_prefix<1),c_int),int(lim+2,c_int), &
+                int(required_degrees-1,c_int),moment_errors(:,3),moment_errors(:,4), &
+                moment_errors(:,6))
+          end if
+          moment_errors_valid=coarse_status==1
+
+        end if
+      end if
+    end if
+#endif
+#ifdef USE_QUAD
+    if(parity_integrals) then
+      ! Recover eta times odd degree offsets by integrating the same recurrence.
+      do il = 1, required_degrees - 3, 2
+        pint4(il + 1) = (pint4(il + 2) - beta(il + 1) * pint4(il)) / alpha(il + 1)
+      end do
+    end if
+#endif
      do 200 il = 1, lim, 2
      pint3(il + 1) = (pint2(il + 2) - beta(il + 1) * pint2(il)) &
            /alpha(il + 1)
 200    continue
+#ifdef USE_QUAD
+    if(checked_used) then
+      ! Propagate through the same stored coefficients used for parity reconstruction.
+      do il=1,required_degrees-1,2
+        moment_errors(il,1)=moment_errors(il,3)
+        moment_errors(il,2)=moment_errors(il,4)
+      end do
+      do il=2,lim+1,2
+        checked_status=checked_parity_proc(alpha(il),beta(il),pint2(il-1),pint2(il+1), &
+            moment_errors(il-1,4),moment_errors(il+1,4),pint3(il),moment_errors(il,1))
+        if(checked_status/=1) moment_errors_valid=.false.
+      end do
+      do il=2,required_degrees-2,2
+        checked_status=checked_parity_proc(alpha(il),beta(il),pint4(il-1),pint4(il+1), &
+            moment_errors(il-1,6),moment_errors(il+1,6),pint4(il),moment_errors(il,2))
+        if(checked_status/=1) moment_errors_valid=.false.
+      end do
+      if(.not.moment_errors_valid) then
+      checked_moments_rejected=.true.
+      moment_errors=0.0_knd
+      call pint(c,m,lnum,x1,limint,maxint,maxlp,maxmp,ndec,wg,xg,ngau,ngqs, &
+          rpint1,rpint2,pint1,pint2,pint3,pint4,norme,pnorm,ipnorm,coefme,coefmo, &
+          use_geometry_cache,0,moment_errors,0,moment_errors_valid)
+      return
+      end if
+      moment_errors(1,5)=1.0_knd
+    end if
+#endif
 !
 !  calculation of ratios of integrals for ease in compution of r2 and
 !  r2d in subroutine r2int
@@ -5966,6 +9844,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) c, cx, rn, stemp0, stemp1, x
     real(knd) sbesdf(maxj), sbesdr(maxlp), sbesf(maxj), sbesn(maxlp)
 !
@@ -5973,6 +9852,7 @@ end if
     dimension ibese(maxlp)
 !
     cx = c * x
+    call paired_sine_cosine(cx, sine_value, cosine_value)
     lim1 = int(cx + cx + 20)
 !
 !  compute first kind Bessel function ratios
@@ -5985,8 +9865,8 @@ end if
 !  get fcn. ratios:
 !       j(n+1,c*x)/j(n,c*x)=(2*n+1)/(c*x)-1/(j(n,c*x)/j(n-1,c*x))
 !
-    stemp0 = sin(cx) / cx
-    sbesf(1) = (stemp0 / cx - cos(cx) / cx) / stemp0
+    stemp0 = sine_value / cx
+    sbesf(1) = (stemp0 / cx - cosine_value / cx) / stemp0
      do 10 n = 1, limj - 1
      rn = n + n + 1
      sbesf(n + 1) = (rn / cx) - (1.0e0_knd / sbesf(n))
@@ -6015,23 +9895,23 @@ end if
 !  for all c*x, calculate the amplitude and sign scale
 !  factors by forward operation on the Bessel function
 !  ratios.
-    stemp0 = sin(cx) / cx
-    stemp1 = stemp0 / cx - cos(cx) / cx
-    ibese(1) = int(log10(abs(stemp0)))
+    stemp0 = sine_value / cx
+    stemp1 = stemp0 / cx - cosine_value / cx
+    ibese(1) = decimal_exponent(abs(stemp0))
     sbesn(1) = stemp0 * 10.0e0_knd ** (-ibese(1))
-    if(abs(sin(cx)) < 0.5e0_knd .and. cx > 1.0e0_knd) go to 70
+    if(abs(sine_value) < 0.5e0_knd .and. cx > 1.0e0_knd) go to 70
     sbesn(2) = sbesn(1) * sbesf(1)
-    ibese(2) = int(log10(abs(sbesn(2))))
+    ibese(2) = decimal_exponent(abs(sbesn(2)))
     sbesn(2) = sbesn(2) * 10.0e0_knd ** (-ibese(2))
     ibese(2) = ibese(2) + ibese(1)
     go to 80
-70   ibese(2) = int(log10(abs(stemp1)))
+70   ibese(2) = decimal_exponent(abs(stemp1))
     sbesn(2) = stemp1 * 10.0e0_knd ** (-ibese(2))
     sbesf(1) = stemp1 / stemp0
 80   continue
      do 90 n = 3, maxlp
      sbesn(n) = sbesn(n - 1) * sbesf(n - 1)
-     ibese(n) = int(log10(abs(sbesn(n))))
+     ibese(n) = decimal_exponent(abs(sbesn(n)))
      sbesn(n) = sbesn(n) * 10.0e0_knd ** (-ibese(n))
      ibese(n) = ibese(n) + ibese(n - 1)
 90    continue
@@ -6095,11 +9975,15 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) c, cx, rn, rnn, stemp0, stemp1, x
     real(knd) sneudf(maxn), sneudr(maxlp), sneuf(maxn), sneun(maxlp)
 !
 !  integer arrays
     dimension ineue(maxlp)
+!
+    ! Reuse exact forward prefixes when the complete request fits the cache.
+    if(sphneu_cached(c, x, limn, maxn, maxlp, sneuf, sneun, ineue, sneudf, sneudr)) return
 !
 !  compute first kind ratios of Neumann functions and ratios
 !  of their first derivatives
@@ -6115,8 +9999,9 @@ end if
 !
 !  compute derivative ratios at same time using function ratios.
     cx = c * x
-    stemp0 = -cos(cx) / cx
-    stemp1 = stemp0 / cx - sin(cx) / cx
+    call paired_sine_cosine(cx, sine_value, cosine_value)
+    stemp0 = -cosine_value / cx
+    stemp1 = stemp0 / cx - sine_value / cx
     sneuf(1) = stemp1 / stemp0
     sneudf(1) = -(cx - 2.0e0_knd * sneuf(1)) / (cx * sneuf(1))
      do 10 n = 1, limn - 1
@@ -6133,15 +10018,15 @@ end if
 !
 !  calculate the characteristic and exponent
 !  by forward operation on the Neumann function ratios:
-    ineue(1) = int(log10(abs(stemp0)))
+    ineue(1) = decimal_exponent(abs(stemp0))
     sneun(1) = stemp0 * 10.0e0_knd ** (-ineue(1))
-    ineue(2) = int(log10(abs(stemp1)))
+    ineue(2) = decimal_exponent(abs(stemp1))
     sneun(2) = stemp1 * 10.0e0_knd ** (-ineue(2))
     nlimit = maxlp
     if(maxlp > limn + 1) nlimit = limn + 1
      do 20 n = 3, nlimit
      sneun(n) = sneun(n - 1) * sneuf(n - 1)
-     ineue(n) = int(log10(abs(sneun(n))))
+     ineue(n) = decimal_exponent(abs(sneun(n)))
      sneun(n) = sneun(n) * 10.0e0_knd ** (-ineue(n))
      ineue(n) = ineue(n) + ineue(n - 1)
 20    continue
@@ -6161,6 +10046,104 @@ end if
 40    continue
     return
     end subroutine
+
+    logical function sphneu_cached(c, x, limn, maxn, maxlp, sneuf, sneun, ineue, &
+                                  sneudf, sneudr) result(reused)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: limn, maxn, maxlp
+    real(knd), intent(in) :: c, x
+    real(knd), intent(inout) :: sneuf(maxn), sneun(maxlp), sneudf(maxn), sneudr(maxlp)
+    integer, intent(inout) :: ineue(maxlp)
+    integer, parameter :: cache_bytes = 256 * 1024
+    integer, parameter :: cache_entry_bytes = &
+        4 * (storage_size(0.0_knd) / 8) + storage_size(0) / 8
+    integer, parameter :: cache_entries = &
+        (cache_bytes - modulo(cache_bytes, cache_entry_bytes)) / cache_entry_bytes
+    real(knd), save :: ratios(cache_entries), derivative_ratios(cache_entries)
+    real(knd), save :: amplitudes(cache_entries), derivative_values(cache_entries)
+    integer, save :: exponents(cache_entries)
+    real(knd), save :: cached_argument = 0.0_knd
+    integer, save :: ratio_count = 0, amplitude_count = 0, derivative_count = 0
+    type(ieee_round_type), save :: cached_rounding = ieee_nearest
+    type(ieee_round_type) :: rounding
+    real(knd) :: cx, rn, rnn, stemp0, stemp1, sine_value, cosine_value
+    integer :: n, nlimit, derivative_limit
+
+    ! Larger requests retain the original unbounded computation below.
+    reused = .false.
+    nlimit = min(maxlp, limn + 1)
+    if(limn < 1 .or. limn > cache_entries .or. nlimit < 2 .or. &
+        nlimit > cache_entries .or. maxn < limn + 2) return
+    cx = c * x
+    if(.not. ieee_is_finite(cx) .or. cx == 0.0_knd) return
+    call ieee_get_rounding_mode(rounding)
+    if(cached_argument /= cx .or. cached_rounding /= rounding) then
+      ratio_count = 0
+      amplitude_count = 0
+      derivative_count = 0
+    end if
+    cached_argument = cx
+    cached_rounding = rounding
+
+    ! Keep adjacent ratios separate from the same-parity output transformation.
+    if(ratio_count == 0) then
+      call paired_sine_cosine(cx, sine_value, cosine_value)
+      stemp0 = -cosine_value / cx
+      stemp1 = stemp0 / cx - sine_value / cx
+      ratios(1) = stemp1 / stemp0
+      derivative_ratios(1) = -(cx - 2.0e0_knd * ratios(1)) / (cx * ratios(1))
+      ratio_count = 1
+      exponents(1) = decimal_exponent(abs(stemp0))
+      amplitudes(1) = stemp0 * 10.0e0_knd ** (-exponents(1))
+      exponents(2) = decimal_exponent(abs(stemp1))
+      amplitudes(2) = stemp1 * 10.0e0_knd ** (-exponents(2))
+      amplitude_count = 2
+    end if
+    do n = ratio_count, limn - 1
+      rn = n
+      rnn = n + n + 1
+      ratios(n + 1) = rnn / cx - 1.0e0_knd / ratios(n)
+      derivative_ratios(n + 1) = (cx - (rn + 2.0e0_knd) * ratios(n + 1)) / (rn- &
+          cx * ratios(n + 1))
+    end do
+    ratio_count = max(ratio_count, limn)
+
+    ! Extend each scaled amplitude in the original forward operation order.
+    do n = amplitude_count + 1, nlimit
+      amplitudes(n) = amplitudes(n - 1) * ratios(n - 1)
+      exponents(n) = decimal_exponent(abs(amplitudes(n)))
+      amplitudes(n) = amplitudes(n) * 10.0e0_knd ** (-exponents(n))
+      exponents(n) = exponents(n) + exponents(n - 1)
+    end do
+    amplitude_count = max(amplitude_count, nlimit)
+    derivative_limit = min(nlimit, limn)
+    do n = derivative_count + 1, derivative_limit
+      rn = n - 1
+      derivative_values(n) = (rn / cx) - ratios(n)
+    end do
+    derivative_count = max(derivative_count, derivative_limit)
+
+    ! Restore the requested tail sentinels before evaluating their derivative.
+    sneuf(1:limn) = ratios(1:limn)
+    sneudf(1:limn) = derivative_ratios(1:limn)
+    sneuf(limn + 1) = 0.0e0_knd
+    sneuf(limn + 2) = 0.0e0_knd
+    sneudf(limn + 1) = 0.0e0_knd
+    sneudf(limn + 2) = 0.0e0_knd
+    sneun(1:nlimit) = amplitudes(1:nlimit)
+    ineue(1:nlimit) = exponents(1:nlimit)
+    sneudr(1:derivative_limit) = derivative_values(1:derivative_limit)
+    if(nlimit == limn + 1) then
+      rn = nlimit - 1
+      sneudr(nlimit) = (rn / cx) - sneuf(nlimit)
+    end if
+    do n = limn, 2,-1
+      sneuf(n) = sneuf(n - 1) * sneuf(n)
+      sneudf(n) = sneudf(n - 1) * sneudf(n)
+    end do
+    reused = .true.
+    end function
 ! end module prolate_swf
 
 ! Link to C
@@ -6275,6 +10258,102 @@ subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, &
 end subroutine profcn_cpp_interface_batch_quad
 #else
 end subroutine profcn_cpp_interface_batch
+#endif
+
+! Return coefficient expansions with the existing radial and angular outputs.
+#ifdef USE_QUAD
+subroutine profcn_cpp_interface_batch_coeff_quad(c, m_start, m_count, lnum, &
+#else
+subroutine profcn_cpp_interface_batch_coeff(c, m_start, m_count, lnum, &
+#endif
+           ioprad, x1, iopang, iopnorm, narg, arg, &
+           r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+           s1c, is1e, s1dc, is1de, naccs, capacity, coefficients, lengths, status) bind(C)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer(c_int), intent(in) :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg, capacity
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c, x1, arg(*)
+    real(c_float128), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+        r2c(lnum, m_count), r2dc(lnum, m_count), s1c(lnum, narg, m_count), &
+        s1dc(lnum, narg, m_count), coefficients(capacity, lnum, m_count)
+#else
+    real(c_double), intent(in) :: c, x1, arg(*)
+    real(c_double), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+        r2c(lnum, m_count), r2dc(lnum, m_count), s1c(lnum, narg, m_count), &
+        s1dc(lnum, narg, m_count), coefficients(capacity, lnum, m_count)
+#endif
+    integer(c_int), intent(out) :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
+        ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
+        is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), naccs(lnum, narg, m_count), &
+        lengths(lnum, m_count), status
+
+    status = 2
+    lengths = 0
+    coefficients = 0.0_knd
+    if(m_start < 0 .or. m_count < 1 .or. lnum < 1 .or. capacity < 0 .or. narg < 1) return
+    if(.not. ieee_is_finite(c) .or. c <= 0.0_knd) return
+    call profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+        r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+        s1c, is1e, s1dc, is1de, naccs, coefficients, lengths, status)
+#ifdef USE_QUAD
+end subroutine profcn_cpp_interface_batch_coeff_quad
+#else
+end subroutine profcn_cpp_interface_batch_coeff
+#endif
+
+! A coefficient-only request avoids radial work and supports the c=0 limit.
+#ifdef USE_QUAD
+subroutine profcn_coefficients_cpp_interface_quad(c, m_start, m_count, lnum, &
+#else
+subroutine profcn_coefficients_cpp_interface(c, m_start, m_count, lnum, &
+#endif
+                                                 capacity, coefficients, lengths, status) bind(C)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer(c_int), intent(in) :: m_start, m_count, lnum, capacity
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c
+    real(c_float128), intent(out) :: coefficients(capacity, lnum, m_count)
+#else
+    real(c_double), intent(in) :: c
+    real(c_double), intent(out) :: coefficients(capacity, lnum, m_count)
+#endif
+    integer(c_int), intent(out) :: lengths(lnum, m_count), status
+    real(knd) :: radial(lnum, m_count, 4), angular(lnum, 1, m_count, 2), args(1)
+    integer :: radial_exponents(lnum, m_count, 4), radial_accuracy(lnum, m_count), &
+        angular_exponents(lnum, 1, m_count, 2), angular_accuracy(lnum, 1, m_count)
+
+    status = 2
+    lengths = 0
+    coefficients = 0.0_knd
+    if(m_start < 0 .or. m_count < 1 .or. lnum < 1 .or. capacity < 0) return
+    if(.not. ieee_is_finite(c) .or. c < 0.0_knd) return
+    if(c == 0.0_knd) then
+      call identity_legendre_coefficients(coefficients, lengths, status)
+      return
+    end if
+    args = 0.0_knd
+    call profcn_batch(c, m_start, m_count, lnum, 0, 1.0_knd, 0, 1, 1, args, &
+        radial(:,:,1), radial_exponents(:,:,1), radial(:,:,2), radial_exponents(:,:,2), &
+        radial(:,:,3), radial_exponents(:,:,3), radial(:,:,4), radial_exponents(:,:,4), &
+        radial_accuracy, angular(:,:,:,1), angular_exponents(:,:,:,1), &
+        angular(:,:,:,2), angular_exponents(:,:,:,2), angular_accuracy, &
+        coefficients, lengths, status)
+#ifdef USE_QUAD
+end subroutine profcn_coefficients_cpp_interface_quad
+#else
+end subroutine profcn_coefficients_cpp_interface
 #endif
 
 #ifdef USE_QUAD

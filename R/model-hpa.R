@@ -1,5 +1,5 @@
 ################################################################################
-# Ray-based high pass approximation
+# Ray-based high pass approximation ============================================
 ################################################################################
 #' High-pass approximation (HPA) scattering model
 #'
@@ -347,11 +347,11 @@ hpa_initialize <- function(object,
   ka <- k * a
   # Special case: bent cylinder ================================================
   if (length(rho_c) > 0 && !all(is.na(rho_c))) {
-    # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++
+    # Compute the literal radius of curvature ==================================
     r_c <- rho_c * l
-    # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++
+    # Compute effective length of bent cylinder ================================
     H <- 0.5 + 0.5 * rho_c * sin(1 / rho_c)
-    # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Compute sigma_bs =========================================================
     return(
       (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
         (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
@@ -378,13 +378,13 @@ hpa_initialize <- function(object,
   }
   ka <- acoustics$k_sw * a
   # Resolve empirical terms, G (nulls) and F (deviation) =======================
-  # G ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # G ==========================================================================
   if (is.function(parameters$null_fun)) {
     gnull <- parameters$null_fun(ka)
   } else {
     gnull <- parameters$null_fun
   }
-  # F ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # F ==========================================================================
   if (is.function(parameters$deviation_fun)) {
     fdevs <- parameters$deviation_fun(ka)
   } else {
@@ -426,7 +426,7 @@ HPA <- function(object) {
     stanton = .stanton_hp(acoustics, body, parameters, alpha)
   )
   # Update and return modeled TS ===============================================
-  methods::slot(object, "model")$HPA <- data.frame(
+  methods::slot(object, "model")$HPA <- .model_data_frame(
     frequency = acoustics$frequency,
     sigma_bs = obs,
     TS = 10 * log10(obs)

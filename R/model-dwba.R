@@ -1,5 +1,5 @@
 ################################################################################
-# Distorted wave Born approximation (DWBA)
+# Distorted wave Born approximation (DWBA) =====================================
 ################################################################################
 #' Distorted wave Born approximation (DWBA) for weak scatterers
 #'
@@ -202,7 +202,7 @@ DWBA <- function(object) {
   g <- mean(model_body$g)
   h <- mean(model_body$h)
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Update position matrices  ==================================================
+  # Update position matrices ===================================================
   rpos <- rbind(r0, a = model$body$radius)
   # Calculate linear scatter response ==========================================
   f_bs <- dwba_fbs_cpp(
@@ -213,7 +213,7 @@ DWBA <- function(object) {
     R = R
   )
   # Update scatterer object ====================================================
-  methods::slot(object, "model")$DWBA <- data.frame(
+  methods::slot(object, "model")$DWBA <- .model_data_frame(
     frequency = model$parameters$acoustics$frequency,
     ka = model$parameters$acoustics$k_sw * stats::median(model$body$radius),
     f_bs = f_bs,
@@ -259,13 +259,13 @@ dwba_curved_initialize <- function(object,
     mode = "ratio"
   )
   # Define medium parameters ===================================================
-  medium_params <- data.frame(
+  medium_params <- .model_data_frame(
     sound_speed = sound_speed_sw,
     density = density_sw
   )
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
+    acoustics = .model_data_frame(
       frequency = frequency,
       # Wavenumber (medium) ====================================================
       k_sw = acousticTS::wavenumber(
@@ -305,7 +305,7 @@ dwba_curved_initialize <- function(object,
   methods::slot(
     object,
     "model"
-  )$DWBA_curved <- data.frame(
+  )$DWBA_curved <- .model_data_frame(
     frequency = frequency,
     sigma_bs = rep(
       NA,
@@ -332,7 +332,7 @@ DWBA_curved <- function(object) {
   g <- body$g
   h <- body$h
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Update position matrices  ==================================================
+  # Update position matrices ===================================================
   rpos <- rbind(r0, a = model$body$radius)
   # Calculate linear scatter response ==========================================
   f_bs <- dwba_fbs_cpp(
@@ -343,7 +343,7 @@ DWBA_curved <- function(object) {
     R = R
   )
   # Update scatterer object ====================================================
-  methods::slot(object, "model")$DWBA_curved <- data.frame(
+  methods::slot(object, "model")$DWBA_curved <- .model_data_frame(
     frequency = model$parameters$acoustics$frequency,
     ka = model$parameters$acoustics$k_sw * stats::median(model$body$radius),
     f_bs = f_bs,

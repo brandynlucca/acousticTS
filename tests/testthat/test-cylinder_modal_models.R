@@ -1,5 +1,32 @@
 library(acousticTS)
 
+test_that("cylinder order sequences agree with scalar special functions", {
+  ka <- c(1e-4, 0.3, 1, 8, 40, 90)
+  limits <- c(12L, 16L, 20L, 30L, 60L, 120L)
+  weights <- (-1)^(0:max(limits)) * neumann(0:max(limits))
+  for (rigid in c(TRUE, FALSE)) {
+    actual <- if (rigid) {
+      acousticTS:::.fcms_bm_fixed_rigid(ka, neumann(0:max(limits)), limits)
+    } else {
+      acousticTS:::.fcms_bm_pressure_release(ka, neumann(0:max(limits)), limits)
+    }
+    for (i in seq_along(ka)) {
+      m <- 0:limits[i]
+      expected <- if (rigid) {
+        jcd(m, ka[i]) / hcd(m, ka[i])
+      } else {
+        jc(m, ka[i]) / hc(m, ka[i])
+      }
+      expect_equal(actual[m + 1L, i], as.vector(expected) * weights[m + 1L],
+        tolerance = 2e-13
+      )
+      if (limits[i] < max(limits)) {
+        expect_true(all(is.na(actual[seq.int(limits[i] + 2L, nrow(actual)), i])))
+      }
+    }
+  }
+})
+
 test_that(
   "BCMS reproduces the exact straight-cylinder kernel and bent correction",
   {
@@ -451,4 +478,38 @@ test_that("ECMS enforces required elastic inputs and limited-angle scope", {
     ),
     "requires scatterer to be shape-type 'Cylinder'"
   )
+})
+
+test_that("cylinder continuation follows integer-order Bessel identities", {
+  arguments <- c(-0.3, 1.7, -8)
+  limits <- c(2L, 4L)
+  for (rigid in c(FALSE, TRUE)) {
+    actual <- acousticTS:::fcms_bm_cpp(arguments, limits, rigid)
+    expect_identical(dim(actual), c(5L, 3L))
+    for (index in seq_along(arguments)) {
+      orders <- 0:limits[(index - 1L) %% length(limits) + 1L]
+      argument <- abs(arguments[index])
+      j <- besselJ(argument, orders)
+      y <- besselY(argument, orders)
+      if (rigid) {
+        j <- orders / argument * j - besselJ(argument, orders + 1L)
+        y <- orders / argument * y - besselY(argument, orders + 1L)
+      }
+      reference <- j / (j + 1i * y)
+      if (arguments[index] < 0) reference <- -Conj(reference)
+      expect_equal(actual[orders + 1L, index], reference, tolerance = 2e-13)
+      unused <- setdiff(seq_len(nrow(actual)), orders + 1L)
+      expect_true(all(is.na(actual[unused, index])))
+    }
+  }
+})
+
+test_that("cylinder compiled coefficients reject invalid modal inputs", {
+  coefficients <- acousticTS:::fcms_bm_cpp
+  for (rigid in c(FALSE, TRUE)) {
+    expect_error(coefficients(numeric(), 2L, rigid), "must be non-empty")
+    expect_error(coefficients(1, integer(), rigid), "must be non-empty")
+    expect_error(coefficients(1, c(2L, -1L), rigid), "non-negative integers")
+    expect_error(coefficients(1, c(2L, NA_integer_), rigid), "non-negative integers")
+  }
 })

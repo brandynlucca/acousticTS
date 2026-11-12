@@ -21,6 +21,8 @@ struct DwbaIntegrandData {
     std::vector<double> phase0;
     std::vector<double> dphase;
     std::vector<double> cos_beta;
+    std::vector<double> cached_nodes;
+    std::vector<std::complex<double>> cached_values;
     bool imaginary = false;
     int segment = -1;
     double k_over_h = 0.0;
@@ -53,6 +55,17 @@ inline double clamp_unit(double x) {
 // part of the complex DWBA integrand.
 void dwba_integrand_eval(double *x, int n, void *ex) {
     auto *data = static_cast<DwbaIntegrandData*>(ex);
+    // Share the initial panel between the real and imaginary QUADPACK calls.
+    if (data->imaginary && data->cached_nodes.size() == static_cast<size_t>(n) &&
+        std::equal(data->cached_nodes.begin(), data->cached_nodes.end(), x)) {
+        for (int i = 0; i < n; ++i) x[i] = data->cached_values[i].imag();
+        return;
+    }
+    bool cache_panel = !data->imaginary && data->cached_nodes.empty();
+    if (cache_panel) {
+        data->cached_nodes.assign(x, x + n);
+        data->cached_values.resize(n);
+    }
     int n_seg = static_cast<int>(data->a0.size());
     int j_start = (data->segment >= 0) ? data->segment : 0;
     int j_end = (data->segment >= 0) ? data->segment + 1 : n_seg;
@@ -73,6 +86,7 @@ void dwba_integrand_eval(double *x, int n, void *ex) {
                 bessel;
         }
 
+        if (cache_panel) data->cached_values[i] = total;
         x[i] = data->imaginary ? total.imag() : total.real();
     }
 }
@@ -304,6 +318,8 @@ ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos,
             // Restrict the callback to a single segment so the returned matrix
             // exposes the contribution of each segment to the total amplitude.
             data.segment = j;
+            data.cached_nodes.clear();
+            data.cached_values.clear();
             data.imaginary = false;
             double real_part = dwba_quadpack_integral(
                 data, rel_tol, abs_tol, subdivisions

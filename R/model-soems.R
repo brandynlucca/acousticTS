@@ -1,5 +1,5 @@
 ################################################################################
-# Primary scattering model for an elastic solid sphere (CAL)
+# Primary scattering model for an elastic solid sphere (CAL) ===================
 ################################################################################
 #' Solid elastic (calibration) sphere modal series (SOEMS) solution
 #'
@@ -123,13 +123,13 @@ calibration_initialize <- function(
       k_l = body$sound_speed_longitudinal,
       k_t = body$sound_speed_transversal
     ),
-    parameters = data.frame(
+    parameters = .model_data_frame(
       ncyl_b = shape$n_segments,
       adaptive = adaptive
     )
   )
   # Define body parameters recipe ==============================================
-  body_params <- data.frame(
+  body_params <- .model_data_frame(
     diameter = body$diameter,
     radius = body$radius,
     sound_speed_longitudinal = body$sound_speed_longitudinal,
@@ -161,105 +161,19 @@ calibration <- function(object) {
     "model_parameters"
   )$calibration
   # Convergence settings =======================================================
-  modal_tol <- 1e-10
-  max_modal_order <- 500L
   adaptive <- isTRUE(model$parameters$parameters$adaptive[[1]])
   ### Now we solve / calculate equations =======================================
   # Equations 6a -- weight wavenumber by radius ================================
   ka_sw <- model$parameters$acoustics$k_sw * model$body$radius
   ka_l <- model$parameters$acoustics$k_l * model$body$radius
   ka_t <- model$parameters$acoustics$k_t * model$body$radius
-  # Helper for a single partial-wave term ======================================
-  modal_term <- function(m,
-                         ka_sw,
-                         ka_l,
-                         ka_t,
-                         theta,
-                         density_body,
-                         density_sw) {
-    # Calculate Legendre polynomial ============================================
-    Pl <- as.numeric(Pn(m, cos(theta)))
-    # Calculate spherical Bessel functions of first kind =======================
-    js_mat <- js(m, ka_sw)
-    js_mat_l <- js(m, ka_l)
-    js_mat_t <- js(m, ka_t)
-    # Calculate spherical Bessel functions of second kind ======================
-    ys_mat <- ys(m, ka_sw)
-    # Calculate first derivative of spherical Bessel functions of first kind ===
-    jsd_mat <- jsd(m, ka_sw)
-    jsd_mat_l <- jsd(m, ka_l)
-    jsd_mat_t <- jsd(m, ka_t)
-    # Calculate first derivative of spherical Bessel functions of second kind ==
-    ysd_mat <- ysd(m, ka_sw)
-    # Calculate density contrast ===============================================
-    g <- density_body / density_sw
-    # Tangent functions ========================================================
-    tan_sw <- -ka_sw * jsd_mat / js_mat
-    tan_l <- -ka_l * jsd_mat_l / js_mat_l
-    tan_t <- -ka_t * jsd_mat_t / js_mat_t
-    tan_beta <- -ka_sw * ysd_mat / ys_mat
-    tan_diff <- -js_mat / ys_mat
-    # Difference terms =========================================================
-    along_m <- (m * m + m)
-    tan_l_add <- tan_l + 1
-    tan_t_div <- along_m - 1 - ka_t * ka_t / 2 + tan_t
-    numerator <- (tan_l / tan_l_add) - (along_m / tan_t_div)
-    denominator1 <- (along_m - ka_t * ka_t / 2 + 2 * tan_l) / tan_l_add
-    denominator2 <- along_m * (tan_t + 1) / tan_t_div
-    denominator <- denominator1 - denominator2
-    ratio <- -0.5 * (ka_t * ka_t) * numerator / denominator
-    # Additional trig functions ===============================================
-    phi <- -ratio / g
-    eta_tan <- tan_diff * (phi + tan_sw) / (phi + tan_beta)
-    cos_eta <- 1 / sqrt(1 + eta_tan * eta_tan)
-    sin_eta <- eta_tan * cos_eta
-    # Hickling (1962) / MacLennan (1981) modal term ===========================
-    (2 * m + 1) * Pl * (sin_eta * (1i * cos_eta - sin_eta))
-  }
-  # Compute form function ======================================================
-  f_j <- mapply(
-    FUN = function(ka_sw,
-                   ka_l,
-                   ka_t,
-                   theta,
-                   density_body,
-                   density_sw) {
-      # Start with the common MacLennan / echoSMs truncation guess =============
-      ml <- as.integer(round(ka_sw) + 10L)
-      m <- 0:ml
-      terms <- vapply(
-        X = m,
-        FUN = modal_term,
-        FUN.VALUE = complex(1L),
-        ka_sw = ka_sw,
-        ka_l = ka_l,
-        ka_t = ka_t,
-        theta = theta,
-        density_body = density_body,
-        density_sw = density_sw
-      )
-      # Extend the modal sum until the tail term is negligible =================
-      if (adaptive) {
-        while (Mod(utils::tail(terms, 1L)) > modal_tol &&
-          ml < max_modal_order) {
-          ml <- ml + 1L
-          terms <- c(
-            terms,
-            modal_term(
-              m = ml,
-              ka_sw = ka_sw,
-              ka_l = ka_l,
-              ka_t = ka_t,
-              theta = theta,
-              density_body = density_body,
-              density_sw = density_sw
-            )
-          )
-        }
-      }
-      sum(terms)
-    }, ka_sw, ka_l, ka_t, model$body$theta, model$body$density,
-    model$medium$density
+  f_j <- calibration_modal_sum_cpp(
+    ka_sw = ka_sw,
+    ka_l = ka_l,
+    ka_t = ka_t,
+    theta = model$body$theta,
+    density_ratio = model$body$density / model$medium$density,
+    adaptive = adaptive
   )
   # Calculate linear backscatter coefficient ===================================
   f_bs <- abs(-2i * f_j / ka_sw) * model$body$radius / 2
@@ -269,7 +183,7 @@ calibration <- function(object) {
   methods::slot(
     object,
     "model"
-  )$calibration <- data.frame(
+  )$calibration <- .model_data_frame(
     frequency = model$parameters$acoustics$frequency,
     ka = ka_sw,
     f_bs = f_bs,

@@ -1,5 +1,5 @@
 ################################################################################
-# Phase-compensated distorted wave Born approximation (PCDWBA)
+# Phase-compensated distorted wave Born approximation (PCDWBA) =================
 ################################################################################
 #' Phase-compensated distorted wave Born approximation (PCDWBA)
 #'
@@ -326,7 +326,7 @@ pcdwba_initialize <- function(object,
   Cb <- (1 - body$g * body$h * body$h) / (body$g * body$h * body$h) -
     (body$g - 1) / body$g
   # Store the PCDWBA initialization recipe =====================================
-  medium_params <- data.frame(
+  medium_params <- .model_data_frame(
     sound_speed = sound_speed_sw,
     density = density_sw
   )
@@ -365,14 +365,18 @@ PCDWBA <- function(object) {
   body <- model$body
   theta <- body$theta
   eps <- .Machine$double.eps
+  # Reuse frequency-independent geometry and material factors ==================
+  cos_tilt <- abs(cos(body$theta_tilt - theta))
+  cos_phase <- cos(body$gamma_t - theta)
+  radius_position <- body$r_pos / body$h
+  term1 <- body$h^2 * body$Cb * body$dr_norm / 4
   # Evaluate the normalized phase-compensated amplitude ========================
   f_norm <- vapply(seq_len(nrow(acoustics)), function(i) {
     k_sw <- acoustics$k_sw[i]
     X2 <- k_sw * body$radius * body$taper / body$h
-    arg <- 2 * X2 * abs(cos(body$theta_tilt - theta)) + eps
-    term0 <- k_sw * body$length_body * (body$r_pos / body$h)
-    term1 <- body$h^2 * body$Cb * body$dr_norm / 4
-    phase <- exp(1i * term0 * cos(body$gamma_t - theta))
+    arg <- 2 * X2 * cos_tilt + eps
+    term0 <- k_sw * body$length_body * radius_position
+    phase <- exp(1i * term0 * cos_phase)
     term2 <- (X2^2) * (besselJ(arg, 1) / arg) * phase
     sum(term2 * term1) + eps
   }, complex(1))
@@ -380,7 +384,7 @@ PCDWBA <- function(object) {
   f_bs <- f_norm * body$length_body
   sigma_bs <- abs(f_bs)^2
 
-  methods::slot(object, "model")$PCDWBA <- data.frame(
+  methods::slot(object, "model")$PCDWBA <- .model_data_frame(
     frequency = acoustics$frequency,
     ka = acoustics$k_sw * body$radius,
     f_bs = f_bs,

@@ -108,8 +108,7 @@ test_that("compiled spherical TMM agrees with independently assembled blocks", {
   )
   for (shape_name in names(shapes)) {
     params <- shapes[[shape_name]]
-    values <- switch(
-      shape_name,
+    values <- switch(shape_name,
       Sphere = 0.01,
       ProlateSpheroid = c(
         0.012,

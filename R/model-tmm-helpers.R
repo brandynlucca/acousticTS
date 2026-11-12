@@ -384,12 +384,12 @@
 #' @noRd
 .tmm_spheroidal_geometry <- function(shape_parameters) {
   # Convert the stored prolate geometry to spheroidal coordinates =============
-  xi <- 1 / sqrt(
-    1 - (shape_parameters$radius / (shape_parameters$length / 2))^2
+  geometry <- .prolate_spheroidal_geometry(shape_parameters)
+  list(
+    xi = geometry$xi,
+    q = geometry$q,
+    radius = geometry$semiminor_length
   )
-  q <- shape_parameters$length / 2 / xi
-
-  list(xi = xi, q = q)
 }
 
 #' Build the common acoustics table shared by all TMM branches.
@@ -514,7 +514,6 @@
   geometry <- NULL
   if (use_spheroidal_branch) {
     geometry <- .tmm_spheroidal_geometry(shape_parameters)
-    geometry$radius <- shape_parameters$radius
     acoustics <- .tmm_add_spheroidal_acoustics(acoustics, boundary, geometry)
   }
   acoustics <- .tmm_assign_branch_n_max(
@@ -625,7 +624,7 @@
   )
 }
 
-#' Apply conservative hard overrides for slender prolates when a spherical-wave
+#' Apply conservative modal overrides for slender prolates when a spherical-wave
 #' truncation is still needed.
 #' @noRd
 .tmm_prolate_nmax_override <- function(shape_parameters, boundary) {

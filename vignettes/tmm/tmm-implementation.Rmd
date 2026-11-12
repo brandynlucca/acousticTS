@@ -477,9 +477,9 @@ For spheroidal targets, one of the most useful internal checks is to start from 
 
 This check is built into `tmm_diagnostics()` for prolate and oblate targets. The continuation is generated at constant volume, beginning from the exact sphere limit and stepping to the requested spheroidal aspect ratio.
 
-The figure below shows the built-in continuation path for a pressure-release prolate spheroid with target aspect ratio `3.5`.
+The figure below shows the built-in continuation path for a pressure-release prolate spheroid with target aspect ratio `7`.
 
-![Sphere-to-spheroid continuation path for a pressure-release prolate spheroid. The exact sphere limit is at aspect ratio 1, and the target spheroid is at aspect ratio 3.5.](tmm-sphere-to-spheroid-continuation.png){fig-alt="Sphere-to-spheroid continuation path for a pressure-release prolate spheroid, showing target strength versus aspect ratio for 38 and 70 kHz. The curves begin at the exact sphere limit and deform smoothly to the target aspect ratio."}
+![Sphere-to-spheroid continuation path for a pressure-release prolate spheroid. The exact sphere limit is at aspect ratio 1, and the target spheroid is at aspect ratio 7.](tmm-sphere-to-spheroid-continuation.png){fig-alt="Sphere-to-spheroid continuation path for a pressure-release prolate spheroid, showing target strength versus aspect ratio for 38 and 70 kHz. The curves begin at the exact sphere limit and deform smoothly to the target aspect ratio."}
 
 This continuation check can reveal an unstable retained branch before an
 external mesh or far-field normalization is introduced.
@@ -496,9 +496,9 @@ For the retained prolate branch, the most useful validation is not a paper-style
 The retained prolate operator is checked by comparing `tmm_scattering()` with
 `prolate_spheroid_fbs()` at the same frequency and angles.
 
-The figure below shows that check for a rigid and a pressure-release prolate spheroid with `L = 70 mm`, `a = 10 mm`, broadside incidence, and a `38 kHz` equatorial receive-angle sweep. The line is the exact general-angle spheroidal solution and the open symbols are the stored-block `TMM` reconstruction.
+The angular comparison covers rigid and pressure-release prolate spheroids with full length $L=140\,\mathrm{mm}$, semiminor axis $a=10\,\mathrm{mm}$, broadside incidence, and a $38\,\mathrm{kHz}$ equatorial receive-angle sweep. The line is the exact general-angle spheroidal solution and the open symbols are the stored-block `TMM` reconstruction.
 
-![Exact-vs-stored validation for rigid and pressure-release prolate spheroids at 38 kHz, shown as equatorial receive-angle sweeps under broadside incidence.](tmm-prolate-exact-angular-validation.png){fig-alt="Two-panel exact-vs-stored validation figure for the retained prolate TMM branch. Each panel shows differential scattering cross section in decibels versus receive azimuth angle for a 70 mm by 10 mm prolate spheroid at 38 kHz and broadside incidence. The black line is the exact general-angle spheroidal solution and the orange open symbols are the stored-block TMM reconstruction. One panel is pressure-release and the other is fixed-rigid."}
+![Exact-vs-stored validation for rigid and pressure-release prolate spheroids at 38 kHz, shown as equatorial receive-angle sweeps under broadside incidence.](tmm-prolate-exact-angular-validation.png){fig-alt="Two-panel exact-vs-stored validation figure for the retained prolate TMM branch. Each panel shows differential scattering cross section in decibels versus receive azimuth angle for a prolate spheroid with full length 140 mm and semiminor axis 10 mm at 38 kHz and broadside incidence. The black line is the exact general-angle spheroidal solution and the orange open symbols are the stored-block TMM reconstruction. One panel is pressure-release and the other is fixed-rigid."}
 
 This directly tests the retained angular operator that powers `tmm_scattering()`, `tmm_scattering_grid()`, and the higher-level post-processing helpers.
 

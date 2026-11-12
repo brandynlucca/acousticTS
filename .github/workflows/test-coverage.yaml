@@ -53,6 +53,12 @@ jobs:
           )
           print(cov)
           covr::to_cobertura(cov)
+          saveRDS(cov, file.path(Sys.getenv("RUNNER_TEMP"), "coverage.rds"))
+          write.csv(
+            covr::zero_coverage(cov),
+            file.path(Sys.getenv("RUNNER_TEMP"), "coverage-uncovered.csv"),
+            row.names = FALSE
+          )
           coverage <- covr::percent_coverage(cov)
           cat(sprintf("coverage=%.10f\n", coverage),
               file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
@@ -86,9 +92,12 @@ jobs:
           find '${{ runner.temp }}/package' -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
 
-      - name: Upload test results
-        if: failure()
+      - name: Upload coverage reports
+        if: always() && steps.coverage.outcome == 'success'
         uses: actions/upload-artifact@v7
         with:
-          name: coverage-test-failures
-          path: ${{ runner.temp }}/package
+          name: coverage-reports
+          path: |
+            ./cobertura.xml
+            ${{ runner.temp }}/coverage.rds
+            ${{ runner.temp }}/coverage-uncovered.csv

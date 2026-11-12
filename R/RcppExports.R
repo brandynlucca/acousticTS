@@ -77,12 +77,20 @@ hs_complex_deriv_cpp <- function(l, z, k) {
     .Call(`_acousticTS_hs_complex_deriv_cpp`, l, z, k)
 }
 
+calibration_modal_sum_cpp <- function(ka_sw, ka_l, ka_t, theta, density_ratio, adaptive) {
+    .Call(`_acousticTS_calibration_modal_sum_cpp`, ka_sw, ka_l, ka_t, theta, density_ratio, adaptive)
+}
+
 dwba_fbs_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
     .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
 
 dwba_segment_integrals_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
     .Call(`_acousticTS_dwba_segment_integrals_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
+}
+
+fcms_bm_cpp <- function(ka, m_limit, rigid) {
+    .Call(`_acousticTS_fcms_bm_cpp`, ka, m_limit, rigid)
 }
 
 gauss_legendre_cpp <- function(n, a = -1.0, b = 1.0) {
@@ -95,6 +103,14 @@ elastic_shell_boundary_conditions_old <- function(k1a, kLa_shell, kTa_shell, kLa
 
 elastic_shell_boundary_conditions <- function(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
     .Call(`_acousticTS_elastic_shell_boundary_conditions`, ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl)
+}
+
+krm_body_fbs_cpp <- function(rpos, k_sw, k_body, theta, reflection) {
+    .Call(`_acousticTS_krm_body_fbs_cpp`, rpos, k_sw, k_body, theta, reflection)
+}
+
+krm_bladder_fbs_cpp <- function(rpos, k_sw, k_medium, theta, reflection, transmission) {
+    .Call(`_acousticTS_krm_bladder_fbs_cpp`, rpos, k_sw, k_medium, theta, reflection, transmission)
 }
 
 Pn_cpp <- function(n, x) {
@@ -127,6 +143,14 @@ Rmn_cpp <- function(m, n, c, x1, kind = 1L, precision = "double") {
 
 prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid", adaptive = FALSE, vectorized = FALSE) {
     .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized)
+}
+
+prolate_spheroid_rigid_release_batch <- function(acoustics, body, medium, theta_body, rigid) {
+    .Call(`_acousticTS_prolate_spheroid_rigid_release_batch`, acoustics, body, medium, theta_body, rigid)
+}
+
+prolate_spheroid_fluid_batch <- function(acoustics, body, medium, m_seeds, n_seeds, theta_body, theta_scatter, gas) {
+    .Call(`_acousticTS_prolate_spheroid_fluid_batch`, acoustics, body, medium, m_seeds, n_seeds, theta_body, theta_scatter, gas)
 }
 
 prolate_spheroid_tmatrix_cpp <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
