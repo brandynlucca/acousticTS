@@ -577,14 +577,26 @@ module prolate_swf
 #ifdef USE_QUAD
  subroutine clear_radial_retry_ledger()
    implicit none
-   type(radial_retry_workspace) :: empty
    radial_retry_m=-1
    radial_retry_count=0
    radial_retry_captured=0
    if(allocated(radial_retry_values)) deallocate(radial_retry_values)
    if(allocated(radial_retry_metadata)) deallocate(radial_retry_metadata)
    if(allocated(radial_retry_done)) deallocate(radial_retry_done)
-   radial_retry_work=empty
+   ! Release retained arrays before restoring the workspace defaults.
+   if(allocated(radial_retry_work%nf)) deallocate(radial_retry_work%nf)
+   if(allocated(radial_retry_work%ndf)) deallocate(radial_retry_work%ndf)
+   if(allocated(radial_retry_work%nv)) deallocate(radial_retry_work%nv)
+   if(allocated(radial_retry_work%ndr)) deallocate(radial_retry_work%ndr)
+   if(allocated(radial_retry_work%prat)) deallocate(radial_retry_work%prat)
+   if(allocated(radial_retry_work%ratios)) deallocate(radial_retry_work%ratios)
+   if(allocated(radial_retry_work%beta)) deallocate(radial_retry_work%beta)
+   if(allocated(radial_retry_work%gamma)) deallocate(radial_retry_work%gamma)
+   if(allocated(radial_retry_work%ne)) deallocate(radial_retry_work%ne)
+   radial_retry_work%prepared=.false.
+   radial_retry_work%factor=0.0_knd
+   radial_retry_work%exponent=0
+   radial_retry_work%ratio_count=0
    if(radial_retry_generation==huge(radial_retry_generation)) then
      radial_retry_generation=1
    else
@@ -1359,12 +1371,14 @@ module prolate_swf
 
   subroutine prepare_radial_quadrature_results(lnum,mnum)
     integer, intent(in) :: lnum,mnum
+    integer, parameter :: entry_bytes=4*storage_size(0.0_knd)/8+4*storage_size(0)/8
+    integer, parameter :: entry_limit=(1048576-mod(1048576,entry_bytes))/entry_bytes
     integer :: status
     character(len=256) :: allocation_message
     radial_quadrature_count=0
     if(radial_quadrature_mode/=1 .or. mnum/=1) return
-    ! This allocation bound only disables the estimate, never the original radial calculation.
-    if(lnum<1 .or. lnum>1048576/(4*storage_size(0.0_knd)/8+4*storage_size(0)/8)) return
+    ! Retain the integer capacity floor for the optional error estimates.
+    if(lnum<1 .or. lnum>entry_limit) return
     if(allocated(radial_quadrature_errors)) then
       if(size(radial_quadrature_errors,1)/=lnum) &
           deallocate(radial_quadrature_errors,radial_quadrature_valid)

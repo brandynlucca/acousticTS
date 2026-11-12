@@ -232,7 +232,7 @@ inline PositiveBound pdiv(PositiveBound a, PositiveBound b) {
 }
 // Exact outward conversion of a nonzero binary128 subnormal magnitude.
 inline PositiveBound psubnormal(std::uint64_t lo, std::uint64_t hi, bool upper) {
-    const unsigned __int128 v = (static_cast<unsigned __int128>(hi & UINT64_C(0xffffffffffff)) << 64) | lo;
+    const __uint128_t v = (static_cast<__uint128_t>(hi & UINT64_C(0xffffffffffff)) << 64) | lo;
     const std::uint64_t top = std::uint64_t(v >> 64);
     const int bits = top ? 128 - __builtin_clzll(top) : 64 - __builtin_clzll(lo);
     const int shift = std::max(0, bits - 53);
