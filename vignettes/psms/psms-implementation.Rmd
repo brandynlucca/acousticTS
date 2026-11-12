@@ -300,7 +300,7 @@ precision_df$delta_ts <- precision_df$double_ts - precision_df$quad_ts
 knitr::include_graphics("psms-precision-drift.png")
 ```
 
-For this full liquid-filled run, the double- and quadruple-precision curves are effectively indistinguishable through $k_1 b < 1$, differ by only about `1.4e-07 dB` at `38 kHz`, then separate to about `0.01 dB` by `70 kHz` ($k_1 b \approx 2.98$) and to about `1.02 dB` by `100 kHz` ($k_1 b \approx 4.25$). That is the practical reason the benchmark table above starts to favor quadruple precision once the retained PSMS system moves into the higher-frequency penetrable regime.
+The double- and quadruple-precision spectra overlap across the illustrated frequency range, with absolute differences below $10^{-8}\,\mathrm{dB}$ for the plotted liquid-filled case. Agreement between arithmetic precisions does not independently establish convergence of the retained modal support or accuracy across other geometries and material property contrasts.
 
 ## Cross-software implementation checks
 
