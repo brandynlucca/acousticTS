@@ -2071,9 +2071,10 @@ module prolate_swf
     integer :: node, k, i, degree, retained_degrees, capacity, allocation_status, candidate
     integer :: real_bytes, remaining_values, requested_degrees, previous_capacity, available_bytes
     real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
-    real(knd) :: window_base, window_power, legendre_power, coef, sargb, mapped_measure
+    real(knd) :: window_base, window_power, legendre_power, coef, sargb
     real(knd), allocatable :: expanded_basis(:,:)
 #ifdef USE_QUAD
+    real(knd) :: mapped_measure
     real(knd) :: parity_forward(size(alpha)), parity_diagonal(size(alpha))
     real(knd) :: parity_backward(size(alpha)), eta_squared
 #endif
@@ -2592,12 +2593,14 @@ module prolate_swf
     integer(c_int), intent(out) :: checks(5)
     integer, parameter :: psize = 512, plim = 16, grown_limit = 24, trials = 6
     real(knd) :: args(1,trials), pr(1,psize,trials), pdr(1,psize,trials)
-    real(knd) :: coefficients(psize,8,trials), pnorm(1,trials), pdnorm(1,trials)
+    real(knd), allocatable :: coefficients(:,:,:)
+    real(knd) :: pnorm(1,trials), pdnorm(1,trials)
     integer :: ipnorm(1,trials), ipdnorm(1,trials)
     integer :: slot, trial, requested_size, requested_limit, saved_limit, ncoef, cache_slot
     integer :: digits_native, exponent_range, real_bytes, integer_bytes
     integer(int64) :: expected_bytes
 
+    allocate(coefficients(psize,8,trials))
     checks = 1
     digits_native = precision(1.0_knd)
     exponent_range = range(1.0_knd) - 1
@@ -5163,7 +5166,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
-    real(knd) adec, aj, dcon, dec, dnew, dmlms, dmlms1, dnewd, dold, &
+    real(knd) adec, dcon, dec, dnew, dmlms, dmlms1, dnewd, dold, &
          doldd, factor, fterm, rm2, rm2m1, rm2m3, rm2p1, s1, s1d
     real(knd) barg(maxt), enr(maxd), pdr(maxt, maxp), pdnorm(maxt), &
          pnorm(maxt), pr(maxt, maxp), pdtemp(maxt), ptemp(maxt), &
@@ -7926,7 +7929,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and array
-    real(knd) aj, aj2, arr, c, coef, csq, dec, dmfnorm, dmsnorm, dmlmf, &
+    real(knd) aj, aj2, arr, c, csq, dec, dmfnorm, dmsnorm, dmlmf, &
          dmlms, d01, ea, rm2, sgn, sump, ten, term, teste, testeo
     real(knd) enr(maxd)
     real(knd), allocatable, save :: ratio_numerators(:,:), ratio_denominators(:,:)
@@ -8118,12 +8121,12 @@ end if
     real(knd), intent(out) :: factor
     integer, intent(out) :: exponent
     integer :: slot, j, decimal_shift
-    integer(kind=8) :: mode_index
+    integer(int64) :: mode_index
     real(knd) :: aj, twice_m
 
     ! Collisions replace entries without changing normalization or modal support.
-    mode_index = int(l, 8) * (int(l, 8) + 1) / 2 + int(m, 8)
-    slot = 1 + int(modulo(mode_index, int(size(angular_normalization_cache), 8)))
+    mode_index = int(l, int64) * (int(l, int64) + 1) / 2 + int(m, int64)
+    slot = 1 + int(modulo(mode_index, int(size(angular_normalization_cache), int64)))
     if(angular_normalization_cache(slot)%m == m .and. &
         angular_normalization_cache(slot)%l == l) then
       factor = angular_normalization_cache(slot)%factor
@@ -9129,8 +9132,12 @@ end if
 !
     recursive subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
-            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim, &
-            moment_errors, moment_error_prefix, moment_errors_valid)
+            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, &
+#ifdef USE_QUAD
+            resume_lim, moment_errors, moment_error_prefix, moment_errors_valid)
+#else
+            resume_lim)
+#endif
     use iso_c_binding, only: c_int
 !
 !  purpose:     To calculate integrals of the product of associated
@@ -9204,9 +9211,12 @@ end if
 !  integer arrays
     dimension norme(maxmp), ipnorm(maxlp)
     logical, optional, intent(in) :: use_geometry_cache
-    integer, optional, intent(in) :: resume_lim, moment_error_prefix
+    integer, optional, intent(in) :: resume_lim
+#ifdef USE_QUAD
+    integer, optional, intent(in) :: moment_error_prefix
     real(knd), optional, intent(inout) :: moment_errors(:,:)
     logical, optional, intent(out) :: moment_errors_valid
+#endif
     logical :: reuse_geometry, reuse_kernels, store_kernels, need_new_integrals
     integer :: geometry_index, geometry_node, cached_degrees, prior_odd
     type(pint_geometry_entry), pointer :: geometry_entry
@@ -9252,8 +9262,9 @@ end if
       discard_checked_prefix=.true.
     end if
     if(discard_checked_prefix.and.present(moment_errors)) moment_errors=0.0_knd
-#endif
     if(present(moment_errors_valid)) moment_errors_valid=.false.
+#endif
+    nullify(geometry_entry)
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
     amo2 = 0.5e0_knd * m
@@ -9504,6 +9515,7 @@ end if
       if(geometry_index > 0) then
         if(geometry_node > geometry_entry%nodes) go to 190
         etai = geometry_entry%geometry(1, geometry_node)
+        etaim1 = 1.0e0_knd - etai * etai
         coef = geometry_entry%geometry(2, geometry_node)
         sargb = geometry_entry%geometry(3, geometry_node)
         coefo = geometry_entry%geometry(4, geometry_node)
@@ -10044,8 +10056,10 @@ end if
     real(knd), intent(inout) :: sneuf(maxn), sneun(maxlp), sneudf(maxn), sneudr(maxlp)
     integer, intent(inout) :: ineue(maxlp)
     integer, parameter :: cache_bytes = 256 * 1024
-    integer, parameter :: cache_entries = cache_bytes / &
-        (4 * (storage_size(0.0_knd) / 8) + storage_size(0) / 8)
+    integer, parameter :: cache_entry_bytes = &
+        4 * (storage_size(0.0_knd) / 8) + storage_size(0) / 8
+    integer, parameter :: cache_entries = &
+        (cache_bytes - modulo(cache_bytes, cache_entry_bytes)) / cache_entry_bytes
     real(knd), save :: ratios(cache_entries), derivative_ratios(cache_entries)
     real(knd), save :: amplitudes(cache_entries), derivative_values(cache_entries)
     integer, save :: exponents(cache_entries)
@@ -10080,6 +10094,11 @@ end if
       ratios(1) = stemp1 / stemp0
       derivative_ratios(1) = -(cx - 2.0e0_knd * ratios(1)) / (cx * ratios(1))
       ratio_count = 1
+      exponents(1) = decimal_exponent(abs(stemp0))
+      amplitudes(1) = stemp0 * 10.0e0_knd ** (-exponents(1))
+      exponents(2) = decimal_exponent(abs(stemp1))
+      amplitudes(2) = stemp1 * 10.0e0_knd ** (-exponents(2))
+      amplitude_count = 2
     end if
     do n = ratio_count, limn - 1
       rn = n
@@ -10091,13 +10110,6 @@ end if
     ratio_count = max(ratio_count, limn)
 
     ! Extend each scaled amplitude in the original forward operation order.
-    if(amplitude_count == 0) then
-      exponents(1) = decimal_exponent(abs(stemp0))
-      amplitudes(1) = stemp0 * 10.0e0_knd ** (-exponents(1))
-      exponents(2) = decimal_exponent(abs(stemp1))
-      amplitudes(2) = stemp1 * 10.0e0_knd ** (-exponents(2))
-      amplitude_count = 2
-    end if
     do n = amplitude_count + 1, nlimit
       amplitudes(n) = amplitudes(n - 1) * ratios(n - 1)
       exponents(n) = decimal_exponent(abs(amplitudes(n)))
