@@ -100,7 +100,7 @@ methods::selectMethod("reforge", "CAL")
 #> }, target = new("signature", .Data = "CAL", names = "object", 
 #>     package = "acousticTS"), defined = new("signature", .Data = "CAL", 
 #>     names = "object", package = "acousticTS"), generic = "reforge")
-#> <bytecode: 0x6090542fa2f8>
+#> <bytecode: 0x5d16d752b178>
 #> <environment: namespace:acousticTS>
 #> attr(,"target")
 #> An object of class “signature”

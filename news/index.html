@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,6 +70,24 @@
       <small>Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.1.0" id="acousticts-210">acousticTS 2.1.0<a class="anchor" aria-label="anchor" href="#acousticts-210"></a></h2>
+<ul><li>Streamlined API for shape editing for prolate spheroid and other canonical geometries.</li>
+<li>Added C++ backends for KRM, FCMS, and SOEMS for more consistent<br>
+handling across the board for modal series solutions (which includes the low ka breathing mode for the KRM).</li>
+<li>Modified the modal series solution for prolate spheroids to use an entirely new algorithm and workflow that incorporates Robin boundary operators, pre-conditioned GMRES, LU pivot solver bounds, adaptive mode truncation and enlargement, among other changes.</li>
+<li>Tweaked the various compilation-related files (e.g., configure) and<br>
+memory handling of various Fortran/C++-based models.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.8" id="acousticts-208">acousticTS 2.0.8<a class="anchor" aria-label="anchor" href="#acousticts-208"></a></h2><p class="text-muted">CRAN release: 2026-10-12</p>
+<ul><li>Addressed segfault errors in backends for specific platforms.</li>
+<li>Performance enhancements for the C++ backend, particularly for <code>TMM</code><br>
+and <code>PSMS</code>.</li>
+<li>Round out and streamline reforge methods for <code>Shape</code>-class objects.</li>
+<li>Flesh out documentation.</li>
+<li>Fix <code>SBF</code>/<code>BBF</code> plotting bug.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.7" id="acousticts-207">acousticTS 2.0.7<a class="anchor" aria-label="anchor" href="#acousticts-207"></a></h2>
 <ul><li>Correct cylindrical Bessel functions on the imaginary axis and the upper side of the negative real axis branch cut.</li>
