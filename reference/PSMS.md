@@ -39,53 +39,49 @@ This model is accessed via:
 
 - `boundary`:
 
-  Boundary condition at the cylinder surface. One of `"fixed_rigid"`,
+  Boundary condition at the spheroid surface. One of `"fixed_rigid"`,
   `"pressure_release"`, `"liquid_filled"`, or `"gas_filled"`. See the
   boundary conditions documentation for more details on these different
   boundary conditions.
 
 - `adaptive`:
 
-  A boolean argument controlling whether the PSMS backend is allowed to
-  stop once the retained modal tail becomes numerically negligible and
-  to choose an adaptive quadrature order for full fluid- or gas-filled
-  overlap integrals. When `FALSE` (default), the implementation uses the
-  published hard truncation rule and a fixed quadrature order unless the
-  user overrides it directly. When `TRUE`, the hard \\m\_{\max}\\ and
-  \\n\_{\max}\\ rules remain the upper bounds, but the backscatter
-  implementation is allowed to stop early once the retained tail is both
-  numerically small and gradient-flat.
+  Apply adaptive modal support and quadrature selection. Defaults to
+  `FALSE`.
 
 - `simplify_Amn`:
 
-  A boolean argument that flags whether or not to use the simplified
-  calculation for the exansion matrix, \\A\_{mn}\\, for a fluid-filled
-  scatterer. See Theory for the mathematical formulation and
-  assumptions. **Note:** this argument **only** applies to when
-  `boundary = "liquid_filled"` or `boundary = "gas_filled"`. It is
-  otherwise left unused for all other boundary conditions.
+  When `FALSE` (default), solve the coupled pressure and normal-velocity
+  boundary equations for liquid- or gas-filled spheroids. When `TRUE`,
+  retain the diagonal approximation described in Theory. This
+  approximation can differ near gas resonances. Ignored for other
+  boundary conditions.
 
 - `precision`:
 
   A literal argument that allows for levels of precision when
   calculating the expansion matrix, \\A\_{mn}\\. There are two choices:
   `"double"` for double-precision (64-bit) and `"quad"` for
-  quadruple-precision (128-bit). See Details for more double- and
-  quadruple-precision usages are implemented.
+  quadruple-precision (128-bit). Use `"quad"` when strong gas contrast
+  or high acoustic size makes double precision unstable.
 
 - `n_integration`:
 
-  An integer argument that informs the model how many integration points
-  will be used to calculate \\\alpha\_{mn}^{m}\\, which is numerically
-  calculated using Gauss-Legendre quadrature. When left as `NULL`, the
-  model uses 96 integration points unless `adaptive = TRUE`, in which
-  case a reduced-frequency-based quadrature rule is selected internally
-  for the full liquid-filled solve. See
-  [gauss_legendre](https://brandynlucca.github.io/acousticTS/reference/gauss_legendre.md)
-  for a full description of how `n_integration` is used. **Note:** this
-  argument **only** applies to when `boundary = "liquid_filled"` or
-  `boundary = "gas_filled"`. It is otherwise left unused for all other
-  boundary conditions.
+  Number of Gauss-Legendre integration points used to calculate angular
+  overlap integrals for full liquid-filled solutions in either
+  precision. With `adaptive = FALSE`, an explicit value is used as
+  supplied and `NULL` selects automatic integration. With
+  `adaptive = TRUE`, quadrature order is selected internally and an
+  explicit value is ignored with a warning. Full gas solutions calculate
+  overlaps from normalized expansion coefficients and do not use this
+  quadrature count. Fixed quadrature must resolve the angular functions.
+  Automatic quadrature integrates the retained angular expansion
+  products using the Gauss-Legendre polynomial exactness condition.
+  Under this condition, orthogonality allows the integral to be
+  evaluated algebraically from the complete expansion coefficients.
+  Fixed integration counts continue to use their requested quadrature
+  rule. See
+  [gauss_legendre](https://brandynlucca.github.io/acousticTS/reference/gauss_legendre.md).
 
 - `sound_speed_sw`:
 
@@ -163,6 +159,13 @@ keeps the fluid-filled solve in the requested arithmetic so that the
 linear-system stage does not become detached from the rest of the chosen
 precision pathway.
 
+For full gas solutions, angular overlaps are dot products of expansion
+coefficients in an orthonormal associated Legendre basis. This follows
+from the spheroidal expansion and Legendre orthogonality identities in
+[DLMF 30.8.1](https://dlmf.nist.gov/30.8.E1) and [DLMF
+14.17.6](https://dlmf.nist.gov/14.17.E6). The coefficients and overlap
+sums retain the requested arithmetic precision.
+
 In the case that \\h_0 \approx h_1\\, \\\alpha\_{mn}^{m} \approx 0\\ for
 \\n \neq l\\, and a much simplified expression is derived:
 
@@ -171,6 +174,17 @@ In the case that \\h_0 \approx h_1\\, \\\alpha\_{mn}^{m} \approx 0\\ for
 The maximum values of \\m\\ and \\n\\ can be estimated by:
 
 \$\$ m\_{\max} = \[2 k_0 b\] \\ n\_{\max} = m\_{\max} + \[h_0 / 2\] \$\$
+
+Full liquid and gas solutions also use the interior-wave and
+incidence-dependent estimates accompanying Khodabandeloo et al. (2025).
+These estimates initialize the retained modal support. Adaptive
+quad-precision backscatter calculations can enlarge support when
+degree-tail or boundary checks require it and stop negligible azimuthal
+contributions early.
+
+Full fluid solutions preserve pressure and normal-velocity continuity.
+Radial mantissas and exponents remain separate during assembly to avoid
+intermediate overflow.
 
 ## Implementation
 
@@ -213,6 +227,14 @@ integrals, and kernel systems all grow rapidly with \\m\_{\max}\\ and
 Furusawa, M. (1988). Prolate spheroidal models for predicting general
 trends of fish target strength. Journal of the Acoustical Society of
 Japan, 9: 13-24.
+
+Khodabandeloo, B., Heggelund, Y., Ystad, B., Marx, S. A. B., and
+Pedersen, G. (2025). High-precision model and open-source software for
+acoustic backscattering by liquid- and gas-filled prolate spheroids
+across a wide frequency range and incident angles: Implications for
+fisheries acoustics. Journal of Sound and Vibration, 616: 119227.
+[doi:10.1016/j.jsv.2025.119227](https://doi.org/10.1016/j.jsv.2025.119227)
+.
 
 Sanderson, C., and Curtin, R. (2019). Practical sparse matrices in C++
 with hybrid storage and template-based expression optimisation.

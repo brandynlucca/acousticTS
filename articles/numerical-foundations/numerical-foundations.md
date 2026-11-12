@@ -169,9 +169,7 @@ vendored and package-adapted [`profcn` source in
 `src/prolate_swf.f90`](https://github.com/brandynlucca/acousticTS/blob/main/src/prolate_swf.f90).
 It calculates eigenvalues, angular functions, radial functions of the
 first and second kinds, derivatives, normalization quantities, and
-accuracy indicators. The same file is compiled in both double and
-quadruple precision, as shown in
-[`src/Makevars`](https://github.com/brandynlucca/acousticTS/blob/main/src/Makevars).
+accuracy indicators.
 
 The rest of the source tree connects that kernel to R:
 

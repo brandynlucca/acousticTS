@@ -153,11 +153,11 @@ prolate_object@model$TMM
 ```
 
     ##   frequency                        f_bs     sigma_bs        TS n_max
-    ## 1     12000 -4.439503e-05+3.114131e-08i 1.970920e-09 -87.05331     4
-    ## 2     18000 -8.709975e-05+1.363906e-07i 7.586386e-09 -81.19965     5
-    ## 3     38000 -1.380278e-04+9.507581e-07i 1.905259e-08 -77.20046    10
-    ## 4     70000  1.420489e-04-1.952261e-06i 2.018169e-08 -76.95042    17
-    ## 5    100000 -9.784203e-05+1.983609e-06i 9.576997e-09 -80.18771    24
+    ## 1     12000 -4.440154e-05+3.114118e-08i 1.971497e-09 -87.05204     8
+    ## 2     18000 -8.709268e-05+1.364082e-07i 7.585153e-09 -81.20036     9
+    ## 3     38000 -1.380348e-04+9.507579e-07i 1.905452e-08 -77.20002    14
+    ## 4     70000  1.420510e-04-1.952268e-06i 2.018229e-08 -76.95030    21
+    ## 5    100000 -9.784282e-05+1.983609e-06i 9.577152e-09 -80.18764    28
 
 For spheres, `n_max` is the spherical-wave cutoff. For prolates, it is
 inherited from the spheroidal retained system and describes the size of
@@ -694,16 +694,15 @@ constant volume, beginning from the exact sphere limit and stepping to
 the requested spheroidal aspect ratio.
 
 The figure below shows the built-in continuation path for a
-pressure-release prolate spheroid with target aspect ratio `3.5`.
+pressure-release prolate spheroid with target aspect ratio `7`.
 
 ![Sphere-to-spheroid continuation path for a pressure-release prolate
 spheroid. The exact sphere limit is at aspect ratio 1, and the target
-spheroid is at aspect ratio
-3.5.](tmm-sphere-to-spheroid-continuation.png)
+spheroid is at aspect ratio 7.](tmm-sphere-to-spheroid-continuation.png)
 
 Sphere-to-spheroid continuation path for a pressure-release prolate
 spheroid. The exact sphere limit is at aspect ratio 1, and the target
-spheroid is at aspect ratio 3.5.
+spheroid is at aspect ratio 7.
 
 This continuation check can reveal an unstable retained branch before an
 external mesh or far-field normalization is introduced.
@@ -725,11 +724,12 @@ The retained prolate operator is checked by comparing
 [`tmm_scattering()`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.md)
 with `prolate_spheroid_fbs()` at the same frequency and angles.
 
-The figure below shows that check for a rigid and a pressure-release
-prolate spheroid with `L = 70 mm`, `a = 10 mm`, broadside incidence, and
-a `38 kHz` equatorial receive-angle sweep. The line is the exact
-general-angle spheroidal solution and the open symbols are the
-stored-block `TMM` reconstruction.
+The angular comparison covers rigid and pressure-release prolate
+spheroids with full length L=140\\\mathrm{mm}, semiminor axis
+a=10\\\mathrm{mm}, broadside incidence, and a 38\\\mathrm{kHz}
+equatorial receive-angle sweep. The line is the exact general-angle
+spheroidal solution and the open symbols are the stored-block `TMM`
+reconstruction.
 
 ![Exact-vs-stored validation for rigid and pressure-release prolate
 spheroids at 38 kHz, shown as equatorial receive-angle sweeps under

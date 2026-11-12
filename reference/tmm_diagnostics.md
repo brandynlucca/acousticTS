@@ -129,11 +129,11 @@ tmm_diagnostics(stored, n_theta = 5, n_phi = 9)
 #>    shape coordinate_system         boundary frequency monostatic_abs_residual
 #> 1 Sphere         spherical pressure_release     12000            8.673617e-19
 #>   monostatic_rel_residual reciprocity_rel_residual  sigma_total    sigma_ext
-#> 1            1.867274e-16             4.251432e-17 0.0002918541 0.0003078102
+#> 1            1.867274e-16                        0 0.0002918541 0.0003078102
 #>   optical_theorem_sign optical_theorem_rel_residual min_block_rcond
 #> 1                    1                    0.0518376    1.128043e-06
 #>   max_block_cond_est max_block_transpose_residual
-#> 1           886491.1                 2.066084e-17
+#> 1           886491.1                 7.277126e-18
 #>   continuation_target_aspect_ratio continuation_max_abs_step_TS
 #> 1                               NA                           NA
 #>   continuation_max_abs_second_diff_TS continuation_any_nonfinite
@@ -142,11 +142,11 @@ tmm_diagnostics(stored, n_theta = 5, n_phi = 9)
 #> $block_metrics
 #> $block_metrics$`12000`
 #>   m n_terms        rcond transpose_residual
-#> 1 0       6 1.255165e-05       2.066084e-17
-#> 2 1       5 1.128043e-06       3.690615e-18
-#> 3 2       4 3.340586e-06       4.772712e-18
-#> 4 3       3 5.818129e-05       4.471309e-18
-#> 5 4       2 3.854585e-03       2.200130e-18
+#> 1 0       6 1.255165e-05       5.589103e-18
+#> 2 1       5 1.128043e-06       7.277126e-18
+#> 3 2       4 3.340586e-06       5.807420e-18
+#> 4 3       3 5.818129e-05       1.248881e-18
+#> 5 4       2 3.854585e-03       1.592872e-18
 #> 6 5       1 1.000000e+00       0.000000e+00
 #> 
 #> 

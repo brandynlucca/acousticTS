@@ -172,13 +172,23 @@ methods::selectMethod("reforge", "FLS")
 #>         }
 #>         methods::slot(object, "shape_parameters")$radius <- max(radii, 
 #>             na.rm = TRUE)
+#>         if (identical(shape$shape, "ProlateSpheroid") && !is.null(body_scales)) {
+#>             if ("semimajor_length" %in% names(shape)) {
+#>                 methods::slot(object, "shape_parameters")$semimajor_length <- shape$semimajor_length * 
+#>                   unname(body_scales["length"])
+#>             }
+#>             if ("semiminor_length" %in% names(shape)) {
+#>                 methods::slot(object, "shape_parameters")$semiminor_length <- shape$semiminor_length * 
+#>                   unname(body_scales["radius"])
+#>             }
+#>         }
 #>         return(object)
 #>     }
 #>     .local(object, ...)
 #> }, target = new("signature", .Data = "FLS", names = "object", 
 #>     package = "acousticTS"), defined = new("signature", .Data = "FLS", 
 #>     names = "object", package = "acousticTS"), generic = "reforge")
-#> <bytecode: 0x563896075568>
+#> <bytecode: 0x55af8ea39908>
 #> <environment: namespace:acousticTS>
 #> attr(,"target")
 #> An object of class “signature”
