@@ -43,7 +43,7 @@ One of \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, or \code{"gas_filled"}. See the
 boundary conditions documentation for more
 details on these different boundary conditions.}
-  \item{\code{adaptive}}{Apply adaptive modal support and quadrature
+\item{\code{adaptive}}{Apply adaptive modal support and quadrature
 selection. Defaults to \code{FALSE}.}
 \item{\code{simplify_Amn}}{When \code{FALSE} (default), solve the coupled
 pressure and normal-velocity boundary equations for liquid- or gas-filled
@@ -58,8 +58,8 @@ strong gas contrast or high acoustic size makes double precision unstable.}
 \item{\code{n_integration}}{Number of Gauss-Legendre integration points
 used to calculate angular overlap integrals for full liquid-filled
 solutions in either precision. With \code{adaptive = FALSE}, an explicit
-value is used as supplied and \code{NULL} selects automatic integration. With
-\code{adaptive = TRUE}, quadrature order is selected internally and an
+value is used as supplied and \code{NULL} selects automatic integration.
+With \code{adaptive = TRUE}, quadrature order is selected internally and an
 explicit value is ignored with a warning. Full gas solutions calculate
 overlaps from normalized expansion coefficients and do not use this
 quadrature count. Fixed quadrature must resolve the angular functions.
