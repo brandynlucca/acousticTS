@@ -21,7 +21,10 @@ ComplexMatrix fcms_bm_cpp(NumericVector ka, IntegerVector m_limit,
     int nf = std::max(ka.size(), m_limit.size());
     // Pad unused modes so callers retain their existing matrix dimensions.
     ComplexMatrix out(m_max + 1, nf);
-    std::fill(out.begin(), out.end(), Rcomplex{NA_REAL, NA_REAL});
+    Rcomplex missing_value;
+    missing_value.r = NA_REAL;
+    missing_value.i = NA_REAL;
+    std::fill(out.begin(), out.end(), missing_value);
     std::vector<double> j(m_max + 2), y(m_max + 2);
     for (int i = 0; i < nf; ++i) {
         if (i % 64 == 0) Rcpp::checkUserInterrupt();
