@@ -45,6 +45,7 @@
 ^R/.*\.audit-.*$
 ^R/.*\.bak-.*$
 ^scratch$
+^.scratch$
 ^Rplots
 ^src/.*\.(dll|o|mod)$
 ^tests/testthat/Rplots\.pdf$
