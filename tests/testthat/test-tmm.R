@@ -881,6 +881,9 @@ test_that(
       tmm_rebuild_prolate_support(object, 16L, 16L)
     )
 
+    reference_acoustics <-
+      enlarged[[length(enlarged)]]@model_parameters$TMM$parameters$acoustics
+
     for (i in seq_len(nrow(scatter_angles))) {
       body$theta_body <- theta_body
       body$phi_body <- phi_body
@@ -888,12 +891,13 @@ test_that(
       body$phi_scatter <- scatter_angles$phi_scatter[i]
 
       exact_raw <- prolate_spheroid_fbs(
-        acoustics = acoustics,
+        acoustics = reference_acoustics,
         body = body,
         medium = medium,
         integration_pts = quad,
         precision = "double",
-        Amn_method = "Amn_pressure_release"
+        Amn_method = "Amn_pressure_release",
+        adaptive = FALSE
       )
       exact_f <- (-2i / acoustics$k_sw) * exact_raw
       stored_f <- tmm_scattering(
@@ -906,7 +910,7 @@ test_that(
 
       finite_f <- tmm_finite_rigid_release_field(acoustics, body, "pressure_release")
       expect_equal(stored_f, finite_f, tolerance = 1e-10)
-      # Check separate degree and order growth against automatic PSMS ==========
+      # Compare enlarged fields against the same fixed-support PSMS reference ==
       previous <- NULL
       for (fitted in enlarged) {
         enlarged_f <- tmm_scattering(fitted,
@@ -962,6 +966,9 @@ test_that("Stored prolate rigid scattering preserves finite support and converge
     tmm_rebuild_prolate_support(object, 16L, 16L)
   )
 
+  reference_acoustics <-
+    enlarged[[length(enlarged)]]@model_parameters$TMM$parameters$acoustics
+
   for (i in seq_len(nrow(scatter_angles))) {
     body$theta_body <- theta_body
     body$phi_body <- phi_body
@@ -969,12 +976,13 @@ test_that("Stored prolate rigid scattering preserves finite support and converge
     body$phi_scatter <- scatter_angles$phi_scatter[i]
 
     exact_raw <- prolate_spheroid_fbs(
-      acoustics = acoustics,
+      acoustics = reference_acoustics,
       body = body,
       medium = medium,
       integration_pts = quad,
       precision = "double",
-      Amn_method = "Amn_fixed_rigid"
+      Amn_method = "Amn_fixed_rigid",
+      adaptive = FALSE
     )
     exact_f <- (-2i / acoustics$k_sw) * exact_raw
     stored_f <- tmm_scattering(
@@ -987,7 +995,7 @@ test_that("Stored prolate rigid scattering preserves finite support and converge
 
     finite_f <- tmm_finite_rigid_release_field(acoustics, body, "fixed_rigid")
     expect_equal(stored_f, finite_f, tolerance = 1e-10)
-    # Check degree and order enlargement before comparison with automatic PSMS =
+    # Compare enlarged fields against the same fixed-support PSMS reference ====
     previous <- NULL
     for (fitted in enlarged) {
       enlarged_f <- tmm_scattering(fitted,

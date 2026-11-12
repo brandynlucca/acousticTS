@@ -1324,7 +1324,7 @@ test_that("adaptive quad PSMS preserves frequency vectors and scalar results", {
 
 test_that("adaptive quad PSMS preserves simulation grids and generated inputs", {
   skip_if_not(acousticTS:::.quad_precision_available())
-  withr::local_seed(1379)
+  set.seed(1379)
   object <- gas_generate(
     prolate_spheroid(length_body = 0.02, radius_body = 0.002),
     density_fluid = 1.24, sound_speed_fluid = 345
