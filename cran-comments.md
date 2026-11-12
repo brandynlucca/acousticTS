@@ -1,18 +1,8 @@
-## Resubmission
-
-This resubmission addresses the `CRAN URL not in canonical form` NOTE that was triggered by `README.md`. The offending link has been replaced with the requested canonical form. 
-
-### R CMD check results
-
-0 errors | 0 warnings | 0 notes
-
-Other validation checks: all successful checks below in the original submission still apply.
-
 ## Submission
 
-This is a maintenance update to acousticTS, version 2.0.8
+This is a maintenance update to acousticTS, version 2.1.0
 
-This release corrects numerical edge cases in Bessel functions, spheroidal angular function indexing, and SVD solvers. It also improves numerical stability and compiler portability, and expands regression test coverage.
+This release provides robust changes to the C++ and Fortran backends for the modal series solution for prolate spheroids (`PSMS`) and related T-matrix methods (`TMM`). It also improves numerical stability and compiler portability, and expands regression test coverage.
 
 ## R CMD check results
 
@@ -69,4 +59,4 @@ Other validation checks:
 
 ## Reverse dependencies
 
-There are currently no downstream dependencies for this package. Checked on 2026-10-08.
+There are currently no downstream dependencies for this package. Checked on 2026-11-12.

@@ -1,3 +1,22 @@
+# acousticTS 2.1.0
+* Streamlined API for shape editing for prolate spheroid and other 
+  canonical geometries.
+* Added C++ backends for KRM, FCMS, and SOEMS for more consistent   
+  handling across the board for modal series solutions (which includes the low ka breathing mode for the KRM).
+* Modified the modal series solution for prolate spheroids to use an 
+  entirely new algorithm and workflow that incorporates Robin boundary operators, pre-conditioned GMRES, LU pivot solver bounds, adaptive mode truncation and enlargement, among other changes.
+* Tweaked the various compilation-related files (e.g., configure) and   
+  memory handling of various Fortran/C++-based models.
+
+# acousticTS 2.0.8
+
+* Addressed segfault errors in backends for specific platforms.
+* Performance enhancements for the C++ backend, particularly for `TMM`  
+  and `PSMS`.
+* Round out and streamline reforge methods for `Shape`-class objects.
+* Flesh out documentation.
+* Fix `SBF`/`BBF` plotting bug.
+
 # acousticTS 2.0.7
 
 * Correct cylindrical Bessel functions on the imaginary axis and the upper side of the negative real axis branch cut.
