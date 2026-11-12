@@ -44,7 +44,8 @@ jobs:
     if: ${{ needs.setup.outputs.containers != '[]' }}
     runs-on: ubuntu-latest
     name: ${{ matrix.config.label }}
-    timeout-minutes: 60
+    # Valgrind instrumentation routinely needs more than one hour.
+    timeout-minutes: ${{ matrix.config.label == 'valgrind' && 360 || 60 }}
     env:
       OMP_NUM_THREADS: 1
       OPENBLAS_NUM_THREADS: 1
@@ -65,6 +66,102 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      - name: Provision and verify Flang binary128 math
+        if: ${{ matrix.config.label == 'clang21' || matrix.config.label == 'clang22' }}
+        shell: bash
+        env:
+          RHUB_PLATFORM: ${{ matrix.config.label }}
+        run: |
+          set -euo pipefail
+
+          case "$RHUB_PLATFORM" in
+            clang21)
+              version=21.1.8
+              source_sha256=4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142
+              ;;
+            clang22)
+              version=22.1.8
+              source_sha256=922f1817a0df7b1489272d18134ee0087a8b068828f87ac63b9861b1a9965888
+              ;;
+          esac
+
+          read -r -a fc <<< "$(R CMD config FC)"
+          read -r -a cxx <<< "$(R CMD config CXX17)"
+          read -r -a cxx_standard <<< "$(R CMD config CXX17STD)"
+          read -r -a flibs <<< "$(R CMD config FLIBS)"
+          "${fc[@]}" --version | grep -F "flang version $version "
+
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -y
+          apt-get install -y --no-install-recommends \
+            cmake ninja-build python3 gcc g++ gfortran libquadmath0 xz-utils
+
+          work="$RUNNER_TEMP/acousticts-flang-quad-${version}"
+          mkdir -p "$work"
+          source_name="llvm-project-${version}.src"
+          source_archive="$work/${source_name}.tar.xz"
+          source_url="https://github.com/llvm/llvm-project/releases/download/llvmorg-${version}/${source_name}.tar.xz"
+          curl --fail --location --silent --show-error --retry 5 \
+            "$source_url" --output "$source_archive"
+          printf '%s  %s\n' "$source_sha256" "$source_archive" | sha256sum --check
+          tar -xJf "$source_archive" -C "$work" \
+            "$source_name/cmake" "$source_name/llvm/cmake" \
+            "$source_name/runtimes" "$source_name/flang" "$source_name/flang-rt"
+
+          # Use upstream math sources and libstdc++ headers for __float128.
+          cmake -S "$work/$source_name/runtimes" -B "$work/build" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
+            -DCMAKE_Fortran_COMPILER=gfortran \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DLLVM_ENABLE_RUNTIMES=flang-rt \
+            -DFLANG_RUNTIME_F128_MATH_LIB=libquadmath \
+            -DLLVM_INCLUDE_TESTS=OFF -DFLANG_RT_INCLUDE_TESTS=OFF
+          cmake --build "$work/build" --target flang_rt.quadmath --parallel 2
+
+          mapfile -t math_archives < <(
+            find "$work/build" -type f -name libflang_rt.quadmath.a
+          )
+          test "${#math_archives[@]}" -eq 1
+          core_runtime="$("${cxx[@]}" -print-file-name=libflang_rt.runtime.a)"
+          test -f "$core_runtime"
+          math_runtime="${core_runtime%/*}/libflang_rt.quadmath.a"
+          install -m 644 "${math_archives[0]}" "$math_runtime"
+          nm -g --defined-only "$math_runtime" > "$work/math-symbols.txt"
+          grep -F ' _FortranALog10F128' "$work/math-symbols.txt"
+
+          cat > "$work/quad-probe.f90" <<'EOF'
+          function acousticts_quad_probe(value) result(status) bind(C)
+            use, intrinsic :: iso_c_binding, only: c_double, c_int
+            integer, parameter :: quad_kind = selected_real_kind(33)
+            real(c_double), intent(in) :: value
+            integer(c_int) :: status
+            real(quad_kind) :: argument, tolerance
+            argument = real(value, quad_kind)
+            tolerance = 8 * epsilon(argument)
+            status = 1
+            if (abs(log10(argument) - &
+                0.3010299956639811952137388947244930267681898814621_quad_kind) <= tolerance .and. &
+                abs(sqrt(argument) - &
+                1.4142135623730950488016887242096980785696718753769_quad_kind) <= tolerance) status = 0
+          end function acousticts_quad_probe
+          EOF
+          cat > "$work/quad-probe.cpp" <<'EOF'
+          #include <cstdlib>
+          extern "C" int acousticts_quad_probe(const double*);
+          int main(int argc, char** argv) {
+              if (argc != 2) return 2;
+              const double value = std::strtod(argv[1], nullptr);
+              return acousticts_quad_probe(&value);
+          }
+          EOF
+          "${fc[@]}" -O2 -c "$work/quad-probe.f90" -o "$work/quad-probe.o"
+          "${cxx[@]}" "${cxx_standard[@]}" \
+            "$work/quad-probe.cpp" "$work/quad-probe.o" \
+            "$math_runtime" "$core_runtime" -lquadmath "${flibs[@]}" \
+            -o "$work/quad-probe"
+          "$work/quad-probe" 2
+          echo 'Flang binary128 LOG10 and SQRT passed the numerical probe.'
       - uses: r-hub/actions/run-check@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
