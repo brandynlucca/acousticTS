@@ -1467,3 +1467,148 @@ test_that("adaptive quad gas agrees with independently enlarged references", {
       20 * log10(Mod(-2i / wavenumber * reference))), 1e-8)
   }
 })
+
+test_that("PSMS batch eligibility preserves mixed precision row results", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520
+  )
+  parameters <- list(
+    theta = c(0.2, 0.7), boundary = "pressure_release",
+    precision = c("double", "quad"), adaptive = TRUE
+  )
+  frequency <- c(18000, 12000, 18000)
+  actual <- simulate_ts(object, frequency, "psms",
+    parameters = parameters, parallel = FALSE, verbose = FALSE
+  )$PSMS
+  grid <- expand.grid(theta = parameters$theta, precision = parameters$precision,
+    stringsAsFactors = FALSE
+  )
+  expect_identical(actual$theta, rep(grid$theta, each = length(frequency)))
+  expect_identical(actual$precision, rep(grid$precision, each = length(frequency)))
+  expect_identical(actual$frequency, rep(frequency, nrow(grid)))
+  for (index in seq_len(nrow(grid))) {
+    reference_object <- fls_generate(prolate_spheroid(0.02, 0.002),
+      density_body = 1045, sound_speed_body = 1520, theta_body = grid$theta[index]
+    )
+    reference <- target_strength(reference_object, frequency, "psms",
+      boundary = "pressure_release", precision = grid$precision[index],
+      adaptive = TRUE
+    )@model$PSMS
+    rows <- (index - 1L) * length(frequency) + seq_along(frequency)
+    expect_equal(actual$f_bs[rows], reference$f_bs, tolerance = 1e-13)
+    expect_equal(actual$TS[rows], reference$TS, tolerance = 1e-11)
+  }
+  parameters$precision <- "double"
+  unbatched <- simulate_ts(object, frequency, "psms",
+    parameters = parameters, parallel = FALSE, verbose = FALSE
+  )$PSMS
+  expect_identical(unbatched$f_bs, actual$f_bs[actual$precision == "double"])
+})
+
+test_that("PSMS batch failures preserve independent scalar solutions", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520
+  )
+  frequency <- c(18000, 12000)
+  parameters <- list(theta = c(0.2, 0.7), boundary = "pressure_release",
+    precision = "quad", adaptive = TRUE
+  )
+  reference <- lapply(parameters$theta, function(theta) {
+    scalar_object <- fls_generate(prolate_spheroid(0.02, 0.002),
+      density_body = 1045, sound_speed_body = 1520, theta_body = theta
+    )
+    target_strength(scalar_object, frequency, "psms",
+      boundary = "pressure_release", precision = "quad", adaptive = TRUE
+    )@model$PSMS
+  })
+  evaluate_failure <- function(failure) {
+    calls <- 0L
+    local_mocked_bindings(
+      prolate_spheroid_rigid_release_batch = function(...) {
+        calls <<- calls + 1L
+        failure()
+      },
+      .package = "acousticTS"
+    )
+    actual <- simulate_ts(object, frequency, "psms",
+      parameters = parameters, parallel = FALSE, verbose = FALSE
+    )$PSMS
+    expect_identical(calls, 1L)
+    expect_identical(actual$frequency, rep(frequency, 2L))
+    expect_identical(actual$theta, rep(parameters$theta, each = 2L))
+    expect_equal(actual$f_bs, unlist(lapply(reference, `[[`, "f_bs")),
+      tolerance = 1e-13
+    )
+    expect_equal(actual$TS, unlist(lapply(reference, `[[`, "TS")), tolerance = 1e-11)
+  }
+  evaluate_failure(function() stop("Unavailable shared-state solve"))
+  evaluate_failure(function() matrix(0, 2L, 2L))
+  evaluate_failure(function() matrix(0i, 1L, 2L))
+})
+
+test_that("PSMS batch state mismatches retain distinct physical inputs", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520
+  )
+  parameters <- list(theta = c(0.2, 0.7), sound_speed_sw = c(1470, 1500),
+    boundary = "pressure_release", precision = "quad", adaptive = TRUE
+  )
+  reference <- simulate_ts(object, 12000, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )$PSMS
+  shared_calls <- 0L
+  local_mocked_bindings(
+    .psms_simulation_batch_plan = function(object, frequency, parameters,
+                                          simulation_grid, parallel) {
+      list(seq_len(nrow(simulation_grid)))
+    },
+    prolate_spheroid_rigid_release_batch = function(...) {
+      shared_calls <<- shared_calls + 1L
+      stop("Incompatible initialized states reached the shared solver")
+    },
+    .package = "acousticTS"
+  )
+  actual <- simulate_ts(object, 12000, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )$PSMS
+  expect_equal(actual, reference, tolerance = 1e-13)
+  expect_identical(actual$sound_speed_sw, rep(c(1470, 1500), each = 2L))
+  expect_gt(length(unique(actual$f_bs)), 1L)
+  expect_identical(shared_calls, 0L)
+})
+test_that("PSMS batch worker scheduling restores original grid order", {
+  skip_on_cran()
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520
+  )
+  original <- object
+  frequency <- c(18000, 12000, 18000)
+  parameters <- list(theta = c(0.2, 0.7, 0.4, 1.1, 0.9),
+    boundary = "pressure_release", precision = "quad", adaptive = TRUE
+  )
+  reference <- simulate_ts(object, frequency, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )$PSMS
+  planned <- FALSE
+  local_mocked_bindings(
+    .psms_simulation_batch_plan = function(object, frequency, parameters,
+                                          simulation_grid, parallel) {
+      expect_true(parallel)
+      planned <<- TRUE
+      list(c(4L, 2L), c(5L, 1L), 3L)
+    },
+    .package = "acousticTS"
+  )
+  actual <- simulate_ts(object, frequency, "psms", parameters = parameters,
+    parallel = TRUE, n_cores = 2L, verbose = FALSE
+  )$PSMS
+  expect_true(planned)
+  expect_identical(actual$theta, rep(parameters$theta, each = length(frequency)))
+  expect_identical(actual$frequency, rep(frequency, length(parameters$theta)))
+  expect_equal(actual, reference, tolerance = 1e-13)
+  expect_identical(object, original)
+})

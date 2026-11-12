@@ -1721,3 +1721,23 @@ test_that(
     expect_true(any(grepl("Simulations complete!", verbose_run, fixed = TRUE)))
   }
 )
+
+test_that("simulation rejects batch plans with omitted or duplicate rows", {
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520
+  )
+  check_plan <- function(plan) {
+    local_mocked_bindings(
+      .psms_simulation_batch_plan = function(...) plan,
+      .package = "acousticTS"
+    )
+    expect_error(simulate_ts(object, 12000, "psms",
+      parameters = list(theta = c(0.2, 0.7)),
+      parallel = FALSE, verbose = FALSE
+    ), "batch plan did not cover the grid exactly", fixed = TRUE)
+  }
+  check_plan(list(1L))
+  check_plan(list(c(1L, 1L), 2L))
+  check_plan(list(c(1L, 3L)))
+  check_plan(1:2)
+})

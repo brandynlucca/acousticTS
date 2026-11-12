@@ -479,3 +479,37 @@ test_that("ECMS enforces required elastic inputs and limited-angle scope", {
     "requires scatterer to be shape-type 'Cylinder'"
   )
 })
+
+test_that("cylinder continuation follows integer-order Bessel identities", {
+  arguments <- c(-0.3, 1.7, -8)
+  limits <- c(2L, 4L)
+  for (rigid in c(FALSE, TRUE)) {
+    actual <- acousticTS:::fcms_bm_cpp(arguments, limits, rigid)
+    expect_identical(dim(actual), c(5L, 3L))
+    for (index in seq_along(arguments)) {
+      orders <- 0:limits[(index - 1L) %% length(limits) + 1L]
+      argument <- abs(arguments[index])
+      j <- besselJ(argument, orders)
+      y <- besselY(argument, orders)
+      if (rigid) {
+        j <- orders / argument * j - besselJ(argument, orders + 1L)
+        y <- orders / argument * y - besselY(argument, orders + 1L)
+      }
+      reference <- j / (j + 1i * y)
+      if (arguments[index] < 0) reference <- -Conj(reference)
+      expect_equal(actual[orders + 1L, index], reference, tolerance = 2e-13)
+      unused <- setdiff(seq_len(nrow(actual)), orders + 1L)
+      expect_true(all(is.na(actual[unused, index])))
+    }
+  }
+})
+
+test_that("cylinder compiled coefficients reject invalid modal inputs", {
+  coefficients <- acousticTS:::fcms_bm_cpp
+  for (rigid in c(FALSE, TRUE)) {
+    expect_error(coefficients(numeric(), 2L, rigid), "must be non-empty")
+    expect_error(coefficients(1, integer(), rigid), "must be non-empty")
+    expect_error(coefficients(1, c(2L, -1L), rigid), "non-negative integers")
+    expect_error(coefficients(1, c(2L, NA_integer_), rigid), "non-negative integers")
+  }
+})
